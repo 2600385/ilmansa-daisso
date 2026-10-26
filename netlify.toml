@@ -1,0 +1,4 @@
+# 화면 파일(index.html)만 공개합니다. 원본 코드와 설정 SQL은 올리지 않습니다.
+[build]
+  command = "mkdir -p dist && cp index.html dist/"
+  publish = "dist"

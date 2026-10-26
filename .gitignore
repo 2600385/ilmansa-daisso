@@ -2,3 +2,4 @@ preview.html
 __pycache__/
 .DS_Store
 .netlify/
+dist/
