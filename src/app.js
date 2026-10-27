@@ -158,8 +158,8 @@ function track(type,target){try{api.track(type,target);}catch(e){}}
 /* ---------- 도우미 ---------- */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function byId(id){for(var i=0;i<S.tools.length;i++){if(S.tools[i].id===id)return S.tools[i];}return null;}
-function areaLabel(id){for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
-function inPlace(t,p){return p==='none'||p==='all'||t.kind==='edu'||t.tags.indexOf(p)>=0;}
+function areaLabel(id){if(id==='month')return '이달의 주요 이슈';for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
+function inPlace(t,p){if(p==='month')return !!t.month;return p==='none'||p==='all'||t.kind==='edu'||t.tags.indexOf(p)>=0;}
 function inNeed(t,n){return n==='none'||n==='all'||t.kind===n;}
 function say(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){S.toast='';render();},2800);}
 function fail(e){console.error(e);say((e&&e.message)||'처리하지 못했어요. 잠시 뒤 다시 시도해 주세요.');render();}
@@ -241,7 +241,9 @@ function vTools(){
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
-  h+='</div><div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
+  var mOn=S.place==='month'&&!S.favOnly,mN=activeTools().filter(function(t){return t.month;}).length;
+  h+='</div><button type="button" class="issue-chip'+(mOn?' on':'')+'" data-act="place" data-v="month" aria-pressed="'+mOn+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈<span class="n">'+mN+'</span></button>';
+  h+='<div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
@@ -282,7 +284,7 @@ function vResults(){
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
-  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-doc">이달의 공략</span>':'')+'</div>'+
+  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
     '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="meta">'+esc(t.tags.map(areaLabel).join(' · '))+' · 만든 사람 '+esc(t.by)+'</div><div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
@@ -451,7 +453,7 @@ function vToolAdmin(){
   h+='<div class="grid">';
   list.forEach(function(t){
     var op=t.file?(/\.pdf$/i.test(t.file)?'PDF':'파일'):t.url?'주소':'';
-    h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-doc">이달의 공략</span>':'')+'</div></div>'+
+    h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div></div>'+
       '<h3>'+esc(t.name)+'</h3><div class="meta">'+esc(t.tags.map(areaLabel).join('·')||'전체')+' · 열기: '+(op?'<b>'+op+'</b>':'<b style="color:#8A4B12">주소 미등록</b>')+' · '+esc(t.by)+'</div>'+
       '<button type="button" class="vis-sw'+(t.active?' on':'')+'" data-act="toggleActive" data-v="'+t.id+'" aria-pressed="'+t.active+'"><span class="knob" aria-hidden="true"></span>MR 화면에 보이기</button>'+
       '<div class="acts"><button type="button" class="btn btn-line" data-act="editTool" data-v="'+t.id+'">수정</button><button type="button" class="btn btn-ghost" data-act="delAsk" data-v="tool:'+t.id+'">삭제</button></div></article>';});
@@ -554,7 +556,7 @@ function vModal(){
         (v.file?'<span class="muted" style="font-size:13px">지금 등록된 파일: '+esc(v.file.replace(/^\d+-/,''))+' · 새 파일을 고르면 바뀝니다</span>':'')+(LIVE?'':'<span class="muted" style="font-size:13px">미리보기 모드에서는 파일을 올릴 수 없어요</span>')+'</div>'+
       '<div class="fg full"><label class="lb" for="fDesc">MR에게 보이는 설명</label><input id="fDesc" class="field" value="'+esc(v.desc)+'"></div>'+
       '<div class="fg full"><span class="lb">어디 갈 때 쓰나요? (여러 개 선택)</span><div class="checks">'+placeOptions(v.tags)+'</div></div>'+
-      '<div class="fg full"><div class="checks"><label class="chk"><input id="fMonth" type="checkbox"'+(v.month?' checked':'')+'> 이달의 공략에 올리기</label>'+
+      '<div class="fg full"><div class="checks"><label class="chk"><input id="fMonth" type="checkbox"'+(v.month?' checked':'')+'> 이달의 주요 이슈에 올리기</label>'+
       '<label class="chk"><input id="fDoc" type="checkbox"'+(v.doctor?' checked':'')+'> 원장님께 보여드려도 돼요 (거래처 모드에 나옴)</label>'+
       '<label class="chk"><input id="fActive" type="checkbox"'+(v.active?' checked':'')+'> MR 화면에 보이기</label></div></div>'+
       '<div class="fg full"><label class="lb" for="fPub">원장님께 보이는 설명</label><input id="fPub" class="field" value="'+esc(v.pub)+'" placeholder="거래처 모드 카드에 나오는 문장. 비우면 위 설명을 씁니다"></div></div>',true);

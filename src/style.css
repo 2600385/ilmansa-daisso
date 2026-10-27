@@ -389,3 +389,11 @@ button.ic:hover{border-color:var(--navy)}
   .rail-i .rl{display:none}
   .rail-i.on .rl{display:-webkit-box;max-width:140px}
 }
+
+/* 이달의 주요 이슈 */
+.issue-chip{display:inline-flex;align-items:center;gap:8px;min-height:62px;padding:0 22px;border-radius:16px;border:1.5px dashed #F2B48A;background:#FFF4EC;color:#C2410C;font-size:17px;font-weight:700}
+.issue-chip .n{font-size:13px;opacity:.7}
+.issue-chip:hover{border-style:solid}
+.issue-chip.on{background:#C2410C;border:1.5px solid #C2410C;color:#FFFFFF}
+.tag.a-issue{background:#FFF4EC;color:#C2410C}
+@media (max-width:640px){.issue-chip{min-height:48px;width:100%;justify-content:center}}
