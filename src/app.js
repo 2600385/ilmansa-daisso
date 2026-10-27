@@ -192,13 +192,13 @@ function vLogin(){
   return '<div class="login wrap"><form id="loginForm" novalidate>'+
     '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px">'+
       '<h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
-      '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p>'+
-      '<p style="margin:0;font-size:14px;color:var(--sub);text-align:center">일만사·웰체크 업무에 필요한 자료,<br>여기서 바로 찾아 쓰세요.</p></div>'+
+      '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p></div>'+
     '<div class="fg"><label class="lb" for="empId">사번</label><input id="empId" class="field" inputmode="numeric" autocomplete="username" placeholder="사번을 입력하세요"></div>'+
     '<label class="chk"><input id="keep" type="checkbox" checked> 이 기기에서 로그인 유지</label>'+
     (LIVE?'':'<label class="chk"><input id="asAdmin" type="checkbox"> 관리자 화면까지 미리보기 <span class="preview-flag">미리보기 전용</span></label>')+
     (S.loginErr?'<div role="alert" style="color:var(--warn);font-size:14px;font-weight:700;text-align:center">'+esc(S.loginErr)+'</div>':'')+
     '<button class="btn btn-primary" type="submit" style="min-height:54px;font-size:19px"'+(S.busy?' disabled':'')+'>'+(S.busy?'들어가는 중…':'들어가기')+'</button>'+
+    '<p style="margin:4px 0 0;font-size:14px;color:var(--sub);text-align:center">일만사·웰체크 업무에 필요한 자료, 여기서 바로 찾아 쓰세요.</p>'+
     (LIVE?'':'<div style="font-size:12px;color:var(--warn);text-align:center">미리보기 모드: 아무 사번이나 넣어도 들어가지고, 저장되지 않습니다.</div>')+
   '</form></div>';
 }
