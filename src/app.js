@@ -13,10 +13,10 @@ var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'}];
-var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
+var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'site',label:'URL',c:'#4FA3B8'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'notice',label:'공문',c:'#8D72C9'},{id:'tool',label:'툴',c:'#5C7FC4'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
-var KIND={tool:'툴',site:'사이트',brochure:'브로셔',notice:'지침공문',edu:'교육자료'};
+var KIND={tool:'툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
 var STAGES=[{id:'s1',label:'초기 제안',no:'1단계'},{id:'s2',label:'기초 셋팅',no:'2단계'},{id:'s3',label:'일만사 시작·청구',no:'3단계'}];
 var REQ_STATUS=['접수','만드는 중','올림'];
 
@@ -193,13 +193,10 @@ function vLogin(){
       '<h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
       '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p></div>'+
     '<div class="fg"><label class="lb" for="empId">사번</label><input id="empId" class="field" inputmode="numeric" autocomplete="username" placeholder="사번을 입력하세요"></div>'+
-    (S.showPw?'<div class="fg"><label class="lb" for="empPw">관리자 비밀번호</label><input id="empPw" class="field" type="password" autocomplete="current-password"></div>':'')+
     '<label class="chk"><input id="keep" type="checkbox" checked> 이 기기에서 로그인 유지</label>'+
     (LIVE?'':'<label class="chk"><input id="asAdmin" type="checkbox"> 관리자 화면까지 미리보기 <span class="preview-flag">미리보기 전용</span></label>')+
     (S.loginErr?'<div role="alert" style="color:var(--warn);font-size:14px;font-weight:700;text-align:center">'+esc(S.loginErr)+'</div>':'')+
     '<button class="btn btn-primary" type="submit" style="min-height:54px;font-size:19px"'+(S.busy?' disabled':'')+'>'+(S.busy?'들어가는 중…':'들어가기')+'</button>'+
-    '<div style="font-size:13px;color:var(--sub);text-align:center">처음이라 들어가지지 않으면 담당 CM에게 사번 등록을 요청해 주세요.</div>'+
-    '<button type="button" class="btn btn-ghost" data-act="togglePw" style="align-self:center">'+(S.showPw?'MR 로그인으로':'관리자 로그인')+'</button>'+
     (LIVE?'':'<div style="font-size:12px;color:var(--warn);text-align:center">미리보기 모드: 아무 사번이나 넣어도 들어가지고, 저장되지 않습니다.</div>')+
   '</form></div>';
 }
@@ -227,10 +224,10 @@ function navBtn(id,label){return '<button type="button" data-act="page" data-v="
 function vTools(){
   var q=S.q.trim().toLowerCase();
   var idle=S.place==='none'&&S.need==='none'&&!q&&!S.favOnly;
-  var h='<div class="page wrap"><div class="layout"><div class="main">';
+  var h='<div class="page wrap">';
   h+='<section class="hero"><h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
      '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 툴과 자료를 한곳에 모았습니다. 필요할 때 바로 꺼내 쓰세요.</span></p>'+
-     '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이터, 투석, 청구)"></div></section>';
+     '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이션, 검체위수탁, 기관신고)"></div></section>';
   h+='<section class="blk"><div class="filters"><div class="fgroup" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
@@ -238,7 +235,6 @@ function vTools(){
   h+='</div><div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
-    if(!cnt&&!on&&n.id!=='all')return;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
   h+='</div></div>';
   var list=null,label='';
@@ -266,7 +262,7 @@ function vTools(){
   h+='</section>';
   h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
      '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
-  h+='</div><aside class="basket-side" aria-label="제안서">'+basketPanel()+'</aside></div></div>';
+  h+='</div>';
   return h+vBasketBar();
 }
 function vCard(t){
@@ -280,34 +276,19 @@ function vCard(t){
   if(!t.doctor){h+='<div class="note-in">내부용 자료라 거래처 모드에는 나오지 않아요</div>';}
   return h+'</article>';
 }
-function basketPanel(){
-  var n=S.basket.length;
-  var h='<div class="bk-panel"><div class="bk-head"><span class="bk-title">'+I.bag+'제안서</span><span class="bk-cnt">'+n+'</span></div>';
-  if(!n){
-    h+='<p class="bk-empty">원장님께 보여드릴 자료를 <b>"제안서에 담기"</b>로 담아두세요. 거래처에서 <b>거래처 제안서 모드</b>를 누르면 담은 순서대로 나옵니다.</p>';
-  }else{
-    h+='<div class="basket-list">';
-    S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
-      h+='<div class="bk-row"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
-        '<button type="button" class="icon-btn" data-act="bkUp" data-v="'+i+'" aria-label="위로"'+(i===0?' disabled':'')+'>'+I.up+'</button>'+
-        '<button type="button" class="icon-btn" data-act="bkDown" data-v="'+i+'" aria-label="아래로"'+(i===n-1?' disabled':'')+'>'+I.down+'</button>'+
-        '<button type="button" class="icon-btn" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></div>';});
-    h+='</div>';
-  }
-  h+='<div class="bk-opts"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
-    (n?'<button type="button" class="btn btn-ghost" data-act="basketClear">제안서 비우기</button>':'')+'</div>'+
-    '<button type="button" class="btn btn-primary bk-go" data-act="mode" data-v="clinic">거래처 제안서 모드로 '+I.arrow+'</button>';
-  return h+'</div>';
-}
+/* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
 function vBasketBar(){
-  var n=S.basket.length;
-  var h='<div class="basket-bar"><div class="wrap">';
-  if(S.basketOpen){h+=basketPanel()+'<button type="button" class="btn btn-ghost" data-act="basketOpen" style="width:100%">접기</button>';}
-  else{
-    h+='<div class="basket-in"><button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="false">'+I.bag+'제안서 '+n+'개 · '+(n?'순서 보기':'담는 방법')+'</button>'+
-      '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">제안서 모드로 '+I.arrow+'</button></div>';
-  }
-  return h+'</div></div>';
+  var n=S.basket.length;if(!n)return '';
+  var h='<div class="basket-bar"><div class="wrap"><div class="bk-line">'+
+    '<span class="bk-title">'+I.bag+'제안서 <span class="bk-cnt">'+n+'</span></span><ol class="bk-items">';
+  S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
+    h+='<li class="bk-item"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
+      (i>0?'<button type="button" class="mini" data-act="bkUp" data-v="'+i+'" aria-label="앞으로">'+I.up+'</button>':'')+
+      '<button type="button" class="mini" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></li>';});
+  h+='</ol><div class="bk-acts"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플</button>'+
+    '<button type="button" class="btn btn-ghost" data-act="basketClear">비우기</button>'+
+    '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">거래처 제안서 모드로 '+I.arrow+'</button></div></div></div></div>';
+  return h;
 }
 function vContacts(){
   var list=S.contacts.filter(function(c){return inPlace(c,S.place);});
@@ -617,7 +598,6 @@ document.addEventListener('click',function(e){
     case 'home':S.mode='prep';S.page='tools';S.present=-1;window.scrollTo(0,0);break;
     case 'logout':api.signOut();S.uid=null;S.me=null;S.basket=[];saveBasket();S.mode='prep';S.page='tools';S.stats=S.reqs=S.members=null;break;
     case 'pwModal':S.modal='pw';break;
-    case 'togglePw':S.showPw=!S.showPw;S.loginErr='';break;
     case 'place':S.place=S.place===v?'none':v;S.favOnly=false;break;
     case 'need':S.need=S.need===v?'none':v;S.favOnly=false;break;
     case 'favOnly':S.favOnly=!S.favOnly;break;
@@ -700,14 +680,13 @@ document.addEventListener('submit',async function(e){
   var f=e.target;if(S.busy)return;
   try{
     if(f.id==='loginForm'){
-      var emp=val('empId'),pwEl=document.getElementById('empPw'),pw=pwEl?pwEl.value:'';
+      var emp=val('empId');
       if(LIVE&&!emp){S.loginErr='사번을 넣어주세요.';render();return;}
-      if(LIVE&&S.showPw&&!pw){S.loginErr='관리자 비밀번호를 넣어주세요.';render();return;}
-      var byEmpOnly=!pw;if(byEmpOnly)pw=mrPw(emp);
+      var pw=mrPw(emp);
       var keepOn=checked('keep'),asAdmin=checked('asAdmin');
       S.busy=true;S.loginErr='';render();
       try{var uid=await api.signIn(emp,pw,keepOn,asAdmin);await afterLogin(uid);track('login',null);}
-      catch(err){S.loginErr=byEmpOnly?'등록되지 않은 사번이에요. 담당 CM에게 등록을 요청해 주세요. 관리자는 아래 "관리자 로그인"을 눌러주세요.':(err.message||'로그인하지 못했어요.');S.uid=null;}
+      catch(err){S.loginErr='등록되지 않은 사번이에요. 담당 CM에게 문의해 주세요.';S.uid=null;}
       S.busy=false;render();return;
     }
     if(f.id==='reqForm'){

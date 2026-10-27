@@ -248,3 +248,27 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 }
 .brand .bt,.brand .bs{white-space:nowrap}
 .btn svg{flex:none}
+
+/* 아래 제안서 막대 (담았을 때만) */
+.basket-bar{display:block}
+.bk-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bk-line .bk-title{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--navy);font-size:15px;white-space:nowrap}
+.bk-line .bk-cnt{min-width:22px;height:22px;font-size:12px;padding:0 6px}
+.bk-items{display:flex;gap:8px;margin:0;padding:0;list-style:none;flex:1;min-width:0;overflow-x:auto}
+.bk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 6px;border-radius:999px;background:var(--bg);border:1px solid var(--line);white-space:nowrap;flex:none}
+.bk-item .num{width:22px;height:22px;border-radius:11px;background:var(--navy);color:#FFFFFF;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.bk-item .nm{font-size:14px;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.mini{width:28px;height:28px;border-radius:14px;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;padding:0}
+.mini:hover{background:#E4E8EF}
+.mini svg{width:14px;height:14px}
+.bk-acts{display:flex;align-items:center;gap:6px;flex:none}
+@media (max-width:640px){
+  .bk-items{order:3;flex-basis:100%}
+  .bk-acts{margin-left:auto}
+  .bk-acts .btn-primary{padding:0 12px}
+}
+@media (max-width:640px){
+  .brand{flex:0 1 auto}
+  .who{margin-left:auto}
+  .who>span:first-child{display:none}
+}
