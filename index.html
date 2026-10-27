@@ -210,6 +210,54 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .brand{border:0;background:transparent;padding:0;text-align:left;cursor:pointer}
 .brand>span{display:flex;flex-direction:column}
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+
+/* 2단 배치: 왼쪽 목록, 오른쪽 제안서 칸 (PC) */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.main{display:flex;flex-direction:column;gap:28px;min-width:0}
+.basket-side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 88px)}
+.bk-panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 20px rgba(31,42,68,.06)}
+.bk-head{display:flex;align-items:center;justify-content:space-between}
+.bk-title{display:inline-flex;align-items:center;gap:8px;font-size:17px;font-weight:700;color:var(--navy)}
+.bk-cnt{min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:var(--navy);color:#FFFFFF;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.bk-empty{margin:0;font-size:14px;color:var(--muted);line-height:1.6;padding:14px;border-radius:12px;background:var(--bg)}
+.bk-opts{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bk-go{width:100%}
+.basket-bar{display:none}
+/* 분류 묶음 */
+.filters{display:flex;flex-wrap:wrap;gap:10px}
+.fgroup{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px;border-radius:16px;background:#E9EDF3}
+.flab{font-size:14px;font-weight:700;color:var(--muted);padding:0 8px 0 10px}
+.list-h{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px}
+.simple-sw.fav .st{color:#D9B25F;font-size:15px}
+.simple-sw.fav.on{color:var(--gold-ink)}.simple-sw.fav.on .knob{background:var(--gold)}
+.who{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .basket-side{display:none}
+  .basket-bar{display:block}
+  .basket-bar .bk-panel{box-shadow:none;border:0;padding:0 0 4px}
+}
+@media (max-width:640px){
+  .hero .logo,.hero .rainbow,.hero .sub{display:none}
+  .hero{padding:18px 16px;gap:10px}
+  .top-r{width:100%}
+  .flab{width:100%;padding:2px 6px}
+}
+.bk-panel .icon-btn{width:32px;height:32px;border-radius:8px}
+.bk-panel .bk-row{gap:6px;padding:8px}
+.bk-panel .nm{font-size:14px;line-height:1.4}
+.basket-bar .basket-in{flex-wrap:nowrap}
+.basket-bar .basket-in .btn-line{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){
+  .top-in{gap:8px}
+  .brand{flex:1}
+  .top-r{display:contents}
+  .who{order:1}
+  .top-in .mode{order:2;width:100%}
+  .who .btn{min-height:36px;padding:0 10px}
+}
+.brand .bt,.brand .bs{white-space:nowrap}
+.btn svg{flex:none}
 </style>
 </head>
 <body>
@@ -397,7 +445,7 @@ var I={
   copy:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>'
 };
 /* 시그니처 마크: 주황 네모 + 熊 (현황판과 같은 모양) */
-function signMark(){return '<svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="14" fill="#F47920"/><text x="50" y="70" text-anchor="middle" font-family="serif" font-size="62" font-weight="900" fill="#FFFFFF">熊</text></svg>';}
+function signMark(){return '<svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="#FFFFFF" stroke="#C9D2E3" stroke-width="6"/><text x="50" y="68" text-anchor="middle" font-family="serif" font-size="54" font-weight="900" fill="#F47920">熊</text></svg>';}
 function logo(){return '<span aria-hidden="true">일만사 다<span class="ss"><span class="top">있</span><span class="bot">있</span></span>소</span>';}
 function audTag(t){return t.doctor?'<span class="tag a-doc">'+I.screen+'원장님 화면용</span>':'<span class="tag a-in">'+I.lock+'내부용</span>';}
 function placeOptions(sel){return PLACES.filter(function(p){return p.id!=='all';}).map(function(a){return '<label class="chk"><input type="checkbox" name="tg" value="'+a.id+'"'+(sel.indexOf(a.id)>=0?' checked':'')+'> '+a.label+'</label>';}).join('');}
@@ -426,48 +474,42 @@ function vHeader(){
   var clinic=S.mode==='clinic',onAdmin=S.page==='admin';
   var h='<header class="top"><div class="wrap"><div class="top-in">';
   h+='<button type="button" class="brand" data-act="home" aria-label="처음 화면으로">'+signMark()+'<span><span class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</span><span class="bs">Daewoong</span></span></button>';
+  h+='<div class="top-r">'+(onAdmin?'':modeSwitch());
   if(!clinic){
-    h+='<div class="top-r"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
+    h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
        (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'툴·자료로':'관리자')+'</button>':'')+
-       '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></div>';
+       '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></span>';
   }
-  return h+'</div></div></header>';
+  return h+'</div></div></div></header>';
 }
 function modeSwitch(){
   var clinic=S.mode==='clinic';
   return '<div class="mode" role="group" aria-label="화면 모드">'+
     '<button type="button" data-act="mode" data-v="prep" class="'+(clinic?'':'on')+'" aria-pressed="'+!clinic+'">혼자 자료 찾는 중</button>'+
-    '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처에 와 있어요</button></div>';
+    '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처 제안서 모드</button></div>';
 }
 function navBtn(id,label){return '<button type="button" data-act="page" data-v="'+id+'" class="'+(S.page===id?'on':'')+'" aria-current="'+(S.page===id?'page':'false')+'">'+label+'</button>';}
 
 function vTools(){
   var q=S.q.trim().toLowerCase();
   var idle=S.place==='none'&&S.need==='none'&&!q&&!S.favOnly;
-  var h='<div class="page wrap">';
+  var h='<div class="page wrap"><div class="layout"><div class="main">';
   h+='<section class="hero"><h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
-     '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 툴과 자료를 한곳에 모았습니다. 필요할 때 바로 꺼내 쓰세요.</p>'+
+     '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 툴과 자료를 한곳에 모았습니다. 필요할 때 바로 꺼내 쓰세요.</span></p>'+
      '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이터, 투석, 청구)"></div></section>';
-  h+='<div class="toolbar">'+modeSwitch()+
-     '<button type="button" class="btn btn-gold'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'">'+(S.favOnly?'전체 툴 보기':'즐겨찾기한 툴만 보기')+'</button></div>';
-  h+='<section class="blk"><h2 style="margin:0;font-size:20px">지금 어디 가세요?</h2><div class="tabs">';
+  h+='<section class="blk"><div class="filters"><div class="fgroup" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
-  h+='</div><h2 style="margin:6px 0 0;font-size:20px">지금 뭐가 필요하세요?</h2><div class="tabs">';
+  h+='</div><div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
     if(!cnt&&!on&&n.id!=='all')return;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
-  h+='</div>';
-  if(idle){
-    h+='<div class="prompt"><b>가는 곳이나 필요한 걸 골라주세요</b><span class="muted">하나만 골라도 되고, 둘 다 고르면 딱 맞는 것만 꺼내드려요.</span></div>';
-  }else if(!S.favOnly&&S.need==='script'){
-    h+=vScripts();
-  }else if(!S.favOnly&&S.need==='contact'){
-    h+=vContacts();
-  }else{
-    var list=activeTools().filter(function(t){
+  h+='</div></div>';
+  var list=null,label='';
+  if(!idle&&!(!S.favOnly&&(S.need==='script'||S.need==='contact'))){
+    list=activeTools().filter(function(t){
       var hit=!q||(t.name+' '+t.desc+' '+t.by).toLowerCase().indexOf(q)>=0;
       if(S.favOnly)return !!S.favs[t.id]&&hit;
       return inPlace(t,S.place)&&inNeed(t,S.need)&&hit;
@@ -475,17 +517,23 @@ function vTools(){
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
-    h+='<div class="muted" style="font-size:14px">'+esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개</div>';
-    if(list.length&&!S.basket.length&&list.some(function(t){return t.doctor;})){
-      h+='<div class="guide">'+I.bag+'<div><b>원장님 뵙기 전에, 보여드릴 자료를 제안서에 담아두세요.</b><br>거래처에 도착해 "거래처에 와 있어요"를 누르면 담은 순서대로 나옵니다.</div></div>';
-    }
-    if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
-    else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
+    label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
   }
+  h+='<div class="list-h"><span class="muted" style="font-size:14px">'+label+'</span>'+
+     '<button type="button" class="simple-sw fav'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'"><span class="st" aria-hidden="true">★</span>즐겨찾기만<span class="knob" aria-hidden="true"></span></button></div>';
+  if(idle){
+    h+='<div class="prompt"><b>가는 곳이나 필요한 걸 골라주세요</b><span class="muted">하나만 골라도 되고, 둘 다 고르면 딱 맞는 것만 꺼내드려요.</span></div>';
+  }else if(!S.favOnly&&S.need==='script'){
+    h+=vScripts();
+  }else if(!S.favOnly&&S.need==='contact'){
+    h+=vContacts();
+  }else if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
+  else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
   h+='</section>';
   h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
      '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
-  return h+'</div>'+vBasketBar();
+  h+='</div><aside class="basket-side" aria-label="제안서">'+basketPanel()+'</aside></div></div>';
+  return h+vBasketBar();
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
@@ -498,21 +546,32 @@ function vCard(t){
   if(!t.doctor){h+='<div class="note-in">내부용 자료라 거래처 모드에는 나오지 않아요</div>';}
   return h+'</article>';
 }
-function vBasketBar(){
-  if(!S.basket.length)return '';
-  var h='<div class="basket-bar"><div class="wrap"><div class="basket-in">'+
-    '<button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="'+S.basketOpen+'">'+I.bag+'제안서 '+S.basket.length+'개 · '+(S.basketOpen?'접기':'순서 보기')+'</button>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-ghost" data-act="basketClear">제안서 비우기</button>'+
-    '<button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
-    '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">거래처 모드로 '+I.arrow+'</button></div></div>';
-  if(S.basketOpen){
+function basketPanel(){
+  var n=S.basket.length;
+  var h='<div class="bk-panel"><div class="bk-head"><span class="bk-title">'+I.bag+'제안서</span><span class="bk-cnt">'+n+'</span></div>';
+  if(!n){
+    h+='<p class="bk-empty">원장님께 보여드릴 자료를 <b>"제안서에 담기"</b>로 담아두세요. 거래처에서 <b>거래처 제안서 모드</b>를 누르면 담은 순서대로 나옵니다.</p>';
+  }else{
     h+='<div class="basket-list">';
     S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
-      h+='<div class="bk-row"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(t.name)+'</span>'+
+      h+='<div class="bk-row"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
         '<button type="button" class="icon-btn" data-act="bkUp" data-v="'+i+'" aria-label="위로"'+(i===0?' disabled':'')+'>'+I.up+'</button>'+
-        '<button type="button" class="icon-btn" data-act="bkDown" data-v="'+i+'" aria-label="아래로"'+(i===S.basket.length-1?' disabled':'')+'>'+I.down+'</button>'+
+        '<button type="button" class="icon-btn" data-act="bkDown" data-v="'+i+'" aria-label="아래로"'+(i===n-1?' disabled':'')+'>'+I.down+'</button>'+
         '<button type="button" class="icon-btn" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></div>';});
     h+='</div>';
+  }
+  h+='<div class="bk-opts"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
+    (n?'<button type="button" class="btn btn-ghost" data-act="basketClear">제안서 비우기</button>':'')+'</div>'+
+    '<button type="button" class="btn btn-primary bk-go" data-act="mode" data-v="clinic">거래처 제안서 모드로 '+I.arrow+'</button>';
+  return h+'</div>';
+}
+function vBasketBar(){
+  var n=S.basket.length;
+  var h='<div class="basket-bar"><div class="wrap">';
+  if(S.basketOpen){h+=basketPanel()+'<button type="button" class="btn btn-ghost" data-act="basketOpen" style="width:100%">접기</button>';}
+  else{
+    h+='<div class="basket-in"><button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="false">'+I.bag+'제안서 '+n+'개 · '+(n?'순서 보기':'담는 방법')+'</button>'+
+      '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">제안서 모드로 '+I.arrow+'</button></div>';
   }
   return h+'</div></div>';
 }
@@ -554,7 +613,6 @@ function clinicList(){
 function vClinic(){
   var list=clinicList();
   var sw='<span style="display:inline-flex;align-items:center;gap:4px"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
-    '<button type="button" class="simple-sw" data-act="mode" data-v="prep">준비 화면으로</button>'+
     '<button type="button" class="simple-sw" data-act="endVisit">제안 마치기</button></span>';
   var h='<div class="clinic"><div class="wrap">';
   if(S.simple){h+='<div class="clinic-simple">'+sw+'</div>';}
@@ -883,6 +941,12 @@ async function doDelete(key){
   }catch(e){fail(e);}
 }
 document.addEventListener('input',function(e){
+  var t=e.target;
+  if(e.isComposing&&(t.id==='q'||t.id==='hosp'))return; /* 한글 조합 중에는 다시 그리지 않음 */
+  if(t.id==='q'){S.q=t.value;render();}
+  else if(t.id==='hosp'){S.hospital=t.value;render();}
+});
+document.addEventListener('compositionend',function(e){
   var t=e.target;
   if(t.id==='q'){S.q=t.value;render();}
   else if(t.id==='hosp'){S.hospital=t.value;render();}
