@@ -14,7 +14,7 @@ var EMAIL_DOMAIN = '@daisso.internal';
 /* ---------- 고정 분류 ---------- */
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'},{id:'all',label:'전체',c:'#8C99B3'}];
 var NEEDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
-/* 사번만으로 로그인: 등록된 사번이면 들어감. 내부 비밀번호는 사번에서 만들어 씀 */
+/* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
 var KIND={tool:'툴',site:'사이트',brochure:'브로셔',notice:'지침공문'};
 var STAGES=[{id:'s1',label:'초기 제안',no:'1단계'},{id:'s2',label:'기초 셋팅',no:'2단계'},{id:'s3',label:'일만사 시작·청구',no:'3단계'}];
@@ -188,11 +188,13 @@ function vLogin(){
       '<h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
       '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p></div>'+
     '<div class="fg"><label class="lb" for="empId">사번</label><input id="empId" class="field" inputmode="numeric" autocomplete="username" placeholder="사번을 입력하세요"></div>'+
+    (S.showPw?'<div class="fg"><label class="lb" for="empPw">관리자 비밀번호</label><input id="empPw" class="field" type="password" autocomplete="current-password"></div>':'')+
     '<label class="chk"><input id="keep" type="checkbox" checked> 이 기기에서 로그인 유지</label>'+
     (LIVE?'':'<label class="chk"><input id="asAdmin" type="checkbox"> 관리자 화면까지 미리보기 <span class="preview-flag">미리보기 전용</span></label>')+
     (S.loginErr?'<div role="alert" style="color:var(--warn);font-size:14px;font-weight:700;text-align:center">'+esc(S.loginErr)+'</div>':'')+
     '<button class="btn btn-primary" type="submit" style="min-height:54px;font-size:19px"'+(S.busy?' disabled':'')+'>'+(S.busy?'들어가는 중…':'들어가기')+'</button>'+
-    '<div style="font-size:13px;color:var(--sub);text-align:center">등록된 사번이면 바로 들어갑니다. 안 들어가지면 담당 CM에게 문의해 주세요.</div>'+
+    '<div style="font-size:13px;color:var(--sub);text-align:center">처음이라 들어가지지 않으면 담당 CM에게 사번 등록을 요청해 주세요.</div>'+
+    '<button type="button" class="btn btn-ghost" data-act="togglePw" style="align-self:center">'+(S.showPw?'MR 로그인으로':'관리자 로그인')+'</button>'+
     (LIVE?'':'<div style="font-size:12px;color:var(--warn);text-align:center">미리보기 모드: 아무 사번이나 넣어도 들어가지고, 저장되지 않습니다.</div>')+
   '</form></div>';
 }
@@ -206,6 +208,7 @@ function vHeader(){
      '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처에 와 있어요</button></div>';
   if(!clinic){
     h+='<span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
+       (isAdmin()?'<button type="button" class="btn btn-ghost" data-act="pwModal">비밀번호 변경</button>':'')+
        '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button>';
   }
   h+='</div></div>';
@@ -434,7 +437,7 @@ function vUsers(){
   if(!S.members)return h+loading();
   h+='<div class="tbl-box"><table><thead><tr><th>사번</th><th>이름</th><th>사업부</th><th>사무소</th><th>권한</th><th></th></tr></thead><tbody>';
   S.members.forEach(function(m){h+='<tr><td>'+esc(m.emp_no)+'</td><td>'+esc(m.name)+'</td><td>'+esc(m.division)+'</td><td>'+esc(m.office)+'</td><td>'+(m.role==='admin'?'관리자':'MR')+'</td>'+
-    '<td style="white-space:nowrap"><button type="button" class="btn btn-line" data-act="editUser" data-v="'+esc(m.emp_no)+'" style="min-height:36px">수정</button>'+(S.me&&m.emp_no===S.me.emp_no?'':' <button type="button" class="btn btn-ghost" data-act="delAsk" data-v="user:'+esc(m.emp_no)+'">삭제</button>')+'</td></tr>';});
+    '<td style="white-space:nowrap"><button type="button" class="btn btn-line" data-act="editUser" data-v="'+esc(m.emp_no)+'" style="min-height:36px">수정·비밀번호</button>'+(S.me&&m.emp_no===S.me.emp_no?'':' <button type="button" class="btn btn-ghost" data-act="delAsk" data-v="user:'+esc(m.emp_no)+'">삭제</button>')+'</td></tr>';});
   return h+'</tbody></table></div>';
 }
 
@@ -498,7 +501,8 @@ function vModal(){
       '<div class="fg"><label class="lb" for="uName">이름</label><input id="uName" class="field" value="'+esc(uv.name)+'"></div>'+
       '<div class="fg"><label class="lb" for="uDiv">사업부</label><input id="uDiv" class="field" value="'+esc(uv.division)+'"></div>'+
       '<div class="fg"><label class="lb" for="uOff">사무소</label><input id="uOff" class="field" value="'+esc(uv.office)+'"></div>'+
-      '<div class="fg"><label class="lb" for="uRole">권한</label><select id="uRole" class="field"><option value="mr"'+(uv.role==='mr'?' selected':'')+'>MR</option><option value="admin"'+(uv.role==='admin'?' selected':'')+'>관리자</option></select></div></div>',true);
+      '<div class="fg"><label class="lb" for="uRole">권한</label><select id="uRole" class="field"><option value="mr"'+(uv.role==='mr'?' selected':'')+'>MR</option><option value="admin"'+(uv.role==='admin'?' selected':'')+'>관리자</option></select></div>'+
+      '<div class="fg"><label class="lb" for="uPw">관리자 비밀번호 (관리자 권한일 때만, 6자 이상)</label><input id="uPw" class="field" type="text" autocomplete="off"></div></div>',true);
   }
   if(m==='bulk'){
     return modalWrap('bulkForm','명단 한 번에 넣기','<p class="muted" style="margin:0;font-size:14px">엑셀에서 <b>사번, 이름, 사업부, 사무소</b> 네 칸을 순서대로 복사해 붙여넣으세요. 한 줄에 한 명입니다.</p>'+
@@ -587,6 +591,7 @@ document.addEventListener('click',function(e){
     case 'page':S.page=v;window.scrollTo(0,0);if(v==='admin')loadAdmin();break;
     case 'logout':api.signOut();S.uid=null;S.me=null;S.basket=[];saveBasket();S.mode='prep';S.page='tools';S.stats=S.reqs=S.members=null;break;
     case 'pwModal':S.modal='pw';break;
+    case 'togglePw':S.showPw=!S.showPw;S.loginErr='';break;
     case 'place':S.place=S.place===v?'none':v;S.favOnly=false;break;
     case 'need':S.need=S.need===v?'none':v;S.favOnly=false;break;
     case 'favOnly':S.favOnly=!S.favOnly;break;
@@ -661,13 +666,14 @@ document.addEventListener('submit',async function(e){
   var f=e.target;if(S.busy)return;
   try{
     if(f.id==='loginForm'){
-      var emp=val('empId');
+      var emp=val('empId'),pwEl=document.getElementById('empPw'),pw=pwEl?pwEl.value:'';
       if(LIVE&&!emp){S.loginErr='사번을 넣어주세요.';render();return;}
-      var pw=mrPw(emp);
+      if(LIVE&&S.showPw&&!pw){S.loginErr='관리자 비밀번호를 넣어주세요.';render();return;}
+      var byEmpOnly=!pw;if(byEmpOnly)pw=mrPw(emp);
       var keepOn=checked('keep'),asAdmin=checked('asAdmin');
       S.busy=true;S.loginErr='';render();
       try{var uid=await api.signIn(emp,pw,keepOn,asAdmin);await afterLogin(uid);track('login',null);}
-      catch(err){S.loginErr='등록되지 않은 사번이에요. 담당 CM에게 문의해 주세요.';S.uid=null;}
+      catch(err){S.loginErr=byEmpOnly?'등록되지 않은 사번이에요. 담당 CM에게 등록을 요청해 주세요. 관리자는 아래 "관리자 로그인"을 눌러주세요.':(err.message||'로그인하지 못했어요.');S.uid=null;}
       S.busy=false;render();return;
     }
     if(f.id==='reqForm'){
@@ -714,10 +720,13 @@ document.addEventListener('submit',async function(e){
       S.modal=null;S.edit=null;say('저장했어요.');
     }
     if(f.id==='userForm'){
-      var u={emp_no:val('uEmp'),name:val('uName'),division:val('uDiv'),office:val('uOff'),role:val('uRole')};u.password=mrPw(u.emp_no);
+      var u={emp_no:val('uEmp'),name:val('uName'),division:val('uDiv'),office:val('uOff'),role:val('uRole'),password:val('uPw')};
       if(!/^[0-9A-Za-z]{3,20}$/.test(u.emp_no)){say('사번은 영문·숫자 3~20자로 넣어주세요.');render();return;}
+      if(u.role==='mr'){u.password=mrPw(u.emp_no);}
+      else if(!S.edit&&u.password.length<6){say('관리자는 6자 이상 비밀번호가 필요해요.');render();return;}
+      else if(u.password&&u.password.length<6){say('비밀번호는 6자 이상이어야 해요.');render();return;}
       S.busy=true;render();await api.upsertMember(u);S.members=await api.members();
-      S.modal=null;S.edit=null;say('저장했어요. 이제 사번만으로 들어갈 수 있어요.');
+      S.modal=null;S.edit=null;say(u.role==='mr'?'저장했어요. 이제 사번만으로 들어갈 수 있어요.':'저장했어요.');
     }
     if(f.id==='bulkForm'){
       var lines=document.getElementById('bulkText').value.split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean);
