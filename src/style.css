@@ -272,3 +272,12 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
   .who{margin-left:auto}
   .who>span:first-child{display:none}
 }
+
+/* 거래처 제안서 모드 위쪽 버튼 */
+.cl-ctrls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cl-ctrls .btn{min-height:42px}
+.cl-ctrls .knob{width:32px;height:18px;border-radius:9px;background:var(--line-2);position:relative;transition:background .15s;flex:none}
+.cl-ctrls .knob::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#FFFFFF;transition:left .15s}
+.cl-ctrls .sw-on{border-color:var(--navy)}.cl-ctrls .sw-on .knob{background:var(--navy)}.cl-ctrls .sw-on .knob::after{left:16px}
+.clinic>.wrap>.steps:first-child{padding-top:24px}
+@media (max-width:640px){.cl-ctrls{order:2;width:100%}.cl-ctrls .btn{flex:1;padding:0 8px;font-size:14px}}

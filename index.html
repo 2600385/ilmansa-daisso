@@ -282,6 +282,15 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
   .who{margin-left:auto}
   .who>span:first-child{display:none}
 }
+
+/* 거래처 제안서 모드 위쪽 버튼 */
+.cl-ctrls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cl-ctrls .btn{min-height:42px}
+.cl-ctrls .knob{width:32px;height:18px;border-radius:9px;background:var(--line-2);position:relative;transition:background .15s;flex:none}
+.cl-ctrls .knob::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#FFFFFF;transition:left .15s}
+.cl-ctrls .sw-on{border-color:var(--navy)}.cl-ctrls .sw-on .knob{background:var(--navy)}.cl-ctrls .sw-on .knob::after{left:16px}
+.clinic>.wrap>.steps:first-child{padding-top:24px}
+@media (max-width:640px){.cl-ctrls{order:2;width:100%}.cl-ctrls .btn{flex:1;padding:0 8px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -495,13 +504,20 @@ function vHeader(){
   var clinic=S.mode==='clinic',onAdmin=S.page==='admin';
   var h='<header class="top"><div class="wrap"><div class="top-in">';
   h+='<button type="button" class="brand" data-act="home" aria-label="처음 화면으로">'+signMark()+'<span><span class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</span><span class="bs">Daewoong</span></span></button>';
-  h+='<div class="top-r">'+(onAdmin?'':modeSwitch());
+  h+='<div class="top-r">'+(onAdmin?'':clinic?clinicCtrls():modeSwitch());
   if(!clinic){
     h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
        (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'툴·자료로':'관리자')+'</button>':'')+
        '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></span>';
   }
   return h+'</div></div></div></header>';
+}
+/* 거래처 제안서 모드의 위쪽 버튼 */
+function clinicCtrls(){
+  return '<div class="cl-ctrls">'+
+    '<button type="button" class="btn btn-line'+(S.simple?' sw-on':'')+'" data-act="simple" aria-pressed="'+S.simple+'"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
+    '<button type="button" class="btn btn-line" data-act="bkEdit">제안서 수정</button>'+
+    '<button type="button" class="btn btn-primary" data-act="endVisit">제안 마치기</button></div>';
 }
 function modeSwitch(){
   var clinic=S.mode==='clinic';
@@ -617,12 +633,9 @@ function clinicList(){
 }
 function vClinic(){
   var list=clinicList();
-  var sw='<span style="display:inline-flex;align-items:center;gap:4px"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
-    '<button type="button" class="simple-sw" data-act="endVisit">제안 마치기</button></span>';
   var h='<div class="clinic"><div class="wrap">';
-  if(S.simple){h+='<div class="clinic-simple">'+sw+'</div>';}
-  else h+='<div class="clinic-hero">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="eyebrow">일만사 · 웰체크 제안</div>'+sw+'</div>'+
+  if(!S.simple)h+='<div class="clinic-hero">'+
+    '<div class="eyebrow">일만사 · 웰체크 제안</div>'+
     '<h1>'+(S.hospital.trim()?esc(S.hospital.trim()):'[병원명]')+' 원장님께 드리는<br>일만사 제안</h1>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
     '</div>';
@@ -748,6 +761,18 @@ function vModal(){
     return modalWrap('reqForm','툴 요청하기','<p class="muted" style="margin:0;font-size:14px">요청은 사무소 단위로만 모아 봅니다. 이름은 관리자에게 보이지 않아요.</p>'+
       '<div class="fg"><label class="lb" for="reqText">어떤 툴이나 자료가 필요한가요?</label><textarea id="reqText" class="field" maxlength="1000" placeholder="예: 투석 환자가 많은 의원에 보여줄 수익 계산"></textarea></div>'+
       '<div class="fg"><label class="lb" for="reqArea">어디 갈 때 쓰나요?</label><select id="reqArea" class="field">'+PLACES.filter(function(p){return p.id!=='all';}).map(function(a){return '<option value="'+a.id+'">'+a.label+'</option>';}).join('')+'</select></div>');
+  }
+  if(m==='bkEdit'){
+    var bh='<div class="modal-bg" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="bkT"><h2 id="bkT">제안서 수정</h2>';
+    if(!S.basket.length){bh+='<p class="muted" style="margin:0">담은 자료가 없어서 지금은 원장님 화면용 자료를 모두 보여주고 있어요. "자료 더 담기"로 보여드릴 자료만 골라보세요.</p>';}
+    else{bh+='<p class="muted" style="margin:0;font-size:14px">순서를 바꾸거나 뺄 수 있어요. 위에서부터 차례로 나옵니다.</p><div class="basket-list">';
+      S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
+        bh+='<div class="bk-row"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
+          '<button type="button" class="icon-btn" data-act="bkUp" data-v="'+i+'" aria-label="위로"'+(i===0?' disabled':'')+'>'+I.up+'</button>'+
+          '<button type="button" class="icon-btn" data-act="bkDown" data-v="'+i+'" aria-label="아래로"'+(i===S.basket.length-1?' disabled':'')+'>'+I.down+'</button>'+
+          '<button type="button" class="icon-btn" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></div>';});
+      bh+='</div>';}
+    return bh+'<div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap"><button type="button" class="btn btn-line" data-act="addMore">+ 자료 더 담기</button><button type="button" class="btn btn-primary" data-act="closeModal">완료</button></div></div></div>';
   }
   if(m==='pw'){
     return modalWrap('pwForm','비밀번호 변경','<div class="fg"><label class="lb" for="pw1">새 비밀번호 (6자 이상)</label><input id="pw1" class="field" type="password" autocomplete="new-password"></div>'+
@@ -909,6 +934,8 @@ document.addEventListener('click',function(e){
     case 'closePresent':S.present=-1;S.presentUrl='';break;
     case 'stage':S.stage=v;break;
     case 'simple':S.simple=!S.simple;break;
+    case 'bkEdit':S.modal='bkEdit';break;
+    case 'addMore':S.modal=null;S.mode='prep';S.page='tools';S.present=-1;window.scrollTo(0,0);say('자료를 더 담은 뒤 아래 "거래처 제안서 모드로"를 누르세요.');break;
     case 'endVisit':S.basket=[];saveBasket();S.hospital='';S.simple=false;S.present=-1;S.presentUrl='';S.mode='prep';S.basketOpen=false;window.scrollTo(0,0);say('제안서를 비웠어요. 다음 병원 준비하세요.');break;
     case 'copy':
       var m=S.scripts.filter(function(x){return x.id===v;})[0];if(!m)break;track('copy',v);
