@@ -178,6 +178,8 @@ var I={
   phone:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
   copy:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>'
 };
+/* 시그니처 마크: 주황 네모 + 熊 (현황판과 같은 모양) */
+function signMark(){return '<svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="14" fill="#F47920"/><text x="50" y="70" text-anchor="middle" font-family="serif" font-size="62" font-weight="900" fill="#FFFFFF">熊</text></svg>';}
 function logo(){return '<span aria-hidden="true">일만사 다<span class="ss"><span class="top">있</span><span class="bot">있</span></span>소</span>';}
 function audTag(t){return t.doctor?'<span class="tag a-doc">'+I.screen+'원장님 화면용</span>':'<span class="tag a-in">'+I.lock+'내부용</span>';}
 function placeOptions(sel){return PLACES.filter(function(p){return p.id!=='all';}).map(function(a){return '<label class="chk"><input type="checkbox" name="tg" value="'+a.id+'"'+(sel.indexOf(a.id)>=0?' checked':'')+'> '+a.label+'</label>';}).join('');}
@@ -205,7 +207,7 @@ function vLogin(){
 function vHeader(){
   var clinic=S.mode==='clinic';
   var h='<header class="top"><div class="wrap"><div class="top-in">';
-  h+='<div class="brand">'+(clinic?'<span>일만사 제안</span>':'<span>일만사 다있소</span>')+'</div>';
+  h+='<div class="brand">'+signMark()+'<div><div class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</div><div class="bs">Daewoong</div></div></div>';
   h+='<div class="top-r"><div class="mode" role="group" aria-label="화면 모드">'+
      '<button type="button" data-act="mode" data-v="prep" class="'+(clinic?'':'on')+'" aria-pressed="'+!clinic+'">혼자 자료 찾는 중</button>'+
      '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처에 와 있어요</button></div>';
@@ -256,7 +258,7 @@ function vTools(){
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
     h+='<div class="muted" style="font-size:14px">'+esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개</div>';
     if(list.length&&!S.basket.length&&list.some(function(t){return t.doctor;})){
-      h+='<div class="guide">'+I.bag+'<div><b>원장님 뵙기 전에, 보여드릴 자료를 "제안에 담기"로 골라두세요.</b><br>거래처에 도착해 "거래처에 와 있어요"를 누르면 담은 순서대로 나옵니다.</div></div>';
+      h+='<div class="guide">'+I.bag+'<div><b>원장님 뵙기 전에, 보여드릴 자료를 제안서에 담아두세요.</b><br>거래처에 도착해 "거래처에 와 있어요"를 누르면 담은 순서대로 나옵니다.</div></div>';
     }
     if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
     else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
@@ -272,7 +274,7 @@ function vCard(t){
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
     '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="meta">'+esc(t.tags.map(areaLabel).join(' · '))+' · 만든 사람 '+esc(t.by)+'</div><div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
-  if(t.doctor){h+='<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안에 담기')+'</button>';}
+  if(t.doctor){h+='<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>';}
   h+='</div>';
   if(!t.doctor){h+='<div class="note-in">내부용 자료라 거래처 모드에는 나오지 않아요</div>';}
   return h+'</article>';
@@ -280,8 +282,8 @@ function vCard(t){
 function vBasketBar(){
   if(!S.basket.length)return '';
   var h='<div class="basket-bar"><div class="wrap"><div class="basket-in">'+
-    '<button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="'+S.basketOpen+'">'+I.bag+'오늘 제안 바구니 '+S.basket.length+'개 · '+(S.basketOpen?'접기':'순서 보기')+'</button>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-ghost" data-act="basketClear">바구니 비우기</button>'+
+    '<button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="'+S.basketOpen+'">'+I.bag+'제안서 '+S.basket.length+'개 · '+(S.basketOpen?'접기':'순서 보기')+'</button>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-ghost" data-act="basketClear">제안서 비우기</button>'+
     '<button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
     '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">거래처 모드로 '+I.arrow+'</button></div></div>';
   if(S.basketOpen){
@@ -341,7 +343,7 @@ function vClinic(){
     '<h1>'+(S.hospital.trim()?esc(S.hospital.trim()):'[병원명]')+' 원장님께 드리는<br>일만사 제안</h1>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
     '</div>';
-  if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
+  if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
   h+='<div class="steps">';
   list.forEach(function(t,i){
     h+='<button type="button" class="step" data-act="present" data-v="'+i+'"><span class="no">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(cleanName(t.name))+'</h2><p>'+esc(t.pub||t.desc)+'</p><span class="go">열기 '+I.arrow+'</span></button>';
@@ -393,11 +395,11 @@ function vStats(){
     Object.keys(divs).sort().map(function(d){return '<option value="d:'+esc(d)+'"'+(scope==='d:'+d?' selected':'')+'>사업부 · '+esc(d)+'</option>';}).join('')+
     Object.keys(offs).sort().map(function(o){return '<option value="o:'+esc(o)+'"'+(scope==='o:'+o?' selected':'')+'>사무소 · '+esc(o)+'</option>';}).join('')+
     '</select><span class="muted" style="font-size:13px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
-  h+='<div class="kpis">'+kpi(people,'사용한 사람')+kpi(sum('open'),'툴 열기')+kpi(sum('fav_now'),'즐겨찾기')+kpi(sum('basket'),'제안에 담기')+kpi(sum('present'),'거래처에서 열기')+kpi(sum('copy'),'멘트 복사')+kpi(reqN,'툴 요청')+'</div>';
+  h+='<div class="kpis">'+kpi(people,'사용한 사람')+kpi(sum('open'),'툴 열기')+kpi(sum('fav_now'),'즐겨찾기')+kpi(sum('basket'),'제안서에 담기')+kpi(sum('present'),'거래처에서 열기')+kpi(sum('copy'),'멘트 복사')+kpi(reqN,'툴 요청')+'</div>';
   var tr=S.tools.map(function(t){return {t:t,o:sum('open',t.id),f:sum('fav_now',t.id),b:sum('basket',t.id),p:sum('present',t.id)};});
   tr.sort(function(a,b){return (b.o+b.b*2+b.p)-(a.o+a.b*2+a.p);});
   var max=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.o;}).concat([0])));
-  h+='<section class="blk"><h2>툴별 사용 순위</h2><div class="tbl-box"><table><thead><tr><th>툴</th><th>원장님 화면용</th><th class="n">열기</th><th style="width:20%">열기 비율</th><th class="n">즐겨찾기</th><th class="n">제안에 담기</th><th class="n">거래처에서 열기</th></tr></thead><tbody>';
+  h+='<section class="blk"><h2>툴별 사용 순위</h2><div class="tbl-box"><table><thead><tr><th>툴</th><th>원장님 화면용</th><th class="n">열기</th><th style="width:20%">열기 비율</th><th class="n">즐겨찾기</th><th class="n">제안서에 담기</th><th class="n">거래처에서 열기</th></tr></thead><tbody>';
   tr.forEach(function(r){h+='<tr><td>'+esc(r.t.name)+(r.t.active?'':' <span class="muted">(숨김)</span>')+'</td><td>'+(r.t.doctor?'예':'내부용')+'</td><td class="n">'+r.o+'</td><td><div class="bar"><i style="width:'+(r.o/max*100)+'%"></i></div></td><td class="n">'+r.f+'</td><td class="n">'+r.b+'</td><td class="n">'+r.p+'</td></tr>';});
   h+='</tbody></table></div></section>';
   var sc=S.scripts.map(function(m){return {m:m,c:sum('copy',m.id)};}).filter(function(x){return x.c;}).sort(function(a,b){return b.c-a.c;});
@@ -616,7 +618,7 @@ document.addEventListener('click',function(e){
       break;
     case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
     case 'basketOpen':S.basketOpen=!S.basketOpen;break;
-    case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('바구니를 비웠어요.');break;
+    case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('제안서를 비웠어요.');break;
     case 'bkUp':case 'bkDown':var k=+v,j=act==='bkUp'?k-1:k+1;if(j>=0&&j<S.basket.length){var tmp=S.basket[k];S.basket[k]=S.basket[j];S.basket[j]=tmp;saveBasket();}break;
     case 'present':showPresent(+v);return;
     case 'prev':if(S.present>0)showPresent(S.present-1);return;
@@ -624,7 +626,7 @@ document.addEventListener('click',function(e){
     case 'closePresent':S.present=-1;S.presentUrl='';break;
     case 'stage':S.stage=v;break;
     case 'simple':S.simple=!S.simple;break;
-    case 'endVisit':S.basket=[];saveBasket();S.hospital='';S.simple=false;S.present=-1;S.presentUrl='';S.mode='prep';S.basketOpen=false;window.scrollTo(0,0);say('바구니를 비웠어요. 다음 병원 준비하세요.');break;
+    case 'endVisit':S.basket=[];saveBasket();S.hospital='';S.simple=false;S.present=-1;S.presentUrl='';S.mode='prep';S.basketOpen=false;window.scrollTo(0,0);say('제안서를 비웠어요. 다음 병원 준비하세요.');break;
     case 'copy':
       var m=S.scripts.filter(function(x){return x.id===v;})[0];if(!m)break;track('copy',v);
       var fallback=function(){var node=document.getElementById('sc-'+v);if(node){var r=document.createRange();r.selectNodeContents(node);var s=window.getSelection();s.removeAllRanges();s.addRange(r);}say('자동 복사가 막혀서 멘트를 선택해 뒀어요. 길게 눌러 복사하세요.');render();};
