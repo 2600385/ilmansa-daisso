@@ -320,6 +320,16 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .pr-row .num{width:24px;height:24px;border-radius:12px;background:var(--navy);color:#FFFFFF;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
 .pr-row .nm{font-weight:500;min-width:0}
 .pr-row.off{opacity:.55;cursor:not-allowed}
+
+/* 관리자: 두 영역 */
+.areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.area{display:flex;flex-direction:column;gap:6px;text-align:left;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:14px;line-height:1.5}
+.area b{font-size:18px;color:var(--ink)}
+.area:hover{border-color:var(--line-2)}
+.area.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy);background:var(--navy-soft)}
+.area.on b{color:var(--navy)}
+.subtabs .bk-cnt{min-width:20px;height:20px;font-size:11px;padding:0 6px;margin-left:4px}
+@media (max-width:640px){.areas{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -374,7 +384,7 @@ var live={
   signIn:async function(emp,pw,keep){
     live.keep=!!keep;try{localStorage.setItem('daisso_keep',keep?'1':'0');}catch(e){}
     var r=await live.sb.auth.signInWithPassword({email:emp.trim().toLowerCase()+EMAIL_DOMAIN,password:pw});
-    if(r.error)throw new Error('사번이나 비밀번호가 맞지 않아요.');
+    if(r.error){var bad=r.error.status===400||/invalid/i.test(r.error.message||'');var er=new Error(bad?'bad':'down');er.code=bad?'bad':'down';throw er;}
     return r.data.user.id;
   },
   signOut:async function(){await live.sb.auth.signOut();},
@@ -478,7 +488,7 @@ var api=LIVE?live:demo;
    ===================================================================== */
 var S={printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
   tools:[],scripts:[],contacts:[],favs:{},basket:[],basketOpen:false,hospital:'',present:-1,stage:'s1',
-  adminTab:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
+  adminTab:'tools',adminArea:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
 var toastTimer=null;
 function isAdmin(){return !!(S.me&&S.me.role==='admin');}
 function track(type,target){try{api.track(type,target);}catch(e){}}
@@ -538,7 +548,7 @@ function vHeader(){
   h+='<div class="top-r">'+(onAdmin?'':clinic?clinicCtrls():modeSwitch());
   if(!clinic){
     h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
-       (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'툴·자료로':'관리자')+'</button>':'')+
+       (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'관리자 페이지 닫기':'관리자')+'</button>':'')+
        '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></span>';
   }
   return h+'</div></div></div></header>';
@@ -704,15 +714,20 @@ function vClinic(){
 
 /* 관리자 */
 function vAdmin(){
-  var h='<div class="page wrap"><section class="blk"><h1 style="margin:0;font-size:26px;font-weight:900;color:var(--navy)">관리자</h1>'+
-    '<p class="muted" style="margin:0">관리자 계정으로 로그인했을 때만 보이는 화면입니다. 데이터베이스 권한으로 막혀 있어 MR 계정으로는 열어도 내용이 나오지 않습니다.</p>'+
-    '<div class="subtabs" role="group" aria-label="관리 메뉴">'+sub('stats','사용 통계')+sub('tools','툴 관리')+sub('scripts','표준멘트')+sub('contacts','문의처')+sub('reqs','요청')+sub('users','계정')+'</div></section>';
-  if(S.adminTab==='stats')h+=vStats();
-  if(S.adminTab==='tools')h+=vToolAdmin();
-  if(S.adminTab==='scripts')h+=vScriptAdmin();
-  if(S.adminTab==='contacts')h+=vContactAdmin();
-  if(S.adminTab==='reqs')h+=vReqs();
-  if(S.adminTab==='users')h+=vUsers();
+  var area=S.adminArea||'stats';
+  var h='<div class="page wrap"><section class="blk"><h1 style="margin:0;font-size:26px;font-weight:900;color:var(--navy)">관리자 페이지</h1>'+
+    '<div class="areas" role="group" aria-label="관리 영역">'+
+    '<button type="button" class="area'+(area==='stats'?' on':'')+'" data-act="adminArea" data-v="stats" aria-pressed="'+(area==='stats')+'"><b>사용 통계</b><span>어떤 자료가 즐겨찾기되고 제안서에 담기는지 보고, 다음에 만들 자료를 정합니다</span></button>'+
+    '<button type="button" class="area'+(area==='manage'?' on':'')+'" data-act="adminArea" data-v="manage" aria-pressed="'+(area==='manage')+'"><b>자료 관리</b><span>자료 추가·삭제, 문의처, 계정, 자료 요청 확인</span></button></div></section>';
+  if(area==='stats')h+=vStats();
+  else{
+    var rq=(S.reqs||[]).filter(function(r){return r.status!=='올림';}).length;
+    h+='<div class="subtabs" role="group" aria-label="자료 관리 메뉴">'+sub('tools','자료')+sub('contacts','문의처')+sub('users','계정')+sub('reqs','자료 요청 확인하기'+(rq?' <span class="bk-cnt" style="background:#C2410C">'+rq+'</span>':''))+'</div>';
+    if(S.adminTab==='tools')h+=vToolAdmin();
+    if(S.adminTab==='contacts')h+=vContactAdmin();
+    if(S.adminTab==='reqs')h+=vReqs();
+    if(S.adminTab==='users')h+=vUsers();
+  }
   return h+'</div>';
 }
 function sub(id,l){return '<button type="button" data-act="adminTab" data-v="'+id+'" class="'+(S.adminTab===id?'on':'')+'" aria-pressed="'+(S.adminTab===id)+'">'+l+'</button>';}
@@ -725,28 +740,28 @@ function vStats(){
   var R=rows.filter(inScope);
   function sum(type,target){return R.filter(function(r){return r.type===type&&(target===undefined||r.target===target);}).reduce(function(a,r){return a+Number(r.cnt);},0);}
   var people=R.filter(function(r){return r.type==='any';}).reduce(function(a,r){return a+Number(r.people);},0);
-  var reqN=(S.reqs||[]).filter(function(q){if(scope==='all')return true;var p=scope.split(':');return p[0]==='d'?q.division===p[1]:q.office===p[1];}).length;
+  var reqs=(S.reqs||[]).filter(function(q){if(scope==='all')return true;var p=scope.split(':');return p[0]==='d'?q.division===p[1]:q.office===p[1];});
   var h=(LIVE?'':'<div class="inbanner">미리보기 모드: 지금 이 화면에서 누른 기록이 바로 숫자로 쌓입니다.</div>');
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><label for="scope" class="lb">보는 단위</label><select id="scope" class="field" style="width:auto;min-width:180px"><option value="all">전사</option>'+
     Object.keys(divs).sort().map(function(d){return '<option value="d:'+esc(d)+'"'+(scope==='d:'+d?' selected':'')+'>사업부 · '+esc(d)+'</option>';}).join('')+
     Object.keys(offs).sort().map(function(o){return '<option value="o:'+esc(o)+'"'+(scope==='o:'+o?' selected':'')+'>사무소 · '+esc(o)+'</option>';}).join('')+
     '</select><span class="muted" style="font-size:13px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
-  h+='<div class="kpis">'+kpi(people,'사용한 사람')+kpi(sum('open'),'툴 열기')+kpi(sum('fav_now'),'즐겨찾기')+kpi(sum('basket'),'제안서에 담기')+kpi(sum('present'),'거래처에서 열기')+kpi(sum('copy'),'멘트 복사')+kpi(reqN,'툴 요청')+'</div>';
-  var tr=S.tools.map(function(t){return {t:t,o:sum('open',t.id),f:sum('fav_now',t.id),b:sum('basket',t.id),p:sum('present',t.id)};});
-  tr.sort(function(a,b){return (b.o+b.b*2+b.p)-(a.o+a.b*2+a.p);});
-  var max=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.o;}).concat([0])));
-  h+='<section class="blk"><h2>툴별 사용 순위</h2><div class="tbl-box"><table><thead><tr><th>툴</th><th>원장님 화면용</th><th class="n">열기</th><th style="width:20%">열기 비율</th><th class="n">즐겨찾기</th><th class="n">제안서에 담기</th><th class="n">거래처에서 열기</th></tr></thead><tbody>';
-  tr.forEach(function(r){h+='<tr><td>'+esc(r.t.name)+(r.t.active?'':' <span class="muted">(숨김)</span>')+'</td><td>'+(r.t.doctor?'예':'내부용')+'</td><td class="n">'+r.o+'</td><td><div class="bar"><i style="width:'+(r.o/max*100)+'%"></i></div></td><td class="n">'+r.f+'</td><td class="n">'+r.b+'</td><td class="n">'+r.p+'</td></tr>';});
+  h+='<div class="kpis">'+kpi(people,'사용한 사람')+kpi(sum('fav_now'),'즐겨찾기')+kpi(sum('basket'),'제안서에 담기')+kpi(reqs.length,'자료 요청')+'</div>';
+  var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id)};});
+  tr.sort(function(a,b){return (b.b*2+b.f)-(a.b*2+a.f);});
+  var max=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0])));
+  h+='<section class="blk"><h2>자료별 순위</h2><div class="tbl-box"><table style="min-width:560px"><thead><tr><th>자료</th><th>종류</th><th class="n">즐겨찾기</th><th class="n">제안서에 담기</th><th style="width:24%">담긴 비율</th></tr></thead><tbody>';
+  tr.forEach(function(r){h+='<tr><td>'+esc(r.t.name)+(r.t.active?'':' <span class="muted">(숨김)</span>')+'</td><td><span class="tag k-'+r.t.kind+'">'+KIND[r.t.kind]+'</span></td><td class="n">'+r.f+'</td><td class="n">'+r.b+'</td><td><div class="bar"><i style="width:'+(r.b/max*100)+'%"></i></div></td></tr>';});
   h+='</tbody></table></div></section>';
-  var sc=S.scripts.map(function(m){return {m:m,c:sum('copy',m.id)};}).filter(function(x){return x.c;}).sort(function(a,b){return b.c-a.c;});
-  if(sc.length){h+='<section class="blk"><h2>많이 복사한 멘트</h2><div class="todo">'+sc.slice(0,5).map(function(x){return '<div><span class="tag k-script pill">'+x.c+'회</span><span>'+esc(x.m.title)+'</span></div>';}).join('')+'</div></section>';}
-  var todo=[];
-  tr.forEach(function(r){if(r.f&&!r.o)todo.push(['개선','"'+r.t.name+'"는 즐겨찾기는 됐는데 열린 적이 없어요. 쓰기 어려운지 확인해 보세요.']);});
-  tr.forEach(function(r){if(r.t.active&&!r.o&&!r.f&&!r.b&&rows.length)todo.push(['정리','"'+r.t.name+'"는 아직 아무도 쓰지 않았어요. 안내가 필요한지, 빼도 되는지 확인해 보세요.']);});
-  tr.forEach(function(r){if(r.b+r.p>=1)todo.push(['확산','"'+r.t.name+'"가 거래처 제안에 쓰였어요. 성공사례로 정리할 후보입니다.']);});
-  var ra={};(S.reqs||[]).forEach(function(q){var k=q.place||'etc';ra[k]=(ra[k]||0)+1;});
-  Object.keys(ra).forEach(function(k){todo.push(['새 툴','"'+(areaLabel(k)||'기타')+'" 요청이 '+ra[k]+'건 들어왔어요. 다음 달 공략 툴 후보입니다.']);});
-  h+='<section class="blk"><h2>다음에 할 일</h2><div class="todo">'+(todo.length?todo.map(function(x){return '<div><span class="tag '+(x[0]==='개선'?'k-bd':x[0]==='확산'?'a-doc':x[0]==='정리'?'a-in':'k-tool')+' pill">'+x[0]+'</span><span>'+esc(x[1])+'</span></div>';}).join(''):'<div><span class="muted">사용 기록이 쌓이면 여기에 할 일을 정리해 드려요.</span></div>')+'</div></section>';
+  var todo=[],byKind={};
+  tr.forEach(function(r){byKind[r.t.kind]=(byKind[r.t.kind]||0)+r.b*2+r.f;});
+  var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
+  if(topKind&&byKind[topKind]>0)todo.push(['방향','"'+KIND[topKind]+'" 자료가 가장 많이 즐겨찾기되고 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.']);
+  tr.forEach(function(r){if(r.b>=1)todo.push(['확산','"'+r.t.name+'"가 제안서에 '+r.b+'번 담겼어요. 성공사례로 정리할 후보입니다.']);});
+  tr.forEach(function(r){if(r.t.active&&!r.f&&!r.b&&rows.length)todo.push(['정리','"'+r.t.name+'"는 아직 즐겨찾기도, 담긴 적도 없어요. 안내가 필요한지, 빼도 되는지 확인해 보세요.']);});
+  var ra={};reqs.forEach(function(q){var k=q.place||'etc';ra[k]=(ra[k]||0)+1;});
+  Object.keys(ra).forEach(function(k){todo.push(['새 자료','"'+(areaLabel(k)||'기타')+'" 자료 요청이 '+ra[k]+'건 들어왔어요. 다음 달 공략 자료 후보입니다.']);});
+  h+='<section class="blk"><h2>다음에 할 일</h2><div class="todo">'+(todo.length?todo.map(function(x){return '<div><span class="tag '+(x[0]==='방향'?'k-tool':x[0]==='확산'?'a-doc':x[0]==='정리'?'a-in':'k-bd')+' pill">'+x[0]+'</span><span>'+esc(x[1])+'</span></div>';}).join(''):'<div><span class="muted">사용 기록이 쌓이면 여기에 할 일을 정리해 드려요.</span></div>')+'</div></section>';
   return h;
 }
 function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
@@ -937,9 +952,8 @@ async function afterLogin(uid){
 function saveBasket(){try{sessionStorage.setItem('daisso_basket',JSON.stringify(S.basket));}catch(e){}}
 async function loadAdmin(){
   try{
-    if(S.adminTab==='stats'){var r=await Promise.all([api.stats(),api.requests()]);S.stats=r[0];S.reqs=r[1];}
-    if(S.adminTab==='reqs'){S.reqs=await api.requests();}
-    if(S.adminTab==='users'){S.members=await api.members();}
+    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(),api.requests()]);S.stats=r[0];S.reqs=r[1];}
+    else{S.reqs=await api.requests();if(S.adminTab==='users')S.members=await api.members();}
   }catch(e){fail(e);}
   render();
 }
@@ -1006,6 +1020,7 @@ document.addEventListener('click',function(e){
     case 'openReq':S.modal='req';break;
     case 'closeModal':S.modal=null;S.edit=null;break;
     case 'adminTab':S.adminTab=v;loadAdmin();break;
+    case 'adminArea':S.adminArea=v;if(v==='manage'&&['tools','contacts','users','reqs'].indexOf(S.adminTab)<0)S.adminTab='tools';loadAdmin();break;
     case 'reloadStats':S.stats=null;loadAdmin();break;
     case 'newTool':S.modal='tool';S.edit=null;break;
     case 'editTool':S.modal='tool';S.edit=v;break;
@@ -1093,7 +1108,7 @@ document.addEventListener('submit',async function(e){
       var keepOn=checked('keep'),asAdmin=checked('asAdmin');
       S.busy=true;S.loginErr='';render();
       try{var uid=await api.signIn(emp,pw,keepOn,asAdmin);await afterLogin(uid);track('login',null);}
-      catch(err){S.loginErr='등록되지 않은 사번이에요. 담당 CM에게 문의해 주세요.';S.uid=null;}
+      catch(err){S.loginErr=err&&err.code==='bad'?'등록되지 않은 사번이에요. 담당 CM에게 문의해 주세요.':'지금 서버가 잠시 멈춰 있어요. 담당 CM에게 알려주세요.';S.uid=null;}
       S.busy=false;render();return;
     }
     if(f.id==='reqForm'){

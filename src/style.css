@@ -310,3 +310,13 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .pr-row .num{width:24px;height:24px;border-radius:12px;background:var(--navy);color:#FFFFFF;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
 .pr-row .nm{font-weight:500;min-width:0}
 .pr-row.off{opacity:.55;cursor:not-allowed}
+
+/* 관리자: 두 영역 */
+.areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.area{display:flex;flex-direction:column;gap:6px;text-align:left;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:14px;line-height:1.5}
+.area b{font-size:18px;color:var(--ink)}
+.area:hover{border-color:var(--line-2)}
+.area.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy);background:var(--navy-soft)}
+.area.on b{color:var(--navy)}
+.subtabs .bk-cnt{min-width:20px;height:20px;font-size:11px;padding:0 6px;margin-left:4px}
+@media (max-width:640px){.areas{grid-template-columns:minmax(0,1fr)}}
