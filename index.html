@@ -291,6 +291,27 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .cl-ctrls .sw-on{border-color:var(--navy)}.cl-ctrls .sw-on .knob{background:var(--navy)}.cl-ctrls .sw-on .knob::after{left:16px}
 .clinic>.wrap>.steps:first-child{padding-top:24px}
 @media (max-width:640px){.cl-ctrls{order:2;width:100%}.cl-ctrls .btn{flex:1;padding:0 8px;font-size:14px}}
+
+/* 가는 곳 묶음은 연한 하늘색, 버튼도 조금 크게 */
+.fgroup.place{background:#E6EEF9}
+.fgroup.place .tab{min-height:50px;padding:0 22px;font-size:17px;font-weight:700}
+.fgroup:not(.place){background:#EEF0F4}
+/* 아래 제안 바구니: 제목과 '제안하러 가기'는 붉은 포인트 */
+.bk-line .bk-title{color:#C2410C;font-size:14px}
+.bk-line .bk-cnt{background:#C2410C}
+.go-link{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 6px;border:0;background:transparent;color:#C2410C;font-size:15px;font-weight:700;white-space:nowrap}
+.go-link:hover{text-decoration:underline}
+.go-link svg{width:16px;height:16px}
+.cl-hint{margin:0 0 48px;padding:14px 16px;border-radius:12px;background:var(--bg);color:var(--muted);font-size:14px}
+/* 제안 화면: 책장 넘기듯 열림 */
+.page-turn{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--bg);transform-origin:left center}
+.page-turn.from-r{transform-origin:right center}
+.page-turn.anim.from-l{animation:turnL .6s cubic-bezier(.2,.7,.2,1) both}
+.page-turn.anim.from-r{animation:turnR .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes turnL{from{transform:perspective(2200px) rotateY(-70deg);opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
+@keyframes turnR{from{transform:perspective(2200px) rotateY(70deg);opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
+.present{perspective:2200px}
+.present>.wrap{width:100%}
 </style>
 </head>
 <body>
@@ -503,7 +524,7 @@ function vLogin(){
 function vHeader(){
   var clinic=S.mode==='clinic',onAdmin=S.page==='admin';
   var h='<header class="top"><div class="wrap"><div class="top-in">';
-  h+='<button type="button" class="brand" data-act="home" aria-label="처음 화면으로">'+signMark()+'<span><span class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</span><span class="bs">Daewoong</span></span></button>';
+  h+='<button type="button" class="brand" data-act="home" aria-label="처음 화면으로">'+signMark()+'<span><span class="bt">'+'일만사 다있소'+'</span><span class="bs">Daewoong</span></span></button>';
   h+='<div class="top-r">'+(onAdmin?'':clinic?clinicCtrls():modeSwitch());
   if(!clinic){
     h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
@@ -532,9 +553,9 @@ function vTools(){
   var idle=S.place==='none'&&S.need==='none'&&!q&&!S.favOnly;
   var h='<div class="page wrap">';
   h+='<section class="hero"><h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
-     '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 툴과 자료를 한곳에 모았습니다. 필요할 때 바로 꺼내 쓰세요.</span></p>'+
+     '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 자료를 한곳에 모았습니다.<br>필요할 때 바로 꺼내 쓰세요.</span></p>'+
      '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이션, 검체위수탁, 기관신고)"></div></section>';
-  h+='<section class="blk"><div class="filters"><div class="fgroup" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
+  h+='<section class="blk"><div class="filters"><div class="fgroup place" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
@@ -543,6 +564,16 @@ function vTools(){
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
   h+='</div></div>';
+  h+='<div id="results" class="results">'+vResults()+'</div>';
+  h+='</section>';
+  h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
+     '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
+  h+='</div>';
+  return h+vBasketBar();
+}
+function vResults(){
+  var q=S.q.trim().toLowerCase(),h='';
+  var idle=S.place==='none'&&S.need==='none'&&!q&&!S.favOnly;
   var list=null,label='';
   if(!idle&&!(!S.favOnly&&(S.need==='script'||S.need==='contact'))){
     list=activeTools().filter(function(t){
@@ -565,11 +596,7 @@ function vTools(){
     h+=vContacts();
   }else if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
-  h+='</section>';
-  h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
-     '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
-  h+='</div>';
-  return h+vBasketBar();
+  return h;
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
@@ -586,14 +613,13 @@ function vCard(t){
 function vBasketBar(){
   var n=S.basket.length;if(!n)return '';
   var h='<div class="basket-bar"><div class="wrap"><div class="bk-line">'+
-    '<span class="bk-title">'+I.bag+'제안서 <span class="bk-cnt">'+n+'</span></span><ol class="bk-items">';
+    '<span class="bk-title">'+I.bag+'제안 바구니 <span class="bk-cnt">'+n+'</span></span><ol class="bk-items">';
   S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
     h+='<li class="bk-item"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
       (i>0?'<button type="button" class="mini" data-act="bkUp" data-v="'+i+'" aria-label="앞으로">'+I.up+'</button>':'')+
       '<button type="button" class="mini" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></li>';});
-  h+='</ol><div class="bk-acts"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플</button>'+
-    '<button type="button" class="btn btn-ghost" data-act="basketClear">비우기</button>'+
-    '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">거래처 제안서 모드로 '+I.arrow+'</button></div></div></div></div>';
+  h+='</ol><div class="bk-acts"><button type="button" class="btn btn-ghost" data-act="basketClear">비우기</button>'+
+    '<button type="button" class="go-link" data-act="mode" data-v="clinic">제안하러 가기 '+I.arrow+'</button></div></div></div></div>';
   return h;
 }
 function vContacts(){
@@ -627,6 +653,7 @@ function vScript(m){
 }
 
 /* 거래처 모드 */
+function hospTitle(){return (S.hospital.trim()||'OOO의원')+' 원장님께 드리는 제안';}
 function clinicList(){
   var ids=S.basket.length?S.basket:activeTools().filter(function(t){return t.doctor;}).map(function(t){return t.id;});
   return ids.map(byId).filter(function(t){return t&&t.doctor&&t.active;});
@@ -635,8 +662,7 @@ function vClinic(){
   var list=clinicList();
   var h='<div class="clinic"><div class="wrap">';
   if(!S.simple)h+='<div class="clinic-hero">'+
-    '<div class="eyebrow">일만사 · 웰체크 제안</div>'+
-    '<h1>'+(S.hospital.trim()?esc(S.hospital.trim()):'[병원명]')+' 원장님께 드리는<br>일만사 제안</h1>'+
+    '<h1 id="hosp-title">'+esc(hospTitle())+'</h1>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
     '</div>';
   if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
@@ -644,7 +670,9 @@ function vClinic(){
   list.forEach(function(t,i){
     h+='<button type="button" class="step" data-act="present" data-v="'+i+'"><span class="no">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(cleanName(t.name))+'</h2><p>'+esc(t.pub||t.desc)+'</p><span class="go">열기 '+I.arrow+'</span></button>';
   });
-  h+='</div></div></div>';
+  h+='</div>';
+  if(list.length)h+='<p class="cl-hint">진료실에 들어가기 전, 01번 자료를 눌러 제안 화면을 열어두세요. 다음 자료는 "다음"으로 넘기면 됩니다.</p>';
+  h+='</div></div>';
   if(S.present>=0&&list[S.present]){
     var t=list[S.present],i=S.present;
     h+='<div class="present" role="dialog" aria-modal="true" aria-label="'+esc(t.name)+'"><div class="wrap"><div class="present-bar">'+
@@ -654,10 +682,11 @@ function vClinic(){
       '<button type="button" class="btn btn-line" data-act="prev"'+(i===0?' disabled':'')+'>이전</button>'+
       '<button type="button" class="btn btn-primary" data-act="next"'+(i===list.length-1?' disabled':'')+'>다음</button>'+
       '<button type="button" class="icon-btn" data-act="closePresent" aria-label="닫기">'+I.x+'</button></div></div></div>';
+    h+='<div class="page-turn '+(S.flip==='prev'?'from-r':'from-l')+(S.flipAnim?' anim':'')+'">';
     if(S.presentUrl){h+='<iframe class="present-frame" src="'+esc(S.presentUrl)+'" title="'+esc(t.name)+'"></iframe>';}
     else{h+='<div class="present-body"><div class="present-ph"><b style="font-size:20px;color:var(--navy)">'+esc(t.name)+'</b>'+
       '<span class="muted">'+(S.presentLoading?'여는 중…':LIVE?'아직 주소나 파일이 등록되지 않은 자료예요. 관리자 화면에서 등록해 주세요.':'미리보기 모드라 실제 툴은 열리지 않아요. 운영 버전에서는 이 자리에 툴이 화면 가득 열립니다.')+'</span></div></div>';}
-    h+='</div>';
+    h+='</div></div>';
   }
   return h;
 }
@@ -895,7 +924,7 @@ async function openTool(t,inPlace){
 }
 async function showPresent(i){
   var t=clinicList()[i];if(!t)return;
-  S.present=i;S.presentUrl='';S.presentLoading=true;render();
+  S.present=i;S.presentUrl='';S.presentLoading=true;S.flipAnim=true;render();S.flipAnim=false;
   try{S.presentUrl=(await openTool(t,true))||'';}catch(e){fail(e);}
   S.presentLoading=false;render();
 }
@@ -928,9 +957,9 @@ document.addEventListener('click',function(e){
     case 'basketOpen':S.basketOpen=!S.basketOpen;break;
     case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('제안서를 비웠어요.');break;
     case 'bkUp':case 'bkDown':var k=+v,j=act==='bkUp'?k-1:k+1;if(j>=0&&j<S.basket.length){var tmp=S.basket[k];S.basket[k]=S.basket[j];S.basket[j]=tmp;saveBasket();}break;
-    case 'present':showPresent(+v);return;
-    case 'prev':if(S.present>0)showPresent(S.present-1);return;
-    case 'next':if(S.present<clinicList().length-1)showPresent(S.present+1);return;
+    case 'present':S.flip='next';showPresent(+v);return;
+    case 'prev':if(S.present>0){S.flip='prev';showPresent(S.present-1);}return;
+    case 'next':if(S.present<clinicList().length-1){S.flip='next';showPresent(S.present+1);}return;
     case 'closePresent':S.present=-1;S.presentUrl='';break;
     case 'stage':S.stage=v;break;
     case 'simple':S.simple=!S.simple;break;
@@ -973,14 +1002,9 @@ async function doDelete(key){
 }
 document.addEventListener('input',function(e){
   var t=e.target;
-  if(e.isComposing&&(t.id==='q'||t.id==='hosp'))return; /* 한글 조합 중에는 다시 그리지 않음 */
-  if(t.id==='q'){S.q=t.value;render();}
-  else if(t.id==='hosp'){S.hospital=t.value;render();}
-});
-document.addEventListener('compositionend',function(e){
-  var t=e.target;
-  if(t.id==='q'){S.q=t.value;render();}
-  else if(t.id==='hosp'){S.hospital=t.value;render();}
+  /* 입력창은 그대로 두고 결과만 바꿔서 한글 조합이 끊기지 않게 함 */
+  if(t.id==='q'){S.q=t.value;var r=document.getElementById('results');if(r)r.innerHTML=vResults();}
+  else if(t.id==='hosp'){S.hospital=t.value;var ht=document.getElementById('hosp-title');if(ht)ht.textContent=hospTitle();}
 });
 document.addEventListener('change',function(e){
   var t=e.target;

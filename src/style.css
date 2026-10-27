@@ -281,3 +281,24 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .cl-ctrls .sw-on{border-color:var(--navy)}.cl-ctrls .sw-on .knob{background:var(--navy)}.cl-ctrls .sw-on .knob::after{left:16px}
 .clinic>.wrap>.steps:first-child{padding-top:24px}
 @media (max-width:640px){.cl-ctrls{order:2;width:100%}.cl-ctrls .btn{flex:1;padding:0 8px;font-size:14px}}
+
+/* 가는 곳 묶음은 연한 하늘색, 버튼도 조금 크게 */
+.fgroup.place{background:#E6EEF9}
+.fgroup.place .tab{min-height:50px;padding:0 22px;font-size:17px;font-weight:700}
+.fgroup:not(.place){background:#EEF0F4}
+/* 아래 제안 바구니: 제목과 '제안하러 가기'는 붉은 포인트 */
+.bk-line .bk-title{color:#C2410C;font-size:14px}
+.bk-line .bk-cnt{background:#C2410C}
+.go-link{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 6px;border:0;background:transparent;color:#C2410C;font-size:15px;font-weight:700;white-space:nowrap}
+.go-link:hover{text-decoration:underline}
+.go-link svg{width:16px;height:16px}
+.cl-hint{margin:0 0 48px;padding:14px 16px;border-radius:12px;background:var(--bg);color:var(--muted);font-size:14px}
+/* 제안 화면: 책장 넘기듯 열림 */
+.page-turn{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--bg);transform-origin:left center}
+.page-turn.from-r{transform-origin:right center}
+.page-turn.anim.from-l{animation:turnL .6s cubic-bezier(.2,.7,.2,1) both}
+.page-turn.anim.from-r{animation:turnR .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes turnL{from{transform:perspective(2200px) rotateY(-70deg);opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
+@keyframes turnR{from{transform:perspective(2200px) rotateY(70deg);opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
+.present{perspective:2200px}
+.present>.wrap{width:100%}
