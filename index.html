@@ -330,6 +330,75 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 .area.on b{color:var(--navy)}
 .subtabs .bk-cnt{min-width:20px;height:20px;font-size:11px;padding:0 6px;margin-left:4px}
 @media (max-width:640px){.areas{grid-template-columns:minmax(0,1fr)}}
+
+/* 관리자 페이지 (시안) */
+.adm-band{background-color:var(--surface);background-image:radial-gradient(circle at 95% 0%,rgba(227,226,255,.9),transparent 42%),radial-gradient(circle at 78% 140%,rgba(255,226,240,.9),transparent 48%),radial-gradient(circle at 0% 120%,rgba(203,232,255,.8),transparent 40%);border:1px solid var(--line);border-radius:20px;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.adm-band h1{margin:0;font-size:24px;font-weight:900;color:var(--navy)}
+.adm-band .sub2{font-size:14px;color:var(--muted);margin-top:2px}
+.seg{display:inline-flex;padding:4px;border-radius:14px;background:rgba(238,242,248,.9);gap:4px}
+.seg button{min-height:42px;padding:0 20px;border-radius:10px;border:0;background:transparent;font-size:15px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--navy);box-shadow:0 2px 6px rgba(46,74,120,.12)}
+.chiprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{min-height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line-2);background:var(--surface);display:inline-flex;align-items:center;font-size:14px;color:var(--navy)}
+.chip.on{background:var(--navy);color:#FFFFFF;border-color:var(--navy)}
+.dir{background:var(--navy);color:#FFFFFF;border-radius:16px;padding:18px 22px;font-size:16px;display:flex;gap:12px;align-items:center}
+.dir b{font-size:13px;background:rgba(255,255,255,.18);border-radius:6px;padding:3px 8px;flex:none}
+.k3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px}
+.kc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:8px}
+.kc .lab{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px;font-weight:700}
+.kc .big{font-size:36px;font-weight:900;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.kc .big small{font-size:16px;color:var(--sub);font-weight:500;margin-left:6px}
+.prog{height:10px;border-radius:5px;background:var(--navy-soft);overflow:hidden}.prog i{display:block;height:100%;background:var(--navy);border-radius:5px}
+.gold{color:#B8935A}.red{color:#C2410C}
+.rank{display:flex;flex-direction:column;gap:10px}
+.ri{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(160px,260px);gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px}
+.ri .no{width:36px;height:36px;border-radius:18px;background:var(--navy-soft);color:var(--navy);font-weight:900;display:flex;align-items:center;justify-content:center}
+.ri.top .no{background:var(--navy);color:#FFFFFF}
+.ri .nm{font-weight:700;font-size:16px}.ri .kd{font-size:13px;color:var(--sub);margin-top:2px}
+.bars{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.bar2{display:grid;grid-template-columns:18px 1fr 30px;gap:8px;align-items:center}
+.bar2 svg{width:14px;height:14px}
+.bar2 .t{height:8px;border-radius:4px;background:#F1F2F5;overflow:hidden}.bar2 .t i{display:block;height:100%;border-radius:4px}
+.bar2 .v{text-align:right;font-variant-numeric:tabular-nums}
+.ins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.ic{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted);text-align:left}
+.ic h3{margin:0;font-size:15px;color:var(--ink);display:flex;justify-content:space-between}
+.ic h3 span{font-size:13px;color:var(--sub);font-weight:500}
+.ic small{font-size:13px;color:var(--sub)}
+button.ic:hover{border-color:var(--navy)}
+.vis-sw{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:36px;padding:0;border:0;background:transparent;color:var(--muted);font-size:13px}
+.vis-sw .knob{width:32px;height:18px;border-radius:9px;background:var(--line-2);position:relative;flex:none}
+.vis-sw .knob::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#FFFFFF;transition:left .15s}
+.vis-sw.on{color:var(--navy)}.vis-sw.on .knob{background:var(--navy)}.vis-sw.on .knob::after{left:16px}
+.kan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.kcol{background:#EEF0F4;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.kcol h3{margin:0 4px 4px;font-size:15px;display:flex;justify-content:space-between}
+.rq{background:var(--surface);border-radius:12px;padding:12px;font-size:14px;border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.rq .m{font-size:12px;color:var(--sub)}
+.rq-acts{display:flex;justify-content:space-between;gap:6px}
+.mini-btn{min-height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--muted);font-size:12px;font-weight:700}
+.mini-btn.on{background:var(--navy);border-color:var(--navy);color:#FFFFFF}
+@media (max-width:900px){.k3{grid-template-columns:minmax(0,1fr)}.ins{grid-template-columns:repeat(2,minmax(0,1fr))}.kan{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.ins{grid-template-columns:minmax(0,1fr)}.ri{grid-template-columns:36px minmax(0,1fr)}.ri .bars{grid-column:1/-1}}
+/* 제안 화면 왼쪽 번호 레일 */
+.pv{flex:1;display:flex;min-height:0}
+.rail{width:220px;flex:none;overflow-y:auto;padding:18px 0 18px 18px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;scroll-snap-type:y proximity}
+.rail-i{position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 12px 6px 0;border:0;background:transparent;text-align:left;color:var(--muted);scroll-snap-align:start}
+.rail-i::before{content:"";position:absolute;left:17px;top:0;bottom:0;border-left:2px dashed var(--line-2)}
+.rail-i:first-child::before{top:50%}.rail-i:last-child::before{bottom:50%}
+.rail-i .rn{position:relative;z-index:1;width:36px;height:36px;border-radius:18px;background:var(--surface);border:2px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;flex:none}
+.rail-i .rl{font-size:14px;font-weight:500;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rail-i:hover .rn{border-color:var(--navy)}
+.rail-i.on{color:var(--ink)}.rail-i.on .rn{background:var(--navy);border-color:var(--navy);color:#FFFFFF}.rail-i.on .rl{font-weight:700}
+@media (max-width:640px){
+  .pv{flex-direction:column}
+  .rail{width:auto;flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line);scroll-snap-type:x proximity}
+  .rail-i{min-height:44px;padding:0 14px 0 0}
+  .rail-i::before{left:0;right:0;top:50%;bottom:auto;border-left:0;border-top:2px dashed var(--line-2)}
+  .rail-i:first-child::before{left:18px;top:50%}.rail-i:last-child::before{right:auto;width:18px;bottom:auto}
+  .rail-i .rl{display:none}
+  .rail-i.on .rl{display:-webkit-box;max-width:140px}
+}
 </style>
 </head>
 <body>
@@ -703,11 +772,13 @@ function vClinic(){
       '<button type="button" class="btn btn-line" data-act="prev"'+(i===0?' disabled':'')+'>이전</button>'+
       '<button type="button" class="btn btn-primary" data-act="next"'+(i===list.length-1?' disabled':'')+'>다음</button>'+
       '<button type="button" class="icon-btn" data-act="closePresent" aria-label="닫기">'+I.x+'</button></div></div></div>';
-    h+='<div class="page-turn '+(S.flip==='prev'?'from-r':'from-l')+(S.flipAnim?' anim':'')+'">';
+    h+='<div class="pv"><nav class="rail" aria-label="제안 순서">';
+    list.forEach(function(x,j){h+='<button type="button" class="rail-i'+(j===i?' on':'')+'" data-act="jump" data-v="'+j+'" aria-current="'+(j===i?'step':'false')+'"><span class="rn">'+(j+1)+'</span><span class="rl">'+esc(cleanName(x.name))+'</span></button>';});
+    h+='</nav><div class="page-turn '+(S.flip==='prev'?'from-r':'from-l')+(S.flipAnim?' anim':'')+'">';
     if(S.presentUrl){h+='<iframe class="present-frame" src="'+esc(S.presentUrl)+'" title="'+esc(t.name)+'"></iframe>';}
     else{h+='<div class="present-body"><div class="present-ph"><b style="font-size:20px;color:var(--navy)">'+esc(t.name)+'</b>'+
       '<span class="muted">'+(S.presentLoading?'여는 중…':LIVE?'아직 주소나 파일이 등록되지 않은 자료예요. 관리자 화면에서 등록해 주세요.':'미리보기 모드라 실제 툴은 열리지 않아요. 운영 버전에서는 이 자리에 툴이 화면 가득 열립니다.')+'</span></div></div>';}
-    h+='</div></div>';
+    h+='</div></div></div>';
   }
   return h;
 }
@@ -715,14 +786,12 @@ function vClinic(){
 /* 관리자 */
 function vAdmin(){
   var area=S.adminArea||'stats';
-  var h='<div class="page wrap"><section class="blk"><h1 style="margin:0;font-size:26px;font-weight:900;color:var(--navy)">관리자 페이지</h1>'+
-    '<div class="areas" role="group" aria-label="관리 영역">'+
-    '<button type="button" class="area'+(area==='stats'?' on':'')+'" data-act="adminArea" data-v="stats" aria-pressed="'+(area==='stats')+'"><b>사용 통계</b><span>어떤 자료가 즐겨찾기되고 제안서에 담기는지 보고, 다음에 만들 자료를 정합니다</span></button>'+
-    '<button type="button" class="area'+(area==='manage'?' on':'')+'" data-act="adminArea" data-v="manage" aria-pressed="'+(area==='manage')+'"><b>자료 관리</b><span>자료 추가·삭제, 문의처, 계정, 자료 요청 확인</span></button></div></section>';
+  var h='<div class="page wrap"><section class="adm-band"><div><h1>관리자 페이지</h1><div class="sub2">'+(area==='stats'?'어떤 자료가 쓰이는지 보고, 다음에 만들 자료를 정합니다':'자료를 올리고 고치고, MR 요청을 확인합니다')+'</div></div>'+
+    '<div class="seg" role="group" aria-label="관리 영역"><button type="button" class="'+(area==='stats'?'on':'')+'" data-act="adminArea" data-v="stats" aria-pressed="'+(area==='stats')+'">사용 통계</button><button type="button" class="'+(area==='manage'?'on':'')+'" data-act="adminArea" data-v="manage" aria-pressed="'+(area==='manage')+'">자료 관리</button></div></section>';
   if(area==='stats')h+=vStats();
   else{
     var rq=(S.reqs||[]).filter(function(r){return r.status!=='올림';}).length;
-    h+='<div class="subtabs" role="group" aria-label="자료 관리 메뉴">'+sub('tools','자료')+sub('contacts','문의처')+sub('users','계정')+sub('reqs','자료 요청 확인하기'+(rq?' <span class="bk-cnt" style="background:#C2410C">'+rq+'</span>':''))+'</div>';
+    h+='<div class="subtabs" role="group" aria-label="자료 관리 메뉴">'+sub('tools','자료 '+S.tools.length)+sub('contacts','문의처 '+S.contacts.length)+sub('users','계정'+(S.members?' '+S.members.length:''))+sub('reqs','자료 요청 확인하기'+(rq?' <span class="bk-cnt" style="background:#C2410C">'+rq+'</span>':''))+'</div>';
     if(S.adminTab==='tools')h+=vToolAdmin();
     if(S.adminTab==='contacts')h+=vContactAdmin();
     if(S.adminTab==='reqs')h+=vReqs();
@@ -734,43 +803,66 @@ function sub(id,l){return '<button type="button" data-act="adminTab" data-v="'+i
 function loading(){return '<div class="prompt muted">불러오는 중…</div>';}
 function vStats(){
   if(!S.stats)return loading();
-  var rows=S.stats,scope=S.scope;
-  var divs={},offs={};rows.forEach(function(r){if(r.division)divs[r.division]=1;if(r.office)offs[r.office]=1;});
+  var rows=S.stats,scope=S.scope,mem=S.members||[];
+  var divs={},offs={};rows.concat(mem).forEach(function(r){if(r.division)divs[r.division]=1;if(r.office)offs[r.office]=1;});
   function inScope(r){if(scope==='all')return true;var p=scope.split(':');return p[0]==='d'?r.division===p[1]:r.office===p[1];}
   var R=rows.filter(inScope);
   function sum(type,target){return R.filter(function(r){return r.type===type&&(target===undefined||r.target===target);}).reduce(function(a,r){return a+Number(r.cnt);},0);}
   var people=R.filter(function(r){return r.type==='any';}).reduce(function(a,r){return a+Number(r.people);},0);
-  var reqs=(S.reqs||[]).filter(function(q){if(scope==='all')return true;var p=scope.split(':');return p[0]==='d'?q.division===p[1]:q.office===p[1];});
+  var total=mem.filter(inScope).length;
+  if(total&&people>total)people=total; /* 소속이 바뀐 사람은 집계 묶음이 둘로 나뉘어 두 번 셀 수 있어 등록 인원으로 맞춤 */
+  var pct=total?Math.round(people/total*100):0;
+  var reqs=(S.reqs||[]).filter(inScope);
+  function chip(v,l){return '<button type="button" class="chip'+(scope===v?' on':'')+'" data-act="scope" data-v="'+esc(v)+'" aria-pressed="'+(scope===v)+'">'+esc(l)+'</button>';}
   var h=(LIVE?'':'<div class="inbanner">미리보기 모드: 지금 이 화면에서 누른 기록이 바로 숫자로 쌓입니다.</div>');
-  h+='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><label for="scope" class="lb">보는 단위</label><select id="scope" class="field" style="width:auto;min-width:180px"><option value="all">전사</option>'+
-    Object.keys(divs).sort().map(function(d){return '<option value="d:'+esc(d)+'"'+(scope==='d:'+d?' selected':'')+'>사업부 · '+esc(d)+'</option>';}).join('')+
-    Object.keys(offs).sort().map(function(o){return '<option value="o:'+esc(o)+'"'+(scope==='o:'+o?' selected':'')+'>사무소 · '+esc(o)+'</option>';}).join('')+
-    '</select><span class="muted" style="font-size:13px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
-  h+='<div class="kpis">'+kpi(people,'사용한 사람')+kpi(sum('fav_now'),'즐겨찾기')+kpi(sum('basket'),'제안서에 담기')+kpi(reqs.length,'자료 요청')+'</div>';
+  h+='<div class="chiprow"><span class="lb" style="margin-right:4px">보는 단위</span>'+chip('all','전사')+
+    Object.keys(offs).sort().map(function(o){return chip('o:'+o,o);}).join('')+
+    Object.keys(divs).sort().map(function(d){return chip('d:'+d,d);}).join('')+
+    '<span class="muted" style="font-size:13px;margin-left:8px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
   var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id)};});
-  tr.sort(function(a,b){return (b.b*2+b.f)-(a.b*2+a.f);});
-  var max=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0])));
-  h+='<section class="blk"><h2>자료별 순위</h2><div class="tbl-box"><table style="min-width:560px"><thead><tr><th>자료</th><th>종류</th><th class="n">즐겨찾기</th><th class="n">제안서에 담기</th><th style="width:24%">담긴 비율</th></tr></thead><tbody>';
-  tr.forEach(function(r){h+='<tr><td>'+esc(r.t.name)+(r.t.active?'':' <span class="muted">(숨김)</span>')+'</td><td><span class="tag k-'+r.t.kind+'">'+KIND[r.t.kind]+'</span></td><td class="n">'+r.f+'</td><td class="n">'+r.b+'</td><td><div class="bar"><i style="width:'+(r.b/max*100)+'%"></i></div></td></tr>';});
-  h+='</tbody></table></div></section>';
-  var todo=[],byKind={};
-  tr.forEach(function(r){byKind[r.t.kind]=(byKind[r.t.kind]||0)+r.b*2+r.f;});
+  tr.sort(function(a,b){return (b.b-a.b)||(b.f-a.f);});
+  var byKind={};tr.forEach(function(r){byKind[r.t.kind]=(byKind[r.t.kind]||0)+r.b*2+r.f;});
   var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
-  if(topKind&&byKind[topKind]>0)todo.push(['방향','"'+KIND[topKind]+'" 자료가 가장 많이 즐겨찾기되고 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.']);
-  tr.forEach(function(r){if(r.b>=1)todo.push(['확산','"'+r.t.name+'"가 제안서에 '+r.b+'번 담겼어요. 성공사례로 정리할 후보입니다.']);});
-  tr.forEach(function(r){if(r.t.active&&!r.f&&!r.b&&rows.length)todo.push(['정리','"'+r.t.name+'"는 아직 즐겨찾기도, 담긴 적도 없어요. 안내가 필요한지, 빼도 되는지 확인해 보세요.']);});
-  var ra={};reqs.forEach(function(q){var k=q.place||'etc';ra[k]=(ra[k]||0)+1;});
-  Object.keys(ra).forEach(function(k){todo.push(['새 자료','"'+(areaLabel(k)||'기타')+'" 자료 요청이 '+ra[k]+'건 들어왔어요. 다음 달 공략 자료 후보입니다.']);});
-  h+='<section class="blk"><h2>다음에 할 일</h2><div class="todo">'+(todo.length?todo.map(function(x){return '<div><span class="tag '+(x[0]==='방향'?'k-tool':x[0]==='확산'?'a-doc':x[0]==='정리'?'a-in':'k-bd')+' pill">'+x[0]+'</span><span>'+esc(x[1])+'</span></div>';}).join(''):'<div><span class="muted">사용 기록이 쌓이면 여기에 할 일을 정리해 드려요.</span></div>')+'</div></section>';
+  if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+KIND[topKind]+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
+  h+='<div class="k3"><div class="kc"><div class="lab">사용한 사람</div><div class="big">'+people+'<small>/ '+total+'명'+(total?' · '+pct+'%':'')+'</small></div><div class="prog"><i style="width:'+Math.min(pct,100)+'%"></i></div>'+(total?'':'<div class="muted" style="font-size:13px">계정에 명단을 넣으면 비율이 나옵니다</div>')+'</div>'+
+    '<div class="kc"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">자주 쓰겠다고 표시한 횟수</div></div>'+
+    '<div class="kc"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수</div></div></div>';
+  var mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
+  h+='<section class="blk"><h2>자료별 순위 <span class="muted" style="font-size:14px;font-weight:500">· 제안서에 담긴 순</span></h2><div class="rank">';
+  tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+KIND[r.t.kind]+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
+    '<div class="bar2"><span class="red">'+I.bag+'</span><span class="t"><i style="width:'+(r.b/mb*100)+'%;background:#C2410C"></i></span><span class="v">'+r.b+'</span></div>'+
+    '<div class="bar2"><span class="gold">★</span><span class="t"><i style="width:'+(r.f/mf*100)+'%;background:#D9B25F"></i></span><span class="v">'+r.f+'</span></div></div></div>';});
+  h+='</div></section>';
+  var spread=tr.filter(function(r){return r.b>=1;}),tidy=tr.filter(function(r){return r.t.active&&!r.f&&!r.b&&rows.length;});
+  var ra={};reqs.forEach(function(q){var k=areaLabel(q.place)||'기타';ra[k]=(ra[k]||0)+1;});
+  var waiting=reqs.filter(function(q){return q.status==='접수';}).length;
+  function names(list){return list.slice(0,3).map(function(r){return esc(cleanName(r.t.name));}).join(' · ')+(list.length>3?' 외 '+(list.length-3)+'개':'');}
+  h+='<section class="blk"><h2>다음에 할 일</h2><div class="ins">'+
+    '<div class="ic"><h3>확산 <span>'+spread.length+'</span></h3>'+(spread.length?names(spread)+'<small>성공사례로 정리할 후보</small>':'<small>제안서에 담긴 자료가 생기면 여기에 나와요</small>')+'</div>'+
+    '<div class="ic"><h3>정리 <span>'+tidy.length+'</span></h3>'+(tidy.length?names(tidy)+'<small>안내가 필요한지, 빼도 되는지 확인</small>':'<small>쓰이지 않는 자료가 없어요</small>')+'</div>'+
+    '<div class="ic"><h3>새 자료 <span>'+reqs.length+'</span></h3>'+(reqs.length?Object.keys(ra).map(function(k){return esc(k)+' '+ra[k]+'건';}).join(' · ')+'<small>다음 달 공략 자료 후보</small>':'<small>들어온 자료 요청이 없어요</small>')+'</div>'+
+    '<button type="button" class="ic" data-act="goReqs"><h3>요청 대기 <span>'+waiting+'</span></h3>'+(waiting?'접수 상태 요청이 '+waiting+'건 있어요':'기다리는 요청이 없어요')+'<small>자료 관리 → 자료 요청 확인하기</small></button>'+
+    '</div></section>';
   return h;
 }
 function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
 function vToolAdmin(){
-  var h='<div style="display:flex;justify-content:flex-end"><button type="button" class="btn btn-primary" data-act="newTool">+ 새 툴 등록</button></div>';
-  h+='<div class="tbl-box"><table><thead><tr><th>이름</th><th>종류</th><th>분류</th><th>보여주기</th><th>열기</th><th>만든 사람</th><th></th></tr></thead><tbody>';
-  S.tools.forEach(function(t){h+='<tr><td>'+esc(t.name)+(t.month?' <span class="tag a-doc">이달의 공략</span>':'')+(t.active?'':' <span class="tag a-in">숨김</span>')+'</td><td><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span></td><td>'+esc(t.tags.map(areaLabel).join(', '))+'</td><td>'+audTag(t)+'</td><td>'+(t.file?'파일':t.url?'주소':'<span style="color:var(--warn);font-weight:700">미등록</span>')+'</td><td>'+esc(t.by)+'</td>'+
-    '<td style="white-space:nowrap"><button type="button" class="btn btn-line" data-act="editTool" data-v="'+t.id+'" style="min-height:36px">수정</button> <button type="button" class="btn btn-ghost" data-act="delAsk" data-v="tool:'+t.id+'">삭제</button></td></tr>';});
-  return h+'</tbody></table></div>';
+  var k=S.admKind||'all';
+  var list=S.tools.filter(function(t){return k==='all'||t.kind===k;});
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="chiprow">';
+  [{id:'all',label:'전체'}].concat(NEEDS.filter(function(n){return KIND[n.id];})).forEach(function(n){
+    var c=n.id==='all'?S.tools.length:S.tools.filter(function(t){return t.kind===n.id;}).length;
+    h+='<button type="button" class="chip'+(k===n.id?' on':'')+'" data-act="admKind" data-v="'+n.id+'" aria-pressed="'+(k===n.id)+'">'+n.label+' '+c+'</button>';});
+  h+='</div><button type="button" class="btn btn-primary" data-act="newTool" style="min-height:46px;padding:0 22px">+ 자료 추가</button></div>';
+  if(!list.length)return h+'<div class="prompt muted">이 종류로 등록된 자료가 없어요. "+ 자료 추가"로 올려보세요.</div>';
+  h+='<div class="grid">';
+  list.forEach(function(t){
+    var op=t.file?(/\.pdf$/i.test(t.file)?'PDF':'파일'):t.url?'주소':'';
+    h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-doc">이달의 공략</span>':'')+'</div></div>'+
+      '<h3>'+esc(t.name)+'</h3><div class="meta">'+esc(t.tags.map(areaLabel).join('·')||'전체')+' · 열기: '+(op?'<b>'+op+'</b>':'<b style="color:#8A4B12">주소 미등록</b>')+' · '+esc(t.by)+'</div>'+
+      '<button type="button" class="vis-sw'+(t.active?' on':'')+'" data-act="toggleActive" data-v="'+t.id+'" aria-pressed="'+t.active+'"><span class="knob" aria-hidden="true"></span>MR 화면에 보이기</button>'+
+      '<div class="acts"><button type="button" class="btn btn-line" data-act="editTool" data-v="'+t.id+'">수정</button><button type="button" class="btn btn-ghost" data-act="delAsk" data-v="tool:'+t.id+'">삭제</button></div></article>';});
+  return h+'</div>';
 }
 function vScriptAdmin(){
   var h='<div style="display:flex;justify-content:flex-end"><button type="button" class="btn btn-primary" data-act="newScript">+ 멘트 추가</button></div>';
@@ -789,11 +881,17 @@ function vContactAdmin(){
 }
 function vReqs(){
   if(!S.reqs)return loading();
-  if(!S.reqs.length)return '<div class="prompt muted">아직 들어온 요청이 없어요. 툴·자료 화면의 "툴 요청하기"로 보내면 여기에 쌓입니다.</div>';
-  var h='<div class="tbl-box"><table><thead><tr><th>요청 내용</th><th>분류</th><th>사무소</th><th>날짜</th><th>상태</th></tr></thead><tbody>';
-  S.reqs.forEach(function(r,i){h+='<tr><td style="white-space:pre-line">'+esc(r.body)+'</td><td>'+esc(areaLabel(r.place))+'</td><td>'+esc(r.office||'')+'</td><td>'+esc((r.created_at||'').slice(0,10))+'</td><td><label class="sr" for="rs'+i+'">상태</label><select id="rs'+i+'" class="field" data-req="'+r.id+'" style="min-height:38px;width:auto">'+
-    REQ_STATUS.map(function(s){return '<option'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td></tr>';});
-  return h+'</tbody></table></div>';
+  var h='<div class="kan">';
+  REQ_STATUS.forEach(function(st,si){
+    var list=S.reqs.filter(function(r){return r.status===st;});
+    h+='<div class="kcol"><h3>'+st+' <span>'+list.length+'</span></h3>';
+    if(!list.length)h+='<div class="muted" style="font-size:13px;padding:8px 4px">없음</div>';
+    list.forEach(function(r){
+      h+='<div class="rq"><div style="white-space:pre-line">'+esc(r.body)+'</div><div class="m">'+esc(areaLabel(r.place)||'기타')+' · '+esc(r.office||'')+' · '+esc((r.created_at||'').slice(5,10).replace('-','.'))+'</div>'+
+        '<div class="rq-acts">'+(si>0?'<button type="button" class="mini-btn" data-act="reqMove" data-v="'+r.id+':'+REQ_STATUS[si-1]+'">← '+REQ_STATUS[si-1]+'</button>':'<span></span>')+
+        (si<REQ_STATUS.length-1?'<button type="button" class="mini-btn on" data-act="reqMove" data-v="'+r.id+':'+REQ_STATUS[si+1]+'">'+REQ_STATUS[si+1]+' →</button>':'')+'</div></div>';});
+    h+='</div>';});
+  return h+'</div>';
 }
 function vUsers(){
   var h='<div class="inbanner">사번·이름·소속은 개인정보입니다. 경인1사무소 시범 운영 범위로만 등록하고, 전사 확대는 IT·보안 확인 후 진행합니다.</div>'+
@@ -952,8 +1050,8 @@ async function afterLogin(uid){
 function saveBasket(){try{sessionStorage.setItem('daisso_basket',JSON.stringify(S.basket));}catch(e){}}
 async function loadAdmin(){
   try{
-    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(),api.requests()]);S.stats=r[0];S.reqs=r[1];}
-    else{S.reqs=await api.requests();if(S.adminTab==='users')S.members=await api.members();}
+    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(),api.requests(),api.members()]);S.stats=r[0];S.reqs=r[1];S.members=r[2];}
+    else{var r2=await Promise.all([api.requests(),api.members()]);S.reqs=r2[0];S.members=r2[1];}
   }catch(e){fail(e);}
   render();
 }
@@ -1003,6 +1101,7 @@ document.addEventListener('click',function(e){
     case 'present':S.flip='next';showPresent(+v);return;
     case 'prev':if(S.present>0){S.flip='prev';showPresent(S.present-1);}return;
     case 'next':if(S.present<clinicList().length-1){S.flip='next';showPresent(S.present+1);}return;
+    case 'jump':var jt=+v;if(jt!==S.present){S.flip=jt<S.present?'prev':'next';showPresent(jt);}return;
     case 'closePresent':S.present=-1;S.presentUrl='';break;
     case 'stage':S.stage=v;break;
     case 'simple':S.simple=!S.simple;break;
@@ -1020,6 +1119,11 @@ document.addEventListener('click',function(e){
     case 'openReq':S.modal='req';break;
     case 'closeModal':S.modal=null;S.edit=null;break;
     case 'adminTab':S.adminTab=v;loadAdmin();break;
+    case 'scope':S.scope=v;break;
+    case 'admKind':S.admKind=v;break;
+    case 'goReqs':S.adminArea='manage';S.adminTab='reqs';loadAdmin();break;
+    case 'toggleActive':var ta=byId(v);if(ta){var nd=Object.assign({},ta,{active:!ta.active});api.saveTool(ta.id,nd,null).then(function(sv){S.tools=S.tools.map(function(x){return x.id===sv.id?sv:x;});say(sv.active?'MR 화면에 다시 보여요.':'MR 화면에서 숨겼어요.');render();}).catch(fail);}return;
+    case 'reqMove':var rp=v.split(':'),rid=rp[0],rst=rp.slice(1).join(':');api.setReqStatus(rid,rst).then(function(){(S.reqs||[]).forEach(function(r){if(r.id===rid)r.status=rst;});render();}).catch(fail);return;
     case 'adminArea':S.adminArea=v;if(v==='manage'&&['tools','contacts','users','reqs'].indexOf(S.adminTab)<0)S.adminTab='tools';loadAdmin();break;
     case 'reloadStats':S.stats=null;loadAdmin();break;
     case 'newTool':S.modal='tool';S.edit=null;break;
