@@ -255,6 +255,9 @@ function vTools(){
     if(S.favOnly)parts.push('즐겨찾기한 툴');
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
     h+='<div class="muted" style="font-size:14px">'+esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개</div>';
+    if(list.length&&!S.basket.length&&list.some(function(t){return t.doctor;})){
+      h+='<div class="guide">'+I.bag+'<div><b>원장님 뵙기 전에, 보여드릴 자료를 "제안에 담기"로 골라두세요.</b><br>거래처에 도착해 "거래처에 와 있어요"를 누르면 담은 순서대로 나옵니다.</div></div>';
+    }
     if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
     else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
   }
