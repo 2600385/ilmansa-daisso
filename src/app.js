@@ -148,7 +148,7 @@ var api=LIVE?live:demo;
 /* =====================================================================
    상태
    ===================================================================== */
-var S={simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
+var S={printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
   tools:[],scripts:[],contacts:[],favs:{},basket:[],basketOpen:false,hospital:'',present:-1,stage:'s1',
   adminTab:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
 var toastTimer=null;
@@ -176,6 +176,7 @@ var I={
   x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   arrow:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
   phone:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  print:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>',
   copy:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>'
 };
 /* 시그니처 마크: 주황 네모 + 熊 (현황판과 같은 모양) */
@@ -299,6 +300,7 @@ function vBasketBar(){
       (i>0?'<button type="button" class="mini" data-act="bkUp" data-v="'+i+'" aria-label="앞으로">'+I.up+'</button>':'')+
       '<button type="button" class="mini" data-act="basket" data-v="'+id+'" aria-label="빼기">'+I.x+'</button></li>';});
   h+='</ol><div class="bk-acts"><button type="button" class="btn btn-ghost" data-act="basketClear">비우기</button>'+
+    '<button type="button" class="btn btn-ghost" data-act="printOpen">'+I.print+'인쇄</button>'+
     '<button type="button" class="go-link" data-act="mode" data-v="clinic">제안하러 가기 '+I.arrow+'</button></div></div></div></div>';
   return h;
 }
@@ -342,7 +344,7 @@ function vClinic(){
   var list=clinicList();
   var h='<div class="clinic"><div class="wrap">';
   if(!S.simple)h+='<div class="clinic-hero">'+
-    '<h1 id="hosp-title">'+esc(hospTitle())+'</h1>'+
+    '<div class="title-row"><h1 id="hosp-title">'+esc(hospTitle())+'</h1><button type="button" class="btn btn-line" data-act="printOpen">'+I.print+'인쇄</button></div>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
     '</div>';
   if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
@@ -470,6 +472,24 @@ function vModal(){
     return modalWrap('reqForm','툴 요청하기','<p class="muted" style="margin:0;font-size:14px">요청은 사무소 단위로만 모아 봅니다. 이름은 관리자에게 보이지 않아요.</p>'+
       '<div class="fg"><label class="lb" for="reqText">어떤 툴이나 자료가 필요한가요?</label><textarea id="reqText" class="field" maxlength="1000" placeholder="예: 투석 환자가 많은 의원에 보여줄 수익 계산"></textarea></div>'+
       '<div class="fg"><label class="lb" for="reqArea">어디 갈 때 쓰나요?</label><select id="reqArea" class="field">'+PLACES.filter(function(p){return p.id!=='all';}).map(function(a){return '<option value="'+a.id+'">'+a.label+'</option>';}).join('')+'</select></div>');
+  }
+  if(m==='print'){
+    var pl=clinicList(),okN=pl.filter(isPrintable).length,selN=pl.filter(function(t){return S.printSel[t.id];}).length;
+    var ph='<div class="modal-bg" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="prT"><h2 id="prT">제안자료 인쇄</h2>'+
+      '<p class="muted" style="margin:0;font-size:14px">담긴 자료 중 PDF·이미지 자료를 골라 한 번에 인쇄합니다. 웹 툴은 새 창에서 열어 인쇄해 주세요.</p>';
+    if(!pl.length)ph+='<div class="prompt muted">제안서에 담긴 자료가 없어요.</div>';
+    else{
+      ph+='<div class="pr-list">';
+      pl.forEach(function(t,i){var ok=isPrintable(t);
+        ph+='<label class="pr-row'+(ok?'':' off')+'"><input type="checkbox" data-print="'+t.id+'"'+(ok&&S.printSel[t.id]?' checked':'')+(ok?'':' disabled')+'><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span><span class="muted" style="font-size:13px;margin-left:auto">'+(ok?(/\.pdf$/i.test(t.file)?'PDF':'이미지'):'웹 툴 · 인쇄 불가')+'</span></label>';});
+      ph+='</div>';
+    }
+    if(S.printUrl)ph+='<p class="muted" style="margin:0;font-size:13px">인쇄 창이 뜨지 않으면 <a href="'+S.printUrl+'" target="_blank" rel="noopener">합친 PDF 열기</a>에서 인쇄하세요.</p>';
+    ph+='<div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">'+
+      (okN?'<button type="button" class="btn btn-line" data-act="printAll">'+(selN===okN?'전체 해제':'전체 선택')+'</button>':'<span></span>')+
+      '<div style="display:flex;gap:8px"><button type="button" class="btn btn-line" data-act="closeModal">닫기</button>'+
+      '<button type="button" class="btn btn-primary" data-act="printGo"'+(selN&&!S.busy?'':' disabled')+'>'+I.print+(S.busy?'준비 중…':'선택한 '+selN+'개 인쇄')+'</button></div></div></div></div>';
+    return ph;
   }
   if(m==='bkEdit'){
     var bh='<div class="modal-bg" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="bkT"><h2 id="bkT">제안서 수정</h2>';
@@ -644,6 +664,9 @@ document.addEventListener('click',function(e){
     case 'stage':S.stage=v;break;
     case 'simple':S.simple=!S.simple;break;
     case 'bkEdit':S.modal='bkEdit';break;
+    case 'printOpen':S.printSel={};S.printUrl='';clinicList().forEach(function(t){if(isPrintable(t))S.printSel[t.id]=true;});S.modal='print';break;
+    case 'printAll':var pa=clinicList().filter(isPrintable),allOn=pa.every(function(t){return S.printSel[t.id];});S.printSel={};if(!allOn)pa.forEach(function(t){S.printSel[t.id]=true;});break;
+    case 'printGo':doPrint();return;
     case 'addMore':S.modal=null;S.mode='prep';S.page='tools';S.present=-1;window.scrollTo(0,0);say('자료를 더 담은 뒤 아래 "거래처 제안서 모드로"를 누르세요.');break;
     case 'endVisit':S.basket=[];saveBasket();S.hospital='';S.simple=false;S.present=-1;S.presentUrl='';S.mode='prep';S.basketOpen=false;window.scrollTo(0,0);say('제안서를 비웠어요. 다음 병원 준비하세요.');break;
     case 'copy':
@@ -670,6 +693,39 @@ document.addEventListener('click',function(e){
   }
   render();
 });
+/* 인쇄: PDF·이미지 자료를 한 PDF로 합쳐 인쇄 창을 엽니다 (pdf-lib는 처음 쓸 때만 불러옴) */
+function isPrintable(t){return !!(t&&t.file&&/\.(pdf|png|jpe?g|webp|gif)$/i.test(t.file));}
+function loadScript(src){return new Promise(function(ok,no){var el=document.createElement('script');el.src=src;el.onload=ok;el.onerror=function(){no(new Error('인쇄 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));};document.head.appendChild(el);});}
+function imageToPng(bytes){return new Promise(function(ok,no){var url=URL.createObjectURL(new Blob([bytes]));var img=new Image();img.onload=function(){var c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);URL.revokeObjectURL(url);c.toBlob(function(b){b.arrayBuffer().then(ok,no);},'image/png');};img.onerror=function(){no(new Error('이미지를 읽지 못했어요.'));};img.src=url;});}
+async function doPrint(){
+  var items=clinicList().filter(function(t){return isPrintable(t)&&S.printSel[t.id];});
+  if(!items.length)return;
+  S.busy=true;render();
+  try{
+    if(!window.PDFLib)await loadScript('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js');
+    var out=await PDFLib.PDFDocument.create();
+    for(var i=0;i<items.length;i++){
+      var t=items[i],url=await api.fileUrl(t.file);
+      var bytes=await (await fetch(url)).arrayBuffer();
+      if(/\.pdf$/i.test(t.file)){
+        var src=await PDFLib.PDFDocument.load(bytes,{ignoreEncryption:true});
+        (await out.copyPages(src,src.getPageIndices())).forEach(function(pg){out.addPage(pg);});
+      }else{
+        var png=await out.embedPng(await imageToPng(bytes));
+        var W=595.28,H=841.89,m=28,sc=Math.min((W-2*m)/png.width,(H-2*m)/png.height,1);
+        var page=out.addPage([W,H]);page.drawImage(png,{x:(W-png.width*sc)/2,y:(H-png.height*sc)/2,width:png.width*sc,height:png.height*sc});
+      }
+    }
+    var blobUrl=URL.createObjectURL(new Blob([await out.save()],{type:'application/pdf'}));
+    S.printUrl=blobUrl;
+    var fr=document.getElementById('print-frame');if(fr)fr.remove();
+    fr=document.createElement('iframe');fr.id='print-frame';fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';fr.src=blobUrl;
+    fr.onload=function(){try{fr.contentWindow.focus();fr.contentWindow.print();}catch(e){}};
+    document.body.appendChild(fr);
+    say('인쇄 창을 여는 중이에요. 안 뜨면 팝업의 "합친 PDF 열기"를 눌러주세요.');
+  }catch(e){S.busy=false;fail(e);return;}
+  S.busy=false;render();
+}
 async function doDelete(key){
   var p=key.split(':'),kind=p[0],id=p.slice(1).join(':');
   try{
@@ -688,6 +744,7 @@ document.addEventListener('input',function(e){
 });
 document.addEventListener('change',function(e){
   var t=e.target;
+  if(t.hasAttribute('data-print')){var pid=t.getAttribute('data-print');if(t.checked)S.printSel[pid]=true;else delete S.printSel[pid];render();return;}
   if(t.id==='scope'){S.scope=t.value;render();}
   else if(t.hasAttribute('data-req')){var id=t.getAttribute('data-req'),val=t.value;api.setReqStatus(id,val).then(function(){(S.reqs||[]).forEach(function(r){if(r.id===id)r.status=val;});say('상태를 바꿨어요.');render();}).catch(fail);}
 });

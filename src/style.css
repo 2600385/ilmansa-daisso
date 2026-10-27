@@ -302,3 +302,11 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 @keyframes turnR{from{transform:perspective(2200px) rotateY(70deg);opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
 .present{perspective:2200px}
 .present>.wrap{width:100%}
+
+.title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pr-list{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.pr-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);cursor:pointer}
+.pr-row input{width:18px;height:18px;accent-color:var(--navy)}
+.pr-row .num{width:24px;height:24px;border-radius:12px;background:var(--navy);color:#FFFFFF;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.pr-row .nm{font-weight:500;min-width:0}
+.pr-row.off{opacity:.55;cursor:not-allowed}
