@@ -12,8 +12,8 @@ var LIVE = !!(SUPABASE_URL && SUPABASE_KEY && window.supabase);
 var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
-var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'},{id:'all',label:'전체',c:'#8C99B3'}];
-var NEEDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
+var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'}];
+var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
 var KIND={tool:'툴',site:'사이트',brochure:'브로셔',notice:'지침공문',edu:'교육자료'};
@@ -160,7 +160,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function byId(id){for(var i=0;i<S.tools.length;i++){if(S.tools[i].id===id)return S.tools[i];}return null;}
 function areaLabel(id){for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
 function inPlace(t,p){return p==='none'||p==='all'||t.kind==='edu'||t.tags.indexOf(p)>=0;}
-function inNeed(t,n){return n==='none'||t.kind===n;}
+function inNeed(t,n){return n==='none'||n==='all'||t.kind===n;}
 function say(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){S.toast='';render();},2800);}
 function fail(e){console.error(e);say((e&&e.message)||'처리하지 못했어요. 잠시 뒤 다시 시도해 주세요.');render();}
 function activeTools(){return S.tools.filter(function(t){return t.active;});}
@@ -238,7 +238,8 @@ function vTools(){
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
   h+='</div><h2 style="margin:6px 0 0;font-size:20px">지금 뭐가 필요하세요?</h2><div class="tabs">';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
-    var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return t.kind===n.id&&inPlace(t,S.place);}).length;
+    var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
+    if(!cnt&&!on&&n.id!=='all')return;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
   h+='</div>';
   if(idle){
@@ -255,7 +256,7 @@ function vTools(){
     }).sort(function(a,b){return (b.month?1:0)-(a.month?1:0)||a.sort-b.sort;});
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
-    else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
+    else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
     h+='<div class="muted" style="font-size:14px">'+esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개</div>';
     if(list.length&&!S.basket.length&&list.some(function(t){return t.doctor;})){
       h+='<div class="guide">'+I.bag+'<div><b>원장님 뵙기 전에, 보여드릴 자료를 제안서에 담아두세요.</b><br>거래처에 도착해 "거래처에 와 있어요"를 누르면 담은 순서대로 나옵니다.</div></div>';
