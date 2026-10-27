@@ -1,0 +1,15 @@
+# Supabase 무료 프로젝트는 1주일간 접속이 없으면 일시정지됩니다.
+# 3일마다 한 번 창고에 접속해서 멈추지 않게 합니다. (공개용 키만 사용)
+name: Supabase 깨우기
+on:
+  schedule:
+    - cron: "17 0 */3 * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 창고에 접속
+        run: |
+          curl -fsS "https://ahyeaqwdwawnxfssokuv.supabase.co/rest/v1/tools?select=id&limit=1" \
+            -H "apikey: sb_publishable_OUtfwHh2ROmroJP-YrBh0Q_JZZFfQtg" -o /dev/null -w "응답 %{http_code}\n"
