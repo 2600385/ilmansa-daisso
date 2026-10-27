@@ -44,7 +44,7 @@ label.lb{font-size:14px;font-weight:700}
 .chk{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:15px}
 .chk input{width:18px;height:18px;accent-color:var(--navy)}
 .tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;letter-spacing:.3px;border-radius:6px;padding:3px 8px;white-space:nowrap}
-.k-tool{background:#E8EDFF;color:#2B44A8}.k-bd,.k-brochure{background:#FDEBDF;color:#A8401A}.k-site{background:#E1F5EC;color:#0B6B50}.k-notice{background:#F1ECFA;color:#5B3FA0}.k-script{background:var(--navy-soft);color:var(--navy)}
+.k-tool{background:#E8EDFF;color:#2B44A8}.k-bd,.k-brochure{background:#FDEBDF;color:#A8401A}.k-site{background:#E1F5EC;color:#0B6B50}.k-notice{background:#F1ECFA;color:#5B3FA0}.k-edu{background:#E3F2EC;color:#1F6B52}.k-script{background:var(--navy-soft);color:var(--navy)}
 .a-doc{background:var(--gold-soft);color:var(--gold-ink)}.a-in{background:#EEF0F5;color:var(--muted)}
 
 /* 헤더 */
@@ -178,8 +178,15 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 
 @media (max-width:640px){
   .hero{padding:26px 20px}
-  .mode{width:100%}.mode button{flex:1;justify-content:center;padding:0 8px}
+  .top-r{width:100%}
+  .mode{width:100%}.mode button{flex:1;justify-content:center;padding:0 8px;white-space:nowrap}
   .form-grid{grid-template-columns:minmax(0,1fr)}
   .stage button{min-height:72px;font-size:14px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.simple-sw{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border:0;background:transparent;color:var(--sub);font-size:13px;font-weight:500}
+.simple-sw .knob{width:32px;height:18px;border-radius:9px;background:var(--line-2);position:relative;transition:background .15s}
+.simple-sw .knob::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#FFFFFF;transition:left .15s}
+.simple-sw.on{color:var(--navy)}.simple-sw.on .knob{background:var(--navy)}.simple-sw.on .knob::after{left:16px}
+.clinic-simple{display:flex;justify-content:flex-end;padding-top:12px}
+.clinic-simple+.steps{padding-top:8px}

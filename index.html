@@ -54,7 +54,7 @@ label.lb{font-size:14px;font-weight:700}
 .chk{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:15px}
 .chk input{width:18px;height:18px;accent-color:var(--navy)}
 .tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;letter-spacing:.3px;border-radius:6px;padding:3px 8px;white-space:nowrap}
-.k-tool{background:#E8EDFF;color:#2B44A8}.k-bd,.k-brochure{background:#FDEBDF;color:#A8401A}.k-site{background:#E1F5EC;color:#0B6B50}.k-notice{background:#F1ECFA;color:#5B3FA0}.k-script{background:var(--navy-soft);color:var(--navy)}
+.k-tool{background:#E8EDFF;color:#2B44A8}.k-bd,.k-brochure{background:#FDEBDF;color:#A8401A}.k-site{background:#E1F5EC;color:#0B6B50}.k-notice{background:#F1ECFA;color:#5B3FA0}.k-edu{background:#E3F2EC;color:#1F6B52}.k-script{background:var(--navy-soft);color:var(--navy)}
 .a-doc{background:var(--gold-soft);color:var(--gold-ink)}.a-in{background:#EEF0F5;color:var(--muted)}
 
 /* 헤더 */
@@ -188,11 +188,18 @@ section.blk>h2{margin:0;font-size:20px;font-weight:700}
 
 @media (max-width:640px){
   .hero{padding:26px 20px}
-  .mode{width:100%}.mode button{flex:1;justify-content:center;padding:0 8px}
+  .top-r{width:100%}
+  .mode{width:100%}.mode button{flex:1;justify-content:center;padding:0 8px;white-space:nowrap}
   .form-grid{grid-template-columns:minmax(0,1fr)}
   .stage button{min-height:72px;font-size:14px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.simple-sw{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border:0;background:transparent;color:var(--sub);font-size:13px;font-weight:500}
+.simple-sw .knob{width:32px;height:18px;border-radius:9px;background:var(--line-2);position:relative;transition:background .15s}
+.simple-sw .knob::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#FFFFFF;transition:left .15s}
+.simple-sw.on{color:var(--navy)}.simple-sw.on .knob{background:var(--navy)}.simple-sw.on .knob::after{left:16px}
+.clinic-simple{display:flex;justify-content:flex-end;padding-top:12px}
+.clinic-simple+.steps{padding-top:8px}
 </style>
 </head>
 <body>
@@ -214,18 +221,20 @@ var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'},{id:'all',label:'전체',c:'#8C99B3'}];
-var NEEDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
+var NEEDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'site',label:'사이트',c:'#4FA3B8'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'notice',label:'지침공문',c:'#8D72C9'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'script',label:'표준멘트',c:'#C9A24A'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
-var KIND={tool:'툴',site:'사이트',brochure:'브로셔',notice:'지침공문'};
+var KIND={tool:'툴',site:'사이트',brochure:'브로셔',notice:'지침공문',edu:'교육자료'};
 var STAGES=[{id:'s1',label:'초기 제안',no:'1단계'},{id:'s2',label:'기초 셋팅',no:'2단계'},{id:'s3',label:'일만사 시작·청구',no:'3단계'}];
 var REQ_STATUS=['접수','만드는 중','올림'];
 
 /* =====================================================================
    데이터 창구: 운영(Supabase) / 미리보기(메모리) 두 가지가 같은 모양
    ===================================================================== */
-function toTool(r){return {id:r.id,name:r.name,kind:r.kind,tags:r.places||[],month:!!r.is_month,doctor:!!r.for_doctor,url:r.url||'',file:r.file_path||'',desc:r.description||'',pub:r.doctor_desc||'',by:r.made_by||'',sort:r.sort||0,active:r.active!==false};}
-function fromTool(t){return {name:t.name,kind:t.kind,places:t.tags,is_month:t.month,for_doctor:t.doctor,url:t.url||null,file_path:t.file||null,description:t.desc,doctor_desc:t.pub,made_by:t.by,sort:t.sort||0,active:t.active!==false,updated_at:new Date().toISOString()};}
+/* 교육자료는 DB의 종류 목록을 바꾸지 않으려고 kind='notice' + places에 '_edu'로 저장합니다 */
+var EDU_TAG='_edu';
+function toTool(r){var pl=r.places||[],edu=pl.indexOf(EDU_TAG)>=0;return {id:r.id,name:r.name,kind:edu?'edu':r.kind,tags:pl.filter(function(x){return x!==EDU_TAG;}),month:!!r.is_month,doctor:!!r.for_doctor,url:r.url||'',file:r.file_path||'',desc:r.description||'',pub:r.doctor_desc||'',by:r.made_by||'',sort:r.sort||0,active:r.active!==false};}
+function fromTool(t){var edu=t.kind==='edu';return {name:t.name,kind:edu?'notice':t.kind,places:edu?t.tags.concat([EDU_TAG]):t.tags,is_month:t.month,for_doctor:t.doctor,url:t.url||null,file_path:t.file||null,description:t.desc,doctor_desc:t.pub,made_by:t.by,sort:t.sort||0,active:t.active!==false,updated_at:new Date().toISOString()};}
 function toScript(r){return {id:r.id,stage:r.stage,type:r.type,title:r.title,text:r.body||'',tool:r.tool_id||null,sort:r.sort||0};}
 function toContact(r){return {id:r.id,topic:r.topic,dept:r.dept||'',tel:r.tel||'',tags:r.places||[],sort:r.sort||0};}
 function must(res){if(res.error)throw res.error;return res.data;}
@@ -295,7 +304,8 @@ var demo=(function(){
     {name:'일만사 등록 이지플래너',kind:'tool',tags:['new','keep'],doctor:true,by:'이혜선 CM',desc:'원장님께 일만사 수가 수입을 한눈에 보여주는 상담용 화면입니다.',pub:'일만사 수가와 등록 절차를 한눈에 확인합니다.'},
     {name:'검진센터 제안 브로셔',kind:'brochure',tags:['new'],month:true,doctor:true,by:'이혜선 CM',desc:'병원명과 담당자명을 넣으면 거래처 맞춤 제안 포스터가 만들어집니다.',pub:'병원에 맞춘 일만사 제안서입니다.'},
     {name:'AX004 청구증대 툴',kind:'tool',tags:['keep'],doctor:false,by:'이혜선 CM',desc:'환자는 많은데 교육상담 청구가 낮은 거래처를 찾아냅니다.',pub:''},
-    {name:'청구현황 대시보드',kind:'tool',tags:['keep'],doctor:false,by:'이혜선 CM',desc:'사무소별 청구 순위와 월별 추이를 봅니다.',pub:''}
+    {name:'청구현황 대시보드',kind:'tool',tags:['keep'],doctor:false,by:'이혜선 CM',desc:'사무소별 청구 순위와 월별 추이를 봅니다.',pub:''},
+    {name:'예시 · 일만사란? (신규 입사자용)',kind:'edu',tags:[],doctor:true,by:'[작성자]',desc:'교육 슬라이드(PPT·PDF)가 들어가는 자리 예시입니다.',pub:'일만사가 무엇인지 한눈에 정리한 자료입니다.'}
   ].map(function(t,i){t.id=nid();t.sort=i;t.url='';t.file='';t.active=true;return t;});
   function tid(name){for(var i=0;i<tools.length;i++)if(tools[i].name===name)return tools[i].id;return null;}
   var scripts=[['s1','base','첫 인사와 일만사 소개','검진센터 제안 브로셔'],['s1','base','예상 수익 보여드리기','일만사 수익 시뮬레이터'],['s1','obj','인력이 없어요',null],['s1','obj','수익이 얼마나 돼요?','일만사 수익 시뮬레이터'],['s1','obj','환자들이 싫어해요',null],
@@ -346,7 +356,7 @@ var api=LIVE?live:demo;
 /* =====================================================================
    상태
    ===================================================================== */
-var S={boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
+var S={simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
   tools:[],scripts:[],contacts:[],favs:{},basket:[],basketOpen:false,hospital:'',present:-1,stage:'s1',
   adminTab:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
 var toastTimer=null;
@@ -357,7 +367,7 @@ function track(type,target){try{api.track(type,target);}catch(e){}}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function byId(id){for(var i=0;i<S.tools.length;i++){if(S.tools[i].id===id)return S.tools[i];}return null;}
 function areaLabel(id){for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
-function inPlace(t,p){return p==='none'||p==='all'||t.tags.indexOf(p)>=0;}
+function inPlace(t,p){return p==='none'||p==='all'||t.kind==='edu'||t.tags.indexOf(p)>=0;}
 function inNeed(t,n){return n==='none'||t.kind===n;}
 function say(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){S.toast='';render();},2800);}
 function fail(e){console.error(e);say((e&&e.message)||'처리하지 못했어요. 잠시 뒤 다시 시도해 주세요.');render();}
@@ -476,7 +486,8 @@ function vBasketBar(){
   if(!S.basket.length)return '';
   var h='<div class="basket-bar"><div class="wrap"><div class="basket-in">'+
     '<button type="button" class="btn btn-line" data-act="basketOpen" aria-expanded="'+S.basketOpen+'">'+I.bag+'오늘 제안 바구니 '+S.basket.length+'개 · '+(S.basketOpen?'접기':'순서 보기')+'</button>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-ghost" data-act="basketClear">비우기</button>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-ghost" data-act="basketClear">바구니 비우기</button>'+
+    '<button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'" title="켜면 병원명 없이 담은 자료만 보여줍니다"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
     '<button type="button" class="btn btn-primary" data-act="mode" data-v="clinic">거래처 모드로 '+I.arrow+'</button></div></div>';
   if(S.basketOpen){
     h+='<div class="basket-list">';
@@ -526,12 +537,16 @@ function clinicList(){
 }
 function vClinic(){
   var list=clinicList();
-  var h='<div class="clinic"><div class="wrap"><div class="clinic-hero">'+
-    '<div class="eyebrow">일만사 · 웰체크 제안</div>'+
+  var sw='<span style="display:inline-flex;align-items:center;gap:4px"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
+    '<button type="button" class="simple-sw" data-act="endVisit">제안 마치기</button></span>';
+  var h='<div class="clinic"><div class="wrap">';
+  if(S.simple){h+='<div class="clinic-simple">'+sw+'</div>';}
+  else h+='<div class="clinic-hero">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="eyebrow">일만사 · 웰체크 제안</div>'+sw+'</div>'+
     '<h1>'+(S.hospital.trim()?esc(S.hospital.trim()):'[병원명]')+' 원장님께 드리는<br>일만사 제안</h1>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
     '</div>';
-  if(!S.basket.length){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
+  if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
   h+='<div class="steps">';
   list.forEach(function(t,i){
     h+='<button type="button" class="step" data-act="present" data-v="'+i+'"><span class="no">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(cleanName(t.name))+'</h2><p>'+esc(t.pub||t.desc)+'</p><span class="go">열기 '+I.arrow+'</span></button>';
@@ -806,13 +821,15 @@ document.addEventListener('click',function(e){
       break;
     case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
     case 'basketOpen':S.basketOpen=!S.basketOpen;break;
-    case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();break;
+    case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('바구니를 비웠어요.');break;
     case 'bkUp':case 'bkDown':var k=+v,j=act==='bkUp'?k-1:k+1;if(j>=0&&j<S.basket.length){var tmp=S.basket[k];S.basket[k]=S.basket[j];S.basket[j]=tmp;saveBasket();}break;
     case 'present':showPresent(+v);return;
     case 'prev':if(S.present>0)showPresent(S.present-1);return;
     case 'next':if(S.present<clinicList().length-1)showPresent(S.present+1);return;
     case 'closePresent':S.present=-1;S.presentUrl='';break;
     case 'stage':S.stage=v;break;
+    case 'simple':S.simple=!S.simple;break;
+    case 'endVisit':S.basket=[];saveBasket();S.hospital='';S.simple=false;S.present=-1;S.presentUrl='';S.mode='prep';S.basketOpen=false;window.scrollTo(0,0);say('바구니를 비웠어요. 다음 병원 준비하세요.');break;
     case 'copy':
       var m=S.scripts.filter(function(x){return x.id===v;})[0];if(!m)break;track('copy',v);
       var fallback=function(){var node=document.getElementById('sc-'+v);if(node){var r=document.createRange();r.selectNodeContents(node);var s=window.getSelection();s.removeAllRanges();s.addRange(r);}say('자동 복사가 막혀서 멘트를 선택해 뒀어요. 길게 눌러 복사하세요.');render();};
