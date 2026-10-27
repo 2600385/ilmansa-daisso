@@ -205,22 +205,21 @@ function vLogin(){
 }
 
 function vHeader(){
-  var clinic=S.mode==='clinic';
+  var clinic=S.mode==='clinic',onAdmin=S.page==='admin';
   var h='<header class="top"><div class="wrap"><div class="top-in">';
-  h+='<div class="brand">'+signMark()+'<div><div class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</div><div class="bs">Daewoong</div></div></div>';
-  h+='<div class="top-r"><div class="mode" role="group" aria-label="화면 모드">'+
-     '<button type="button" data-act="mode" data-v="prep" class="'+(clinic?'':'on')+'" aria-pressed="'+!clinic+'">혼자 자료 찾는 중</button>'+
-     '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처에 와 있어요</button></div>';
+  h+='<button type="button" class="brand" data-act="home" aria-label="처음 화면으로">'+signMark()+'<span><span class="bt">'+(clinic?'일만사 제안':'일만사 다있소')+'</span><span class="bs">Daewoong</span></span></button>';
   if(!clinic){
-    h+='<span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
-       (isAdmin()?'<button type="button" class="btn btn-ghost" data-act="pwModal">비밀번호 변경</button>':'')+
-       '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button>';
+    h+='<div class="top-r"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
+       (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'툴·자료로':'관리자')+'</button>':'')+
+       '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></div>';
   }
-  h+='</div></div>';
-  if(!clinic&&isAdmin()){
-    h+='<nav class="nav" aria-label="메뉴">'+navBtn('tools','툴·자료')+navBtn('admin','관리자')+'</nav>';
-  }
-  return h+'</div></header>';
+  return h+'</div></div></header>';
+}
+function modeSwitch(){
+  var clinic=S.mode==='clinic';
+  return '<div class="mode" role="group" aria-label="화면 모드">'+
+    '<button type="button" data-act="mode" data-v="prep" class="'+(clinic?'':'on')+'" aria-pressed="'+!clinic+'">혼자 자료 찾는 중</button>'+
+    '<button type="button" data-act="mode" data-v="clinic" class="'+(clinic?'on':'')+'" aria-pressed="'+clinic+'">거래처에 와 있어요</button></div>';
 }
 function navBtn(id,label){return '<button type="button" data-act="page" data-v="'+id+'" class="'+(S.page===id?'on':'')+'" aria-current="'+(S.page===id?'page':'false')+'">'+label+'</button>';}
 
@@ -231,8 +230,9 @@ function vTools(){
   h+='<section class="hero"><h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
      '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 툴과 자료를 한곳에 모았습니다. 필요할 때 바로 꺼내 쓰세요.</p>'+
      '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이터, 투석, 청구)"></div></section>';
-  h+='<section class="blk"><div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px"><h2 style="margin:0;font-size:20px">지금 어디 가세요?</h2>'+
-     '<button type="button" class="btn btn-gold'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'">'+(S.favOnly?'전체 툴 보기':'즐겨찾기한 툴만 보기')+'</button></div><div class="tabs">';
+  h+='<div class="toolbar">'+modeSwitch()+
+     '<button type="button" class="btn btn-gold'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'">'+(S.favOnly?'전체 툴 보기':'즐겨찾기한 툴만 보기')+'</button></div>';
+  h+='<section class="blk"><h2 style="margin:0;font-size:20px">지금 어디 가세요?</h2><div class="tabs">';
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
@@ -336,6 +336,7 @@ function clinicList(){
 function vClinic(){
   var list=clinicList();
   var sw='<span style="display:inline-flex;align-items:center;gap:4px"><button type="button" class="simple-sw'+(S.simple?' on':'')+'" data-act="simple" aria-pressed="'+S.simple+'"><span class="knob" aria-hidden="true"></span>심플 모드</button>'+
+    '<button type="button" class="simple-sw" data-act="mode" data-v="prep">준비 화면으로</button>'+
     '<button type="button" class="simple-sw" data-act="endVisit">제안 마치기</button></span>';
   var h='<div class="clinic"><div class="wrap">';
   if(S.simple){h+='<div class="clinic-simple">'+sw+'</div>';}
@@ -603,6 +604,7 @@ document.addEventListener('click',function(e){
   switch(act){
     case 'mode':S.mode=v;S.present=-1;S.basketOpen=false;window.scrollTo(0,0);break;
     case 'page':S.page=v;window.scrollTo(0,0);if(v==='admin')loadAdmin();break;
+    case 'home':S.mode='prep';S.page='tools';S.present=-1;window.scrollTo(0,0);break;
     case 'logout':api.signOut();S.uid=null;S.me=null;S.basket=[];saveBasket();S.mode='prep';S.page='tools';S.stats=S.reqs=S.members=null;break;
     case 'pwModal':S.modal='pw';break;
     case 'togglePw':S.showPw=!S.showPw;S.loginErr='';break;
