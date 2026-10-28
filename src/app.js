@@ -13,7 +13,7 @@ var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'거래처 관리',c:'#4C9F86'},{id:'ref',label:'업무참고',c:'#8D72C9'}];
-var KINDS=[{id:'tool',label:'제안툴',c:'#5C7FC4'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'rp',label:'표준RP',c:'#C77D9B'},{id:'site',label:'참고 사이트',c:'#4FA3B8'},{id:'notice',label:'교육·공문',c:'#6BA37E'}];
+var KINDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'rp',label:'표준RP',c:'#C77D9B'},{id:'site',label:'참고 사이트',c:'#4FA3B8'},{id:'notice',label:'교육·공문',c:'#6BA37E'}];
 var KLBL={};KINDS.forEach(function(k){KLBL[k.id]=k.label;});
 var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'}].concat(KINDS).concat([{id:'contact',label:'문의처',c:'#8D72C9',phone:true}]);
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
@@ -22,7 +22,8 @@ function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
 var KIND={tool:'웹툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
 /* 자료 형태는 따로 고르지 않고 정해짐: 파일이면 PDF·이미지, 주소면 웹툴(tool)·URL(그 밖) */
 var FMT={web:'웹툴',url:'URL',pdf:'PDF',img:'이미지'};
-function fmt(t){if(t.file)return /\.pdf$/i.test(t.file)?'pdf':'img';return t.kind==='tool'||t.kind==='brochure'?'web':'url';}
+function isHtml(f){return /\.html?$/i.test(f||'');}
+function fmt(t){if(t.file)return /\.pdf$/i.test(t.file)?'pdf':isHtml(t.file)?'web':'img';return t.kind==='tool'||t.kind==='brochure'?'web':'url';}
 var STAGES=[{id:'s1',label:'초기 제안',no:'1단계'},{id:'s2',label:'기초 셋팅',no:'2단계'},{id:'s3',label:'일만사 시작·청구',no:'3단계'}];
 var REQ_STATUS=['접수','만드는 중','올림'];
 
@@ -576,7 +577,7 @@ function vModal(){
       '<div class="fg full"><label class="lb" for="fName">이름</label><input id="fName" class="field" value="'+esc(v.name)+'"></div>'+
       '<div class="fg"><label class="lb" for="fKind">종류</label><select id="fKind" class="field">'+KINDS.map(function(k){return '<option value="'+k.id+'"'+(v.kind===k.id?' selected':'')+'>'+k.label+(k.sub?' ('+k.sub+')':'')+'</option>';}).join('')+'</select></div>'+
       '<div class="fg full"><label class="lb" for="fUrl">주소</label><input id="fUrl" class="field" value="'+esc(v.url)+'" placeholder="https:// 로 시작하는 주소"></div>'+
-      '<div class="fg full"><label class="lb" for="fFile">또는 파일 올리기 (PDF·이미지)</label><input id="fFile" class="field" type="file" accept=".pdf,image/*" style="padding:10px"'+(LIVE?'':' disabled')+'>'+
+      '<div class="fg full"><label class="lb" for="fFile">또는 파일 올리기 (PDF·이미지·HTML)</label><input id="fFile" class="field" type="file" accept=".pdf,.html,.htm,image/*" style="padding:10px"'+(LIVE?'':' disabled')+'>'+
         (v.file?'<span class="muted" style="font-size:13px">지금 등록된 파일: '+esc(v.file.replace(/^\d+-/,''))+' · 새 파일을 고르면 바뀝니다</span>':'')+(LIVE?'':'<span class="muted" style="font-size:13px">미리보기 모드에서는 파일을 올릴 수 없어요</span>')+'</div>'+
       '<div class="fg full"><label class="lb" for="fDesc">MR에게 보이는 설명</label><input id="fDesc" class="field" value="'+esc(v.desc)+'"></div>'+
       '<div class="fg full"><span class="lb">어디 갈 때 쓰나요? (여러 개 선택)</span><div class="checks">'+placeOptions(v.tags)+'</div></div>'+
@@ -679,9 +680,18 @@ async function openTool(t,inPlace){
   track(inPlace?'present':'open',t.id);
   if(!LIVE){if(!inPlace)say('미리보기 모드라 실제 툴은 열리지 않아요. 운영 버전에서는 새 탭에 툴만 열립니다.');return null;}
   if(t.url)return t.url;
+  if(t.file&&isHtml(t.file))return await htmlView(t);
   if(t.file)return await api.fileUrl(t.file);
   if(!inPlace)say('아직 주소나 파일이 등록되지 않은 자료예요.');
   return null;
+}
+/* 올린 HTML 툴은 격리된 틀(sandbox) 안에서만 실행: 다있소 로그인 정보에 접근하지 못하게 */
+var htmlCache={};
+async function htmlView(t){
+  if(htmlCache[t.file])return htmlCache[t.file];
+  var src=await (await fetch(await api.fileUrl(t.file))).text();
+  var page='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(t.name)+'</title><style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%;display:block}</style></head><body><iframe sandbox="allow-scripts allow-modals allow-popups allow-forms allow-downloads" srcdoc="'+esc(src)+'"></iframe></body></html>';
+  return htmlCache[t.file]=URL.createObjectURL(new Blob([page],{type:'text/html'}));
 }
 /* 사이트가 다른 화면 안에서 열리는 걸 막았는지 확인 (결과는 기억해 둠) */
 var frameOk={};
