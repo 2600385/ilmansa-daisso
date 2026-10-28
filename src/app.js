@@ -285,8 +285,8 @@ function vResults(){
     if(hot.length){
       h+='<div class="issue-strip" role="region" aria-label="이달의 주요 이슈"><span class="is-lab"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈</span><div class="is-items">';
       hot.forEach(function(t){var inB=S.basket.indexOf(t.id)>=0;
-        h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn go" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
-          (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>':'')+'</span>';});
+        h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn go" data-act="open" data-v="'+t.id+'">열기</button>'+
+          (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'')+'</span>';});
       h+='</div></div>';
     }
     var rest=hot.length?list.filter(function(t){return !t.month;}):list;

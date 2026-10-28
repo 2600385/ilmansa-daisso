@@ -429,3 +429,13 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn.go{background:var(--navy);border-color:var(--navy);color:#FFFFFF}
 .is-btn.on{background:var(--gold);border-color:var(--gold);color:#FFFFFF}
 .present-ph.blocked{border-style:solid;border-color:var(--line);gap:14px;padding:44px 32px}
+
+/* 이달의 주요 이슈 v3: 분홍·빨강 계열, 제목은 꽉 찬 배지로 눈에 띄게 */
+.is-lab{background:#E11D48;color:#FFFFFF;padding:7px 14px;border-radius:999px;font-size:14px;box-shadow:0 4px 10px rgba(225,29,72,.25)}
+.is-lab svg{color:#FFFFFF}
+.is-item{background:#FFF1F4;border:1px solid #FBCFDA;padding:6px 6px 6px 14px;border-radius:999px;gap:8px}
+.is-nm{color:#BE123C}
+.is-btn{border-radius:999px;min-height:32px;padding:0 14px;border:1px solid #FBCFDA;background:#FFFFFF;color:#BE123C}
+.is-btn.go{background:#E11D48;border-color:#E11D48;color:#FFFFFF}
+.is-btn.on{background:#BE123C;border-color:#BE123C;color:#FFFFFF}
+@media (max-width:640px){.is-lab{font-size:0;padding:8px}.is-lab svg{width:16px;height:16px}}

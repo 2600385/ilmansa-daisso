@@ -439,6 +439,16 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn.go{background:var(--navy);border-color:var(--navy);color:#FFFFFF}
 .is-btn.on{background:var(--gold);border-color:var(--gold);color:#FFFFFF}
 .present-ph.blocked{border-style:solid;border-color:var(--line);gap:14px;padding:44px 32px}
+
+/* 이달의 주요 이슈 v3: 분홍·빨강 계열, 제목은 꽉 찬 배지로 눈에 띄게 */
+.is-lab{background:#E11D48;color:#FFFFFF;padding:7px 14px;border-radius:999px;font-size:14px;box-shadow:0 4px 10px rgba(225,29,72,.25)}
+.is-lab svg{color:#FFFFFF}
+.is-item{background:#FFF1F4;border:1px solid #FBCFDA;padding:6px 6px 6px 14px;border-radius:999px;gap:8px}
+.is-nm{color:#BE123C}
+.is-btn{border-radius:999px;min-height:32px;padding:0 14px;border:1px solid #FBCFDA;background:#FFFFFF;color:#BE123C}
+.is-btn.go{background:#E11D48;border-color:#E11D48;color:#FFFFFF}
+.is-btn.on{background:#BE123C;border-color:#BE123C;color:#FFFFFF}
+@media (max-width:640px){.is-lab{font-size:0;padding:8px}.is-lab svg{width:16px;height:16px}}
 </style>
 </head>
 <body>
@@ -732,8 +742,8 @@ function vResults(){
     if(hot.length){
       h+='<div class="issue-strip" role="region" aria-label="이달의 주요 이슈"><span class="is-lab"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈</span><div class="is-items">';
       hot.forEach(function(t){var inB=S.basket.indexOf(t.id)>=0;
-        h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn go" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
-          (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>':'')+'</span>';});
+        h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn go" data-act="open" data-v="'+t.id+'">열기</button>'+
+          (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'')+'</span>';});
       h+='</div></div>';
     }
     var rest=hot.length?list.filter(function(t){return !t.month;}):list;
