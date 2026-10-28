@@ -15,6 +15,7 @@ var EMAIL_DOMAIN = '@daisso.internal';
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'거래처 관리',c:'#4C9F86'},{id:'ref',label:'업무참고',c:'#8D72C9'}];
 var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'web',label:'웹툴',sub:'시뮬레이션·제안툴 등',c:'#5C7FC4'},{id:'url',label:'URL',c:'#4FA3B8'},{id:'pdf',label:'PDF',c:'#E0A15E'},{id:'img',label:'이미지',c:'#C77D9B'},{id:'contact',label:'문의처',c:'#8D72C9',phone:true}];
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
+function normEmp(v){v=String(v||'').trim();var d=v.replace(/\D/g,'');return (d.length>7&&d===v.replace(/[\s-]/g,''))?d.slice(-7):v;}
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
 var KIND={tool:'웹툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
 /* 자료 형태는 따로 고르지 않고 정해짐: 파일이면 PDF·이미지, 주소면 웹툴(tool)·URL(그 밖) */
@@ -825,7 +826,7 @@ document.addEventListener('submit',async function(e){
   var f=e.target;if(S.busy)return;
   try{
     if(f.id==='loginForm'){
-      var emp=val('empId');
+      var emp=normEmp(val('empId'));
       if(LIVE&&!emp){S.loginErr='사번을 넣어주세요.';render();return;}
       var pw=mrPw(emp);
       var keepOn=checked('keep'),asAdmin=checked('asAdmin');
@@ -878,7 +879,7 @@ document.addEventListener('submit',async function(e){
       S.modal=null;S.edit=null;say('저장했어요.');
     }
     if(f.id==='userForm'){
-      var u={emp_no:val('uEmp'),name:val('uName'),division:val('uDiv'),office:val('uOff'),role:val('uRole'),password:val('uPw')};
+      var u={emp_no:normEmp(val('uEmp')),name:val('uName'),division:val('uDiv'),office:val('uOff'),role:val('uRole'),password:val('uPw')};
       if(!/^[0-9A-Za-z]{3,20}$/.test(u.emp_no)){say('사번은 영문·숫자 3~20자로 넣어주세요.');render();return;}
       if(u.role==='mr'){u.password=mrPw(u.emp_no);}
       else if(!S.edit&&u.password.length<6){say('관리자는 6자 이상 비밀번호가 필요해요.');render();return;}
@@ -891,7 +892,7 @@ document.addEventListener('submit',async function(e){
       if(!lines.length){say('붙여넣은 명단이 없어요.');render();return;}
       S.busy=true;render();var okN=0,bad=[];
       for(var i=0;i<lines.length;i++){
-        var c=lines[i].split(/\t|,/).map(function(x){return x.trim();});
+        var c=lines[i].split(/\t|,/).map(function(x){return x.trim();});c[0]=normEmp(c[0]);
         try{if(!/^[0-9A-Za-z]{3,20}$/.test(c[0]||''))throw new Error('형식');
           await api.upsertMember({emp_no:c[0],name:c[1]||'',division:c[2]||'',office:c[3]||'',role:'mr',password:mrPw(c[0])});okN++;}
         catch(err){bad.push(i+1);}
