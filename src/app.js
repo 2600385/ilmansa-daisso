@@ -185,7 +185,8 @@ var I={
 /* 시그니처 마크: 주황 네모 + 熊 (현황판과 같은 모양) */
 function signMark(){return '<svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="#FFFFFF" stroke="#C9D2E3" stroke-width="6"/><text x="50" y="68" text-anchor="middle" font-family="serif" font-size="54" font-weight="900" fill="#F47920">熊</text></svg>';}
 function logo(){return '<span aria-hidden="true">일만사 다<span class="ss"><span class="top">있</span><span class="bot">있</span></span>소</span>';}
-function audTag(t){return t.doctor?'<span class="tag a-doc">'+I.screen+'원장님 화면용</span>':'<span class="tag a-in">'+I.lock+'내부용</span>';}
+/* 원장님께 보여줄 수 있는 자료는 '제안서에 담기' 버튼으로 드러나니, 표시는 내부용만 */
+function audTag(t){return t.doctor?'':'<span class="tag a-in">'+I.lock+'내부용</span>';}
 function placeOptions(sel){return PLACES.filter(function(p){return p.id!=='all';}).map(function(a){return '<label class="chk"><input type="checkbox" name="tg" value="'+a.id+'"'+(sel.indexOf(a.id)>=0?' checked':'')+'> '+a.label+'</label>';}).join('');}
 
 /* =====================================================================
@@ -298,11 +299,11 @@ function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
   var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
-    '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="meta">'+esc(t.tags.map(areaLabel).join(' · '))+' · 만든 사람 '+esc(t.by)+'</div><div class="acts">'+
+    '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
   if(t.doctor){h+='<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>';}
+  else{h+='<span class="btn btn-no" title="내부용 자료라 제안서에 담을 수 없어요">'+I.lock+'담기 불가</span>';}
   h+='</div>';
-  if(!t.doctor){h+='<div class="note-in">내부용 자료라 거래처 모드에는 나오지 않아요</div>';}
   return h+'</article>';
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
@@ -466,7 +467,7 @@ function vToolAdmin(){
   list.forEach(function(t){
     var op=t.file?(/\.pdf$/i.test(t.file)?'PDF':'파일'):t.url?'주소':'';
     h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div></div>'+
-      '<h3>'+esc(t.name)+'</h3><div class="meta">'+esc(t.tags.map(areaLabel).join('·')||'전체')+' · 열기: '+(op?'<b>'+op+'</b>':'<b style="color:#8A4B12">주소 미등록</b>')+' · '+esc(t.by)+'</div>'+
+      '<h3>'+esc(t.name)+'</h3><div class="meta">'+esc(t.tags.map(areaLabel).join('·')||'전체')+' · 열기: '+(op?'<b>'+op+'</b>':'<b style="color:#8A4B12">주소 미등록</b>')+'</div>'+
       '<button type="button" class="vis-sw'+(t.active?' on':'')+'" data-act="toggleActive" data-v="'+t.id+'" aria-pressed="'+t.active+'"><span class="knob" aria-hidden="true"></span>MR 화면에 보이기</button>'+
       '<div class="acts"><button type="button" class="btn btn-line" data-act="editTool" data-v="'+t.id+'">수정</button><button type="button" class="btn btn-ghost" data-act="delAsk" data-v="tool:'+t.id+'">삭제</button></div></article>';});
   return h+'</div>';
@@ -562,7 +563,6 @@ function vModal(){
     return modalWrap('toolForm',t?'툴 수정':'새 툴 등록','<div class="form-grid">'+
       '<div class="fg full"><label class="lb" for="fName">이름</label><input id="fName" class="field" value="'+esc(v.name)+'"></div>'+
       '<div class="fg"><label class="lb" for="fKind">주소일 때 형태</label><select id="fKind" class="field"><option value="tool"'+(fmt(v)==='web'?' selected':'')+'>웹툴 (시뮬레이션·제안툴 등)</option><option value="site"'+(fmt(v)!=='web'?' selected':'')+'>URL (사이트·설문 등)</option></select></div>'+
-      '<div class="fg"><label class="lb" for="fBy">만든 사람</label><input id="fBy" class="field" value="'+esc(v.by)+'"></div>'+
       '<div class="fg full"><label class="lb" for="fUrl">주소</label><input id="fUrl" class="field" value="'+esc(v.url)+'" placeholder="https:// 로 시작하는 주소"></div>'+
       '<div class="fg full"><label class="lb" for="fFile">또는 파일 올리기 (PDF·이미지)</label><input id="fFile" class="field" type="file" accept=".pdf,image/*" style="padding:10px"'+(LIVE?'':' disabled')+'>'+
         (v.file?'<span class="muted" style="font-size:13px">지금 등록된 파일: '+esc(v.file.replace(/^\d+-/,''))+' · 새 파일을 고르면 바뀝니다</span>':'')+(LIVE?'':'<span class="muted" style="font-size:13px">미리보기 모드에서는 파일을 올릴 수 없어요</span>')+'</div>'+
@@ -839,7 +839,7 @@ document.addEventListener('submit',async function(e){
       var url=val('fUrl');if(url&&!/^https?:\/\//i.test(url)){say('주소는 https:// 로 시작해야 해요.');render();return;}
       var fileEl=document.getElementById('fFile'),file=fileEl&&fileEl.files&&fileEl.files[0]||null;
       var old=S.edit?byId(S.edit):null;
-      var data={name:name,kind:val('fKind'),by:val('fBy'),url:url,file:old&&!url?old.file:'',desc:val('fDesc'),pub:val('fPub'),
+      var data={name:name,kind:val('fKind'),by:old?old.by:'',url:url,file:old&&!url?old.file:'',desc:val('fDesc'),pub:val('fPub'),
         tags:[].slice.call(f.querySelectorAll('input[name=tg]:checked')).map(function(x){return x.value;}),
         month:checked('fMonth'),doctor:checked('fDoc'),active:checked('fActive'),sort:old?old.sort:S.tools.length+1};
       S.busy=true;render();

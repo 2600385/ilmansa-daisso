@@ -411,3 +411,11 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn{min-height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line-2);background:var(--surface);color:var(--navy);font-size:12px;font-weight:700}
 .is-btn.on{background:var(--gold);border-color:var(--gold);color:#FFFFFF}
 @media (max-width:640px){.issue-strip{flex-wrap:nowrap}.is-lab{font-size:0;gap:0}.is-lab svg{width:18px;height:18px}}
+
+/* 카드: 마우스를 올리면 살짝 떠오름 */
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(31,42,68,.12);border-color:var(--line-2)}
+.card h3{margin-top:2px}
+/* 내부용: 담기 버튼과 같은 크기의 점선 상자 */
+.btn-no{flex:1;border:1.5px dashed var(--line-2);background:transparent;color:#8C97AD;cursor:not-allowed;font-weight:700}
+.btn-no svg{width:14px;height:14px}
