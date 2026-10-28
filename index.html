@@ -455,6 +455,17 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn{border-color:#D3E3FB;color:#2F6FCB}
 .is-btn.go{background:#5B9BF0;border-color:#5B9BF0;color:#FFFFFF}
 .is-btn.on{background:#2F6FCB;border-color:#2F6FCB;color:#FFFFFF}
+/* 빈 바구니: 오른쪽 아래 작은 알약 → 담으면 바로 펼쳐짐 */
+.bk-pill{position:fixed;right:24px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.92);border:1px dashed #E7B9A6;color:#9A5A44;font-size:13px;box-shadow:0 6px 18px rgba(31,42,68,.08);backdrop-filter:blur(6px);pointer-events:none}
+.bk-pill svg{width:16px;height:16px;color:#C2410C}
+.bk-pill b{color:#C2410C;font-weight:700}
+.bk-pill span{color:#8A7A72}
+.basket-bar.open{animation:bkOpen .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes bkOpen{from{transform:translateY(100%);opacity:0}to{transform:none;opacity:1}}
+.bk-cnt.pop{animation:bkPop .4s ease}
+@keyframes bkPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@media (max-width:640px){.bk-pill span{display:none}.bk-pill{right:16px}}
+@media (prefers-reduced-motion:reduce){.basket-bar.open,.bk-cnt.pop{animation:none}}
 </style>
 </head>
 <body>
@@ -772,9 +783,10 @@ function vCard(t){
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
 function vBasketBar(){
-  var n=S.basket.length;if(!n)return '';
-  var h='<div class="basket-bar"><div class="wrap"><div class="bk-line">'+
-    '<span class="bk-title">'+I.bag+'제안 바구니 <span class="bk-cnt">'+n+'</span></span><ol class="bk-items">';
+  var n=S.basket.length,prev=S.bkLast==null?n:S.bkLast;S.bkLast=n;
+  if(!n)return '<div class="bk-pill" role="note">'+I.bag+'<b>제안 바구니</b><span>원장님께 보여드릴 자료를 담아보세요</span></div>';
+  var h='<div class="basket-bar'+(prev===0?' open':'')+'"><div class="wrap"><div class="bk-line">'+
+    '<span class="bk-title">'+I.bag+'제안 바구니 <span class="bk-cnt'+(n!==prev?' pop':'')+'">'+n+'</span></span><ol class="bk-items">';
   S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
     h+='<li class="bk-item"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
       (i>0?'<button type="button" class="mini" data-act="bkUp" data-v="'+i+'" aria-label="앞으로">'+I.up+'</button>':'')+

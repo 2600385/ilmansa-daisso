@@ -445,3 +445,14 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn{border-color:#D3E3FB;color:#2F6FCB}
 .is-btn.go{background:#5B9BF0;border-color:#5B9BF0;color:#FFFFFF}
 .is-btn.on{background:#2F6FCB;border-color:#2F6FCB;color:#FFFFFF}
+/* 빈 바구니: 오른쪽 아래 작은 알약 → 담으면 바로 펼쳐짐 */
+.bk-pill{position:fixed;right:24px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.92);border:1px dashed #E7B9A6;color:#9A5A44;font-size:13px;box-shadow:0 6px 18px rgba(31,42,68,.08);backdrop-filter:blur(6px);pointer-events:none}
+.bk-pill svg{width:16px;height:16px;color:#C2410C}
+.bk-pill b{color:#C2410C;font-weight:700}
+.bk-pill span{color:#8A7A72}
+.basket-bar.open{animation:bkOpen .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes bkOpen{from{transform:translateY(100%);opacity:0}to{transform:none;opacity:1}}
+.bk-cnt.pop{animation:bkPop .4s ease}
+@keyframes bkPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@media (max-width:640px){.bk-pill span{display:none}.bk-pill{right:16px}}
+@media (prefers-reduced-motion:reduce){.basket-bar.open,.bk-cnt.pop{animation:none}}

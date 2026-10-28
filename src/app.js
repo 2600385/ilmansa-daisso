@@ -309,9 +309,10 @@ function vCard(t){
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
 function vBasketBar(){
-  var n=S.basket.length;if(!n)return '';
-  var h='<div class="basket-bar"><div class="wrap"><div class="bk-line">'+
-    '<span class="bk-title">'+I.bag+'제안 바구니 <span class="bk-cnt">'+n+'</span></span><ol class="bk-items">';
+  var n=S.basket.length,prev=S.bkLast==null?n:S.bkLast;S.bkLast=n;
+  if(!n)return '<div class="bk-pill" role="note">'+I.bag+'<b>제안 바구니</b><span>원장님께 보여드릴 자료를 담아보세요</span></div>';
+  var h='<div class="basket-bar'+(prev===0?' open':'')+'"><div class="wrap"><div class="bk-line">'+
+    '<span class="bk-title">'+I.bag+'제안 바구니 <span class="bk-cnt'+(n!==prev?' pop':'')+'">'+n+'</span></span><ol class="bk-items">';
   S.basket.forEach(function(id,i){var t=byId(id);if(!t)return;
     h+='<li class="bk-item"><span class="num">'+(i+1)+'</span><span class="nm">'+esc(cleanName(t.name))+'</span>'+
       (i>0?'<button type="button" class="mini" data-act="bkUp" data-v="'+i+'" aria-label="앞으로">'+I.up+'</button>':'')+
