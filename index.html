@@ -466,6 +466,10 @@ button.ic:hover{border-color:var(--navy)}
 @keyframes bkPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
 @media (max-width:640px){.bk-pill span{display:none}.bk-pill{right:16px}}
 @media (prefers-reduced-motion:reduce){.basket-bar.open,.bk-cnt.pop{animation:none}}
+/* 관리자 모드 버튼: 연한 앰버 알약 + 열쇠 */
+.adm-btn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid #F2D48A;background:#FFF5DA;color:#8A5A00;font-size:14px;font-weight:700;cursor:pointer}
+.adm-btn:hover{background:#FFEDBF}
+.adm-btn.on{background:#8A5A00;border-color:#8A5A00;color:#FFFFFF}
 </style>
 </head>
 <body>
@@ -689,7 +693,7 @@ function vHeader(){
   h+='<div class="top-r">'+(onAdmin?'':clinic?clinicCtrls():modeSwitch());
   if(!clinic){
     h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
-       (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'관리자 페이지 닫기':'관리자')+'</button>':'')+
+       (isAdmin()?'<button type="button" class="adm-btn'+(onAdmin?' on':'')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/></svg>'+(onAdmin?'관리자 모드 닫기':'관리자 모드')+'</button>':'')+
        '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></span>';
   }
   return h+'</div></div></div></header>';

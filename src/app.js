@@ -215,7 +215,7 @@ function vHeader(){
   h+='<div class="top-r">'+(onAdmin?'':clinic?clinicCtrls():modeSwitch());
   if(!clinic){
     h+='<span class="who"><span style="font-size:15px;font-weight:700;margin:0 4px">'+esc(S.me&&S.me.name||'')+' 님</span>'+
-       (isAdmin()?'<button type="button" class="btn '+(onAdmin?'btn-primary':'btn-line')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'" style="min-height:38px">'+(onAdmin?'관리자 페이지 닫기':'관리자')+'</button>':'')+
+       (isAdmin()?'<button type="button" class="adm-btn'+(onAdmin?' on':'')+'" data-act="page" data-v="'+(onAdmin?'tools':'admin')+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/></svg>'+(onAdmin?'관리자 모드 닫기':'관리자 모드')+'</button>':'')+
        '<button type="button" class="btn btn-ghost" data-act="logout">로그아웃</button></span>';
   }
   return h+'</div></div></div></header>';
