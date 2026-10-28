@@ -20,7 +20,7 @@ create table public.profiles (
 create table public.tools (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  kind text not null check (kind in ('tool','site','brochure','notice')),
+  kind text not null check (kind in ('tool','site','brochure','notice','rp')),
   places text[] not null default '{}',
   is_month boolean not null default false,
   for_doctor boolean not null default false,
