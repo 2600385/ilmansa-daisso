@@ -12,11 +12,14 @@ var LIVE = !!(SUPABASE_URL && SUPABASE_KEY && window.supabase);
 var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
-var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'기존처 관리',c:'#4C9F86'}];
-var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'site',label:'URL',c:'#4FA3B8'},{id:'edu',label:'교육자료',c:'#4C9F86'},{id:'notice',label:'공문',c:'#8D72C9'},{id:'tool',label:'툴',c:'#5C7FC4'},{id:'contact',label:'문의처',c:'#C77D9B',phone:true}];
+var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'거래처 관리',c:'#4C9F86'},{id:'ref',label:'업무참고',c:'#8D72C9'}];
+var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'},{id:'web',label:'웹툴',sub:'시뮬레이션·제안툴 등',c:'#5C7FC4'},{id:'url',label:'URL',c:'#4FA3B8'},{id:'pdf',label:'PDF',c:'#E0A15E'},{id:'img',label:'이미지',c:'#C77D9B'},{id:'contact',label:'문의처',c:'#8D72C9',phone:true}];
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
-var KIND={tool:'툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
+var KIND={tool:'웹툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
+/* 자료 형태는 따로 고르지 않고 정해짐: 파일이면 PDF·이미지, 주소면 웹툴(tool)·URL(그 밖) */
+var FMT={web:'웹툴',url:'URL',pdf:'PDF',img:'이미지'};
+function fmt(t){if(t.file)return /\.pdf$/i.test(t.file)?'pdf':'img';return t.kind==='tool'||t.kind==='brochure'?'web':'url';}
 var STAGES=[{id:'s1',label:'초기 제안',no:'1단계'},{id:'s2',label:'기초 셋팅',no:'2단계'},{id:'s3',label:'일만사 시작·청구',no:'3단계'}];
 var REQ_STATUS=['접수','만드는 중','올림'];
 
@@ -25,7 +28,7 @@ var REQ_STATUS=['접수','만드는 중','올림'];
    ===================================================================== */
 /* 교육자료는 DB의 종류 목록을 바꾸지 않으려고 kind='notice' + places에 '_edu'로 저장합니다 */
 var EDU_TAG='_edu';
-function toTool(r){var pl=r.places||[],edu=pl.indexOf(EDU_TAG)>=0;return {id:r.id,name:r.name,kind:edu?'edu':r.kind,tags:pl.filter(function(x){return x!==EDU_TAG;}),month:!!r.is_month,doctor:!!r.for_doctor,url:r.url||'',file:r.file_path||'',desc:r.description||'',pub:r.doctor_desc||'',by:r.made_by||'',sort:r.sort||0,active:r.active!==false};}
+function toTool(r){var pl=r.places||[],edu=pl.indexOf(EDU_TAG)>=0,tg=pl.filter(function(x){return x!==EDU_TAG;});if(edu&&tg.indexOf('ref')<0)tg.push('ref');return {id:r.id,name:r.name,kind:edu?'site':r.kind,tags:tg,month:!!r.is_month,doctor:!!r.for_doctor,url:r.url||'',file:r.file_path||'',desc:r.description||'',pub:r.doctor_desc||'',by:r.made_by||'',sort:r.sort||0,active:r.active!==false};}
 function fromTool(t){var edu=t.kind==='edu';return {name:t.name,kind:edu?'notice':t.kind,places:edu?t.tags.concat([EDU_TAG]):t.tags,is_month:t.month,for_doctor:t.doctor,url:t.url||null,file_path:t.file||null,description:t.desc,doctor_desc:t.pub,made_by:t.by,sort:t.sort||0,active:t.active!==false,updated_at:new Date().toISOString()};}
 function toScript(r){return {id:r.id,stage:r.stage,type:r.type,title:r.title,text:r.body||'',tool:r.tool_id||null,sort:r.sort||0};}
 function toContact(r){return {id:r.id,topic:r.topic,dept:r.dept||'',tel:r.tel||'',tags:r.places||[],sort:r.sort||0};}
@@ -97,7 +100,7 @@ var demo=(function(){
     {name:'검진센터 제안 브로셔',kind:'brochure',tags:['new'],month:true,doctor:true,by:'이혜선 CM',desc:'병원명과 담당자명을 넣으면 거래처 맞춤 제안 포스터가 만들어집니다.',pub:'병원에 맞춘 일만사 제안서입니다.'},
     {name:'AX004 청구증대 툴',kind:'tool',tags:['keep'],doctor:false,by:'이혜선 CM',desc:'환자는 많은데 교육상담 청구가 낮은 거래처를 찾아냅니다.',pub:''},
     {name:'청구현황 대시보드',kind:'tool',tags:['keep'],doctor:false,by:'이혜선 CM',desc:'사무소별 청구 순위와 월별 추이를 봅니다.',pub:''},
-    {name:'예시 · 일만사란? (신규 입사자용)',kind:'edu',tags:[],doctor:true,by:'[작성자]',desc:'교육 슬라이드(PPT·PDF)가 들어가는 자리 예시입니다.',pub:'일만사가 무엇인지 한눈에 정리한 자료입니다.'}
+    {name:'예시 · 일만사란? (신규 입사자용)',kind:'site',tags:['ref'],doctor:true,by:'[작성자]',desc:'교육 슬라이드(PPT·PDF)가 들어가는 자리 예시입니다.',pub:'일만사가 무엇인지 한눈에 정리한 자료입니다.'}
   ].map(function(t,i){t.id=nid();t.sort=i;t.url='';t.file='';t.active=true;return t;});
   function tid(name){for(var i=0;i<tools.length;i++)if(tools[i].name===name)return tools[i].id;return null;}
   var scripts=[['s1','base','첫 인사와 일만사 소개','검진센터 제안 브로셔'],['s1','base','예상 수익 보여드리기','일만사 수익 시뮬레이터'],['s1','obj','인력이 없어요',null],['s1','obj','수익이 얼마나 돼요?','일만사 수익 시뮬레이터'],['s1','obj','환자들이 싫어해요',null],
@@ -159,8 +162,8 @@ function track(type,target){try{api.track(type,target);}catch(e){}}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function byId(id){for(var i=0;i<S.tools.length;i++){if(S.tools[i].id===id)return S.tools[i];}return null;}
 function areaLabel(id){if(id==='month')return '이달의 주요 이슈';for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
-function inPlace(t,p){if(p==='month')return !!t.month;return p==='none'||p==='all'||t.kind==='edu'||t.tags.indexOf(p)>=0;}
-function inNeed(t,n){return n==='none'||n==='all'||t.kind===n;}
+function inPlace(t,p){if(p==='month')return !!t.month;return p==='none'||p==='all'||t.tags.indexOf(p)>=0||(t.kind==='edu'&&p==='ref');}
+function inNeed(t,n){return n==='none'||n==='all'||fmt(t)===n;}
 function say(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){S.toast='';render();},2800);}
 function fail(e){console.error(e);say((e&&e.message)||'처리하지 못했어요. 잠시 뒤 다시 시도해 주세요.');render();}
 function activeTools(){return S.tools.filter(function(t){return t.active;});}
@@ -246,7 +249,7 @@ function vTools(){
   h+='<div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
-    h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+n.label+'<span class="n">'+cnt+'</span></button>';});
+    h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+(n.sub?'<span class="tw">'+n.label+'<small>'+n.sub+'</small></span>':n.label)+'<span class="n">'+cnt+'</span></button>';});
   h+='</div></div>';
   h+='<div id="results" class="results">'+vResults()+'</div>';
   h+='</section>';
@@ -267,7 +270,7 @@ function vResults(){
     }).sort(function(a,b){return (b.month?1:0)-(a.month?1:0)||a.sort-b.sort;});
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
-    else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KIND[S.need]);if(!parts.length)parts.push('검색 결과');}
+    else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':FMT[S.need]||'문의처');if(!parts.length)parts.push('검색 결과');}
     label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
   }
   h+='<div class="list-h"><span class="muted" style="font-size:14px">'+label+'</span>'+
@@ -284,7 +287,7 @@ function vResults(){
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
-  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
+  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
     '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="meta">'+esc(t.tags.map(areaLabel).join(' · '))+' · 만든 사람 '+esc(t.by)+'</div><div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
@@ -416,15 +419,15 @@ function vStats(){
     '<span class="muted" style="font-size:13px;margin-left:8px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
   var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id)};});
   tr.sort(function(a,b){return (b.b-a.b)||(b.f-a.f);});
-  var byKind={};tr.forEach(function(r){byKind[r.t.kind]=(byKind[r.t.kind]||0)+r.b*2+r.f;});
+  var byKind={};tr.forEach(function(r){var fk=fmt(r.t);byKind[fk]=(byKind[fk]||0)+r.b*2+r.f;});
   var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
-  if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+KIND[topKind]+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
+  if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+FMT[topKind]+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
   h+='<div class="k3"><div class="kc"><div class="lab">사용한 사람</div><div class="big">'+people+'<small>/ '+total+'명'+(total?' · '+pct+'%':'')+'</small></div><div class="prog"><i style="width:'+Math.min(pct,100)+'%"></i></div>'+(total?'':'<div class="muted" style="font-size:13px">계정에 명단을 넣으면 비율이 나옵니다</div>')+'</div>'+
     '<div class="kc"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">자주 쓰겠다고 표시한 횟수</div></div>'+
     '<div class="kc"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수</div></div></div>';
   var mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
   h+='<section class="blk"><h2>자료별 순위 <span class="muted" style="font-size:14px;font-weight:500">· 제안서에 담긴 순</span></h2><div class="rank">';
-  tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+KIND[r.t.kind]+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
+  tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+FMT[fmt(r.t)]+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
     '<div class="bar2"><span class="red">'+I.bag+'</span><span class="t"><i style="width:'+(r.b/mb*100)+'%;background:#C2410C"></i></span><span class="v">'+r.b+'</span></div>'+
     '<div class="bar2"><span class="gold">★</span><span class="t"><i style="width:'+(r.f/mf*100)+'%;background:#D9B25F"></i></span><span class="v">'+r.f+'</span></div></div></div>';});
   h+='</div></section>';
@@ -443,17 +446,17 @@ function vStats(){
 function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
 function vToolAdmin(){
   var k=S.admKind||'all';
-  var list=S.tools.filter(function(t){return k==='all'||t.kind===k;});
+  var list=S.tools.filter(function(t){return k==='all'||fmt(t)===k;});
   var h='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="chiprow">';
-  [{id:'all',label:'전체'}].concat(NEEDS.filter(function(n){return KIND[n.id];})).forEach(function(n){
-    var c=n.id==='all'?S.tools.length:S.tools.filter(function(t){return t.kind===n.id;}).length;
+  [{id:'all',label:'전체'}].concat(NEEDS.filter(function(n){return FMT[n.id];})).forEach(function(n){
+    var c=n.id==='all'?S.tools.length:S.tools.filter(function(t){return fmt(t)===n.id;}).length;
     h+='<button type="button" class="chip'+(k===n.id?' on':'')+'" data-act="admKind" data-v="'+n.id+'" aria-pressed="'+(k===n.id)+'">'+n.label+' '+c+'</button>';});
   h+='</div><button type="button" class="btn btn-primary" data-act="newTool" style="min-height:46px;padding:0 22px">+ 자료 추가</button></div>';
   if(!list.length)return h+'<div class="prompt muted">이 종류로 등록된 자료가 없어요. "+ 자료 추가"로 올려보세요.</div>';
   h+='<div class="grid">';
   list.forEach(function(t){
     var op=t.file?(/\.pdf$/i.test(t.file)?'PDF':'파일'):t.url?'주소':'';
-    h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+t.kind+'">'+KIND[t.kind]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div></div>'+
+    h+='<article class="card mcard"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+audTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div></div>'+
       '<h3>'+esc(t.name)+'</h3><div class="meta">'+esc(t.tags.map(areaLabel).join('·')||'전체')+' · 열기: '+(op?'<b>'+op+'</b>':'<b style="color:#8A4B12">주소 미등록</b>')+' · '+esc(t.by)+'</div>'+
       '<button type="button" class="vis-sw'+(t.active?' on':'')+'" data-act="toggleActive" data-v="'+t.id+'" aria-pressed="'+t.active+'"><span class="knob" aria-hidden="true"></span>MR 화면에 보이기</button>'+
       '<div class="acts"><button type="button" class="btn btn-line" data-act="editTool" data-v="'+t.id+'">수정</button><button type="button" class="btn btn-ghost" data-act="delAsk" data-v="tool:'+t.id+'">삭제</button></div></article>';});
@@ -549,7 +552,7 @@ function vModal(){
     var v=t||{name:'',kind:'tool',tags:[],month:false,doctor:true,by:'',desc:'',pub:'',url:'',file:'',active:true};
     return modalWrap('toolForm',t?'툴 수정':'새 툴 등록','<div class="form-grid">'+
       '<div class="fg full"><label class="lb" for="fName">이름</label><input id="fName" class="field" value="'+esc(v.name)+'"></div>'+
-      '<div class="fg"><label class="lb" for="fKind">종류</label><select id="fKind" class="field">'+Object.keys(KIND).map(function(k){return '<option value="'+k+'"'+(v.kind===k?' selected':'')+'>'+KIND[k]+'</option>';}).join('')+'</select></div>'+
+      '<div class="fg"><label class="lb" for="fKind">주소일 때 형태</label><select id="fKind" class="field"><option value="tool"'+(fmt(v)==='web'?' selected':'')+'>웹툴 (시뮬레이션·제안툴 등)</option><option value="site"'+(fmt(v)!=='web'?' selected':'')+'>URL (사이트·설문 등)</option></select></div>'+
       '<div class="fg"><label class="lb" for="fBy">만든 사람</label><input id="fBy" class="field" value="'+esc(v.by)+'"></div>'+
       '<div class="fg full"><label class="lb" for="fUrl">주소</label><input id="fUrl" class="field" value="'+esc(v.url)+'" placeholder="https:// 로 시작하는 주소"></div>'+
       '<div class="fg full"><label class="lb" for="fFile">또는 파일 올리기 (PDF·이미지)</label><input id="fFile" class="field" type="file" accept=".pdf,image/*" style="padding:10px"'+(LIVE?'':' disabled')+'>'+

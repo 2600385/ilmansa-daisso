@@ -397,3 +397,7 @@ button.ic:hover{border-color:var(--navy)}
 .issue-chip.on{background:#C2410C;border:1.5px solid #C2410C;color:#FFFFFF}
 .tag.a-issue{background:#FFF4EC;color:#C2410C}
 @media (max-width:640px){.issue-chip{min-height:48px;width:100%;justify-content:center}}
+
+.k-web{background:#E8EDFF;color:#2B44A8}.k-url{background:#E1F5EC;color:#0B6B50}.k-pdf{background:#FDEBDF;color:#A8401A}.k-img{background:#F8E6EE;color:#9A2C5B}
+.tab .tw{display:inline-flex;flex-direction:column;line-height:1.15;text-align:left}
+.tab .tw small{font-size:11px;font-weight:500;opacity:.75}
