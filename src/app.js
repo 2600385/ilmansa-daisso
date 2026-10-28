@@ -448,7 +448,7 @@ function vStats(){
     '<div class="kc"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수</div></div></div>';
   var mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
   h+='<section class="blk"><h2>자료별 순위 <span class="muted" style="font-size:14px;font-weight:500">· 제안서에 담긴 순</span></h2><div class="rank">';
-  tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+FMT[fmt(r.t)]+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
+  tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+(KLBL[r.t.kind]||'')+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
     '<div class="bar2"><span class="red">'+I.bag+'</span><span class="t"><i style="width:'+(r.b/mb*100)+'%;background:#C2410C"></i></span><span class="v">'+r.b+'</span></div>'+
     '<div class="bar2"><span class="gold">★</span><span class="t"><i style="width:'+(r.f/mf*100)+'%;background:#D9B25F"></i></span><span class="v">'+r.f+'</span></div></div></div>';});
   h+='</div></section>';
