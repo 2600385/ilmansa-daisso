@@ -13,7 +13,7 @@ var EMAIL_DOMAIN = '@daisso.internal';
 
 /* ---------- 고정 분류 ---------- */
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'거래처 관리',c:'#4C9F86'},{id:'ref',label:'업무참고',c:'#8D72C9'}];
-var KINDS=[{id:'tool',label:'제안툴',sub:'시뮬레이션·대시보드 등',c:'#5C7FC4'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'rp',label:'표준RP',c:'#C77D9B'},{id:'site',label:'참고 사이트',c:'#4FA3B8'},{id:'notice',label:'교육·공문',c:'#6BA37E'}];
+var KINDS=[{id:'tool',label:'제안툴',c:'#5C7FC4'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'rp',label:'표준RP',c:'#C77D9B'},{id:'site',label:'참고 사이트',c:'#4FA3B8'},{id:'notice',label:'교육·공문',c:'#6BA37E'}];
 var KLBL={};KINDS.forEach(function(k){KLBL[k.id]=k.label;});
 var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'}].concat(KINDS).concat([{id:'contact',label:'문의처',c:'#8D72C9',phone:true}]);
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
