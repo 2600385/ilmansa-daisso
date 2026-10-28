@@ -383,7 +383,10 @@ function vClinic(){
     h+='<div class="pv"><nav class="rail" aria-label="제안 순서">';
     list.forEach(function(x,j){h+='<button type="button" class="rail-i'+(j===i?' on':'')+'" data-act="jump" data-v="'+j+'" aria-current="'+(j===i?'step':'false')+'"><span class="rn">'+(j+1)+'</span><span class="rl">'+esc(cleanName(x.name))+'</span></button>';});
     h+='</nav><div class="page-turn '+(S.flip==='prev'?'from-r':'from-l')+(S.flipAnim?' anim':'')+'">';
-    if(S.presentUrl){h+='<iframe class="present-frame" src="'+esc(S.presentUrl)+'" title="'+esc(t.name)+'"></iframe>';}
+    if(S.presentUrl&&S.presentBlocked){h+='<div class="present-body"><div class="present-ph blocked"><b style="font-size:22px;color:var(--navy)">'+esc(cleanName(t.name))+'</b>'+
+      '<span class="muted">이 사이트는 다른 화면 안에서 열리지 않게 되어 있어요. 새 창으로 열어 보여주세요.</span>'+
+      '<a class="btn btn-primary" style="min-height:52px;padding:0 28px;font-size:17px" href="'+esc(S.presentUrl)+'" target="_blank" rel="noopener">새 창으로 열기 '+I.arrow+'</a></div></div>';}
+    else if(S.presentUrl){h+='<iframe class="present-frame" src="'+esc(S.presentUrl)+'" title="'+esc(t.name)+'"></iframe>';}
     else{h+='<div class="present-body"><div class="present-ph"><b style="font-size:20px;color:var(--navy)">'+esc(t.name)+'</b>'+
       '<span class="muted">'+(S.presentLoading?'여는 중…':LIVE?'아직 주소나 파일이 등록되지 않은 자료예요. 관리자 화면에서 등록해 주세요.':'미리보기 모드라 실제 툴은 열리지 않아요. 운영 버전에서는 이 자리에 툴이 화면 가득 열립니다.')+'</span></div></div>';}
     h+='</div></div></div>';
@@ -671,10 +674,18 @@ async function openTool(t,inPlace){
   if(!inPlace)say('아직 주소나 파일이 등록되지 않은 자료예요.');
   return null;
 }
+/* 사이트가 다른 화면 안에서 열리는 걸 막았는지 확인 (결과는 기억해 둠) */
+var frameOk={};
+async function canFrame(url){
+  if(!/^https?:/i.test(url)||url.indexOf(SUPABASE_URL)===0)return true;
+  if(frameOk[url]!==undefined)return frameOk[url];
+  try{var r=await fetch('/api/framecheck?url='+encodeURIComponent(url));var j=await r.json();frameOk[url]=j.embeddable!==false;}catch(e){frameOk[url]=true;}
+  return frameOk[url];
+}
 async function showPresent(i){
   var t=clinicList()[i];if(!t)return;
-  S.present=i;S.presentUrl='';S.presentLoading=true;S.flipAnim=true;render();S.flipAnim=false;
-  try{S.presentUrl=(await openTool(t,true))||'';}catch(e){fail(e);}
+  S.present=i;S.presentUrl='';S.presentBlocked=false;S.presentLoading=true;S.flipAnim=true;render();S.flipAnim=false;
+  try{var u=(await openTool(t,true))||'';if(u&&!t.file&&!(await canFrame(u)))S.presentBlocked=true;S.presentUrl=u;}catch(e){fail(e);}
   S.presentLoading=false;render();
 }
 

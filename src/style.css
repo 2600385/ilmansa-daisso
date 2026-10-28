@@ -428,3 +428,4 @@ button.ic:hover{border-color:var(--navy)}
 .is-btn svg{width:14px;height:14px}
 .is-btn.go{background:var(--navy);border-color:var(--navy);color:#FFFFFF}
 .is-btn.on{background:var(--gold);border-color:var(--gold);color:#FFFFFF}
+.present-ph.blocked{border-style:solid;border-color:var(--line);gap:14px;padding:44px 32px}
