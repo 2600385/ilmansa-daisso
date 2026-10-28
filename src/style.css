@@ -459,4 +459,4 @@ button.ic:hover{border-color:var(--navy)}
 /* 관리자 모드 버튼: 연한 앰버 알약 + 열쇠 */
 .adm-btn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid #F2D48A;background:#FFF5DA;color:#8A5A00;font-size:14px;font-weight:700;cursor:pointer}
 .adm-btn:hover{background:#FFEDBF}
-.adm-btn.on{background:#8A5A00;border-color:#8A5A00;color:#FFFFFF}
+.adm-btn.on{background:#FFD978;border-color:#F2C14E;color:#5C3D00}
