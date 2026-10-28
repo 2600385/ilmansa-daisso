@@ -430,8 +430,8 @@ function vStats(){
   var h=(LIVE?'':'<div class="inbanner">미리보기 모드: 지금 이 화면에서 누른 기록이 바로 숫자로 쌓입니다.</div>');
   var o2d={};mem.forEach(function(m){if(m.office&&m.division)o2d[m.office]=m.division;});
   var curD=scope.indexOf('d:')===0?scope.slice(2):scope.indexOf('o:')===0?o2d[scope.slice(2)]:'';
-  h+='<div class="scope"><div class="chiprow"><span class="lb">사업부</span>'+chip('all','전사')+
-    Object.keys(divs).sort().map(function(d){return chip('d:'+d,d);}).join('')+
+  h+='<div class="scope"><div class="chiprow"><span class="lb">사업부</span>'+chip('all','전체')+
+    Object.keys(divs).sort(function(a,b){var o=['서울3','서울4','지방3','지방4','폴라리스'];var x=o.indexOf(a),y=o.indexOf(b);return (x<0?99:x)-(y<0?99:y)||a.localeCompare(b);}).map(function(d){return chip('d:'+d,d);}).join('')+
     '<span class="sp"></span><span class="muted" style="font-size:13px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
   if(curD){h+='<div class="chiprow sub-scope"><span class="lb">'+esc(curD)+' 사무소</span>'+chip('d:'+curD,'전체')+
     Object.keys(o2d).filter(function(o){return o2d[o]===curD;}).sort().map(function(o){return chip('o:'+o,o);}).join('')+'</div>';}
