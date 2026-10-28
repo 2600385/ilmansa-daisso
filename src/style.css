@@ -483,3 +483,15 @@ button.ic:hover{border-color:var(--navy)}
 /* 이달의 주요 이슈 v5: 제목은 꽉 찬 블루 배지, 아래 실선으로 카드와 분리 */
 .is-lab{background:#3B7DDD;color:#FFFFFF;padding:7px 14px}.is-lab svg{color:#FFFFFF}
 .issue-strip{padding:10px 0 14px;margin-bottom:6px;border-bottom:1.5px solid #C9DBF5}
+/* 이달의 주요 이슈 v6: 버튼 덩어리 대신 한 줄 텍스트형, 제목만 연분홍 배지 */
+.is-lab{background:#FFE3EA;color:#C8426B;box-shadow:none;padding:6px 12px;font-size:13px}.is-lab svg{color:#E06A8E}
+.is-items{gap:0;align-items:center}
+.is-item{background:none;border:0;border-radius:0;padding:2px 16px;gap:6px}
+.is-item+.is-item{border-left:1px solid #E3E7EE}
+.is-nm{color:var(--ink);font-size:15px;font-weight:700}
+.is-btn,.is-btn.go,.is-btn.on{background:none;border:0;min-height:28px;padding:0 4px;border-radius:6px;font-size:13px;font-weight:700}
+.is-btn{color:var(--muted)}
+.is-btn.go{color:#C8426B}
+.is-btn.on{color:#B8862F}
+.is-btn:hover{background:#F3F5F9}
+.issue-strip{border-bottom:1px solid #E3E7EE}
