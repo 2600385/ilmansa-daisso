@@ -1,4 +1,1 @@
-{
-  "buildCommand": "mkdir -p dist && cp index.html dist/",
-  "outputDirectory": "dist"
-}
+{"buildCommand": "mkdir -p dist && cp index.html dist/ && cp -r tools dist/", "outputDirectory": "dist"}
