@@ -915,7 +915,7 @@ function loading(){return '<div class="prompt muted">불러오는 중…</div>';
 function vStats(){
   if(!S.stats)return loading();
   var rows=S.stats,scope=S.scope,mem=S.members||[];
-  var divs={},offs={};rows.concat(mem).forEach(function(r){if(r.division)divs[r.division]=1;if(r.office)offs[r.office]=1;});
+  var divs={};(mem.length?mem:rows).forEach(function(r){if(r.division)divs[r.division]=1;});
   function inScope(r){if(scope==='all')return true;var p=scope.split(':');return p[0]==='d'?r.division===p[1]:r.office===p[1];}
   var R=rows.filter(inScope);
   function sum(type,target){return R.filter(function(r){return r.type===type&&(target===undefined||r.target===target);}).reduce(function(a,r){return a+Number(r.cnt);},0);}
