@@ -244,9 +244,7 @@ function vTools(){
   PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
-  var mOn=S.place==='month'&&!S.favOnly,mN=activeTools().filter(function(t){return t.month;}).length;
-  h+='</div><button type="button" class="issue-chip'+(mOn?' on':'')+'" data-act="place" data-v="month" aria-pressed="'+mOn+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈<span class="n">'+mN+'</span></button>';
-  h+='<div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
+  h+='</div><div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
   NEEDS.forEach(function(n){var on=n.id===S.need&&!S.favOnly;
     var cnt=n.id==='script'?S.scripts.length:n.id==='contact'?S.contacts.length:activeTools().filter(function(t){return inNeed(t,n.id)&&inPlace(t,S.place);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="need" data-v="'+n.id+'" aria-pressed="'+on+'">'+(n.phone?I.phone:'<span class="dot" style="background:'+n.c+'" aria-hidden="true"></span>')+(n.sub?'<span class="tw">'+n.label+'<small>'+n.sub+'</small></span>':n.label)+'<span class="n">'+cnt+'</span></button>';});
@@ -281,7 +279,18 @@ function vResults(){
     h+=vScripts();
   }else if(!S.favOnly&&S.need==='contact'){
     h+=vContacts();
-  }else if(list.length){h+='<div class="grid">'+list.map(vCard).join('')+'</div>';}
+  }else if(list.length){
+    var hot=S.favOnly||S.place==='none'?[]:list.filter(function(t){return t.month;});
+    if(hot.length){
+      h+='<div class="issue-strip" role="region" aria-label="이달의 주요 이슈"><span class="is-lab"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈</span><div class="is-items">';
+      hot.forEach(function(t){var inB=S.basket.indexOf(t.id)>=0;
+        h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn" data-act="open" data-v="'+t.id+'">열기</button>'+
+          (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+(inB?'담았어요':'담기')+'</button>':'')+'</span>';});
+      h+='</div></div>';
+    }
+    var rest=hot.length?list.filter(function(t){return !t.month;}):list;
+    if(rest.length)h+='<div class="grid">'+rest.map(vCard).join('')+'</div>';
+  }
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
   return h;
 }
@@ -631,6 +640,7 @@ function render(){
   if(S.toast)h+='<div class="toast" role="status">'+esc(S.toast)+'</div>';
   if(S.modal){var keep={};[].forEach.call(document.querySelectorAll('.modal input,.modal textarea,.modal select'),function(el){if(el.id&&el.type!=='file'&&el.type!=='checkbox')keep[el.id]=el.value;});}
   app.innerHTML=h;
+  var hd=app.querySelector('header.top');document.documentElement.style.setProperty('--hh',(hd?hd.offsetHeight:0)+'px');
   if(S.modal&&keep){Object.keys(keep).forEach(function(id){var el=document.getElementById(id);if(el)el.value=keep[id];});}
   if(fid){var el=document.getElementById(fid);if(el){el.focus();if(sel){try{el.setSelectionRange(sel[0],sel[1]);}catch(e){}}}}
 }
