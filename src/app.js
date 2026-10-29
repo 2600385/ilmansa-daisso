@@ -285,7 +285,7 @@ function vResults(){
   }else if(!S.favOnly&&S.need==='contact'){
     h+=vContacts();
   }else if(list.length){
-    var hot=S.favOnly||S.place==='none'?[]:list.filter(function(t){return t.month;});
+    var hot=S.favOnly||S.place==='none'||q?[]:list.filter(function(t){return t.month;});
     if(hot.length){
       h+='<div class="issue-strip" role="region" aria-label="이달의 주요 이슈"><span class="is-lab"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>이달의 주요 이슈</span><div class="is-items">';
       hot.forEach(function(t){var inB=S.basket.indexOf(t.id)>=0;
