@@ -330,15 +330,21 @@ var THUMB={},thumbBusy=false;
 /* 미리보기 가능한 파일: 이미지 + PDF(첫 장을 그림으로 그려서 보여줌) */
 function isImg(t){return !!(t.file&&/\.(png|jpe?g|webp|gif|pdf)$/i.test(t.file));}
 var ZOOMS={};
-async function pdfThumb(url,file){
+function loadImg(src){return new Promise(function(ok,no){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){ok(im);};im.onerror=no;im.src=src;});}
+async function pdfThumb(url,file,cover){
   if(!window.pdfjsLib){await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
   var pdf=await pdfjsLib.getDocument(url).promise,n=Math.min(pdf.numPages,2),cs=[];
-  for(var i=1;i<=n;i++){var pg=await pdf.getPage(i),v=pg.getViewport({scale:1}),sc=1100/v.width,vp=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+  for(var i=1;i<=n;i++){var pg=await pdf.getPage(i),v=pg.getViewport({scale:1}),sc=1100/Math.max(v.width,v.height),vp=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
     var cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:cx,viewport:vp}).promise;cs.push(c);}
-  if(cs.length>1&&(cs[0].width>cs[0].height)===(cs[1].width>cs[1].height)){var W=cs[0].width+cs[1].width+24,H=Math.max(cs[0].height,cs[1].height),z=document.createElement('canvas');z.width=W;z.height=H;var zx=z.getContext('2d');zx.fillStyle='#fff';zx.fillRect(0,0,W,H);zx.drawImage(cs[0],0,0);zx.drawImage(cs[1],cs[0].width+24,0);ZOOMS[file]=z.toDataURL('image/jpeg',.88);}
-  var pick=cs.filter(function(c){return c.height>c.width;})[0]||cs[0]; /* 세로 페이지가 있으면 그걸 미리보기로 */
+  if(cover&&cs.length>1)cs[1]=await loadImg(cover); /* 인쇄용으로 눕혀둔 뒷면은 세운 표지로 */
+  if(cs.length>1){ /* 크게 보기: 두 장을 같은 높이로 나란히 */
+    var H=1100,ws=cs.map(function(c){return Math.round(c.width*H/c.height);}),z=document.createElement('canvas');z.width=ws[0]+ws[1]+30;z.height=H;
+    var zx=z.getContext('2d');zx.fillStyle='#fff';zx.fillRect(0,0,z.width,H);zx.drawImage(cs[0],0,0,ws[0],H);zx.drawImage(cs[1],ws[0]+30,0,ws[1],H);ZOOMS[file]=z.toDataURL('image/jpeg',.88);}
+  if(cover)return cover;
+  var pick=cs.filter(function(c){return c.height>c.width;})[0]||cs[0];
   return pick.toDataURL('image/jpeg',.85);
 }
+
 function vGallery(list){
   var need=list.filter(function(t){return isImg(t)&&THUMB[t.file]===undefined;});
   if(need.length&&LIVE)setTimeout(function(){loadThumbs(need);},0);
@@ -359,8 +365,8 @@ function cThumb(t){
 async function loadThumbs(list){
   if(thumbBusy)return;thumbBusy=true;
   for(var i=0;i<list.length;i++){var f=list[i].file;if(THUMB[f])continue;
-    if(/\.pdf$/i.test(f)){try{var cu=await api.fileUrl(f+'.cover.jpg');if((await fetch(cu,{method:'HEAD'})).ok){THUMB[f]=cu;continue;}}catch(e){}} /* 따로 올린 표지 이미지가 있으면 그걸 미리보기로 */
-    try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f):u;}catch(e){THUMB[f]=''; }}
+    var cov=null;if(/\.pdf$/i.test(f)){try{var cu=await api.fileUrl(f+'.cover.jpg');if((await fetch(cu,{method:'HEAD'})).ok)cov=cu;}catch(e){}} /* 따로 올린 표지 이미지가 있으면 그걸 미리보기로 */
+    try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f,cov):u;}catch(e){THUMB[f]=''; }}
   thumbBusy=false;var r=document.getElementById('results');if(r)r.innerHTML=vResults();
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
