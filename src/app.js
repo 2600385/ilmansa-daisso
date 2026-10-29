@@ -305,7 +305,7 @@ var IC_GRID='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
 var IC_LIST='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="4" width="18" height="3.5" rx="1.5"/><rect x="3" y="10.25" width="18" height="3.5" rx="1.5"/><rect x="3" y="16.5" width="18" height="3.5" rx="1.5"/></svg>';
 function vRow(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0,th='';
-  if(t.kind==='brochure'&&isImg(t)){if(!THUMB[t.file]&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
+  if(t.kind==='brochure'&&isImg(t)){if(THUMB[t.file]===undefined&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
     th='<button type="button" class="lr-th" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="">':'')+'</button>';}
   return '<div class="lr" role="listitem">'+th+'<span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+
     '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><span class="lr-nm">'+esc(t.name)+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'<span class="lr-ds">'+esc(t.desc)+'</span></div>'+
@@ -327,13 +327,23 @@ function vCard(t){
 }
 /* 브로셔 갤러리: 이미지로 올린 브로셔는 포스터 미리보기 */
 var THUMB={},thumbBusy=false;
-function isImg(t){return !!(t.file&&/\.(png|jpe?g|webp|gif)$/i.test(t.file));}
+/* 미리보기 가능한 파일: 이미지 + PDF(첫 장을 그림으로 그려서 보여줌) */
+function isImg(t){return !!(t.file&&/\.(png|jpe?g|webp|gif|pdf)$/i.test(t.file));}
+var ZOOMS={};
+async function pdfThumb(url,file){
+  if(!window.pdfjsLib){await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
+  var pdf=await pdfjsLib.getDocument(url).promise,n=Math.min(pdf.numPages,2),cs=[];
+  for(var i=1;i<=n;i++){var pg=await pdf.getPage(i),v=pg.getViewport({scale:1}),sc=1100/v.width,vp=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+    var cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:cx,viewport:vp}).promise;cs.push(c);}
+  if(cs.length>1){var W=cs[0].width+cs[1].width+24,H=Math.max(cs[0].height,cs[1].height),z=document.createElement('canvas');z.width=W;z.height=H;var zx=z.getContext('2d');zx.fillStyle='#fff';zx.fillRect(0,0,W,H);zx.drawImage(cs[0],0,0);zx.drawImage(cs[1],cs[0].width+24,0);ZOOMS[file]=z.toDataURL('image/jpeg',.88);}
+  return cs[0].toDataURL('image/jpeg',.85);
+}
 function vGallery(list){
-  var need=list.filter(function(t){return isImg(t)&&!THUMB[t.file];});
+  var need=list.filter(function(t){return isImg(t)&&THUMB[t.file]===undefined;});
   if(need.length&&LIVE)setTimeout(function(){loadThumbs(need);},0);
   return '<div class="gal">'+list.map(function(t){
     var inB=S.basket.indexOf(t.id)>=0,fav=!!S.favs[t.id],pv;
-    if(isImg(t))pv=THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="'+esc(t.name)+' 미리보기" loading="lazy"><button type="button" class="zoom" data-act="zoom" data-v="'+t.id+'">크게 보기</button>':'<span class="pv-ph">불러오는 중…</span>';
+    if(isImg(t))pv=THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="'+esc(t.name)+' 미리보기" loading="lazy"><button type="button" class="zoom" data-act="zoom" data-v="'+t.id+'">크게 보기</button>':(THUMB[t.file]===''?'<span class="pv-ph"><b>'+FMT[fmt(t)]+'</b>미리보기 없음<br>열어서 보기</span>':'<span class="pv-ph">불러오는 중…</span>');
     else pv='<span class="pv-ph"><b>'+FMT[fmt(t)]+'</b>미리보기 없음<br>열어서 보기</span>';
     return '<div class="gi"><div class="pv'+(isImg(t)?'':' none')+'">'+pv+(t.month?'<span class="tag a-issue st">이달의 주요 이슈</span>':'')+
       '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
@@ -342,12 +352,12 @@ function vGallery(list){
   }).join('')+'</div>';
 }
 function cThumb(t){
-  if(!THUMB[t.file]&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
+  if(THUMB[t.file]===undefined&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
   return '<button type="button" class="cthumb" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="" loading="lazy"><span class="zoom">크게 보기</span>':'<span class="pv-ph">불러오는 중…</span>')+'</button>';
 }
 async function loadThumbs(list){
   if(thumbBusy)return;thumbBusy=true;
-  try{for(var i=0;i<list.length;i++){if(!THUMB[list[i].file])THUMB[list[i].file]=await api.fileUrl(list[i].file);}}catch(e){}
+  for(var i=0;i<list.length;i++){var f=list[i].file;if(THUMB[f])continue;try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f):u;}catch(e){THUMB[f]=''; }}
   thumbBusy=false;var r=document.getElementById('results');if(r)r.innerHTML=vResults();
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
@@ -816,7 +826,7 @@ document.addEventListener('click',function(e){
     case 'fav':
       var on=!S.favs[v];if(on)S.favs[v]=true;else delete S.favs[v];track(on?'fav':'unfav',v);
       api.setFav(v,on).catch(function(err){if(on)delete S.favs[v];else S.favs[v]=true;fail(err);});break;
-    case 'zoom':var zt=byId(v);if(zt&&THUMB[zt.file]){S.zoom=THUMB[zt.file];track('open',v);}break;
+    case 'zoom':var zt=byId(v);if(zt&&THUMB[zt.file]){S.zoom=ZOOMS[zt.file]||THUMB[zt.file];track('open',v);}break;
     case 'zoomClose':S.zoom='';break;
     case 'open':
       var t=byId(v);if(!t)break;
