@@ -155,7 +155,7 @@ var api=LIVE?live:demo;
 /* =====================================================================
    상태
    ===================================================================== */
-var S={printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'none',need:'none',q:'',favOnly:false,
+var S={printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'all',need:'all',q:'',favOnly:false,
   tools:[],scripts:[],contacts:[],favs:{},basket:[],basketOpen:false,hospital:'',present:-1,stage:'s1',
   adminTab:'tools',adminArea:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
 var toastTimer=null;
@@ -747,8 +747,8 @@ document.addEventListener('click',function(e){
     case 'home':S.mode='prep';S.page='tools';S.present=-1;window.scrollTo(0,0);break;
     case 'logout':api.signOut();S.uid=null;S.me=null;S.basket=[];saveBasket();S.mode='prep';S.page='tools';S.stats=S.reqs=S.members=null;break;
     case 'pwModal':S.modal='pw';break;
-    case 'place':S.place=S.place===v?'none':v;S.favOnly=false;break;
-    case 'need':S.need=S.need===v?'none':v;S.favOnly=false;break;
+    case 'place':S.place=v;S.favOnly=false;break;
+    case 'need':S.need=v;S.favOnly=false;break;
     case 'favOnly':S.favOnly=!S.favOnly;break;
     case 'fav':
       var on=!S.favs[v];if(on)S.favs[v]=true;else delete S.favs[v];track(on?'fav':'unfav',v);
