@@ -574,3 +574,24 @@ button.ic:hover{border-color:var(--navy)}
 .card .txt:hover .full{display:block}
 @media (hover:none){.card .full{display:none!important}}
 @media (prefers-reduced-motion:reduce){.card:hover{transform:none}}
+/* 카드 호버: 색 없이 후광만 */
+.card:hover{box-shadow:0 -10px 24px -6px rgba(46,74,120,.22),0 18px 36px rgba(31,42,68,.12);border-color:var(--line)}
+/* 보기 전환 */
+.vsw{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:#E9EDF3;margin-left:auto;margin-right:14px}
+.vsw button{width:32px;height:28px;border:0;border-radius:8px;background:none;color:#8A97AB;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vsw button.on{background:#FFFFFF;color:var(--navy);box-shadow:0 1px 3px rgba(31,42,68,.12)}
+/* 한 줄형 */
+.lrows{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lr{display:flex;align-items:center;gap:12px;padding:10px 16px;transition:background .15s,box-shadow .15s}
+.lr+.lr{border-top:1px solid var(--line)}
+.lr:hover{background:#F8FAFD;box-shadow:inset 3px 0 0 #C9D3E3}
+.lr>.tag{flex:none;min-width:58px;text-align:center}
+.lr-th{flex:none;width:40px;height:56px;padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#F7F9FC;cursor:zoom-in}
+.lr-th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.lr-main{flex:1;min-width:0;display:flex;align-items:center;gap:8px;overflow:hidden}
+.lr-nm{font-weight:700;font-size:15px;white-space:nowrap;flex:none;max-width:48%;overflow:hidden;text-overflow:ellipsis}
+.lr-ds{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lr .tag.a-issue{flex:none}
+.lr .star{flex:none}
+.lr .btn{flex:none;min-height:36px;padding:0 14px;font-size:13px}
+@media (max-width:760px){.lr{flex-wrap:wrap}.lr-main{flex-basis:100%;order:3}.lr-ds{display:none}}

@@ -156,7 +156,7 @@ var api=LIVE?live:demo;
 /* =====================================================================
    상태
    ===================================================================== */
-var S={printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'all',need:'all',q:'',favOnly:false,
+var S={view:(function(){try{return localStorage.getItem('daisso_view')||'card';}catch(e){return 'card';}})(),printSel:{},printUrl:'',simple:false,boot:true,uid:null,me:null,mode:'prep',page:'tools',place:'all',need:'all',q:'',favOnly:false,
   tools:[],scripts:[],contacts:[],favs:{},basket:[],basketOpen:false,hospital:'',present:-1,stage:'s1',
   adminTab:'tools',adminArea:'stats',scope:'all',stats:null,reqs:null,members:null,modal:null,edit:null,toast:'',busy:false,loginErr:''};
 var toastTimer=null;
@@ -278,6 +278,7 @@ function vResults(){
     label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
   }
   h+='<div class="list-h"><span class="muted" style="font-size:14px">'+label+'</span>'+
+     '<span class="vsw" role="group" aria-label="보기 방식"><button type="button" data-act="view" data-v="card" class="'+(S.view!=='list'?'on':'')+'" aria-pressed="'+(S.view!=='list')+'" title="카드형">'+IC_GRID+'</button><button type="button" data-act="view" data-v="list" class="'+(S.view==='list'?'on':'')+'" aria-pressed="'+(S.view==='list')+'" title="한 줄형">'+IC_LIST+'</button></span>'+
      '<button type="button" class="simple-sw fav'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'"><span class="st" aria-hidden="true">★</span>즐겨찾기만<span class="knob" aria-hidden="true"></span></button></div>';
   if(idle){
     h+='<div class="prompt"><b>가는 곳이나 필요한 걸 골라주세요</b><span class="muted">하나만 골라도 되고, 둘 다 고르면 딱 맞는 것만 꺼내드려요.</span></div>';
@@ -295,10 +296,22 @@ function vResults(){
       h+='</div></div>';
     }
     var rest=list; /* 주요 이슈는 위 줄에서 강조 + 아래 카드에도 한 번 더 */
-    if(rest.length)h+=(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
+    if(rest.length)h+=S.view==='list'?'<div class="lrows" role="list">'+rest.map(vRow).join('')+'</div>':(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
   }
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
   return h;
+}
+var IC_GRID='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>';
+var IC_LIST='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="4" width="18" height="3.5" rx="1.5"/><rect x="3" y="10.25" width="18" height="3.5" rx="1.5"/><rect x="3" y="16.5" width="18" height="3.5" rx="1.5"/></svg>';
+function vRow(t){
+  var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0,th='';
+  if(t.kind==='brochure'&&isImg(t)){if(!THUMB[t.file]&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
+    th='<button type="button" class="lr-th" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="">':'')+'</button>';}
+  return '<div class="lr" role="listitem">'+th+'<span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+
+    '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><span class="lr-nm">'+esc(t.name)+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'<span class="lr-ds">'+esc(t.desc)+'</span></div>'+
+    '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button>'+
+    '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
+    (t.doctor?'<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'<span class="btn btn-no">'+I.lock+'내부용</span>')+'</div>';
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
@@ -831,6 +844,7 @@ document.addEventListener('click',function(e){
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
+    case 'view':S.view=v;try{localStorage.setItem('daisso_view',v);}catch(e){}break;
     case 'statFocus':S.statFocus=S.statFocus===v?'':v;break;
     case 'admKind':S.admKind=v;break;
     case 'goReqs':S.adminArea='manage';S.adminTab='reqs';loadAdmin();break;
