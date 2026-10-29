@@ -409,7 +409,7 @@ function vClinic(){
     '</div>';
   if(!list.length){
     h+='<div class="steps empty">'+[1,2,3].map(function(n){return '<div class="step"><span class="c">'+n+'</span></div>';}).join('')+'</div>'+
-      '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>\'혼자 자료 찾는 중\' 화면에서 \'제안서에 담기\'를 누르면 담은 순서대로 여기에 나옵니다.</span><button type="button" class="btn btn-primary" data-act="mode" data-v="prep">자료 담으러 가기</button></div>';
+      '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>\'제안서에 담기\'를 누르면 담은 순서대로 여기에 나옵니다.</span><button type="button" class="btn btn-primary" data-act="mode" data-v="prep">자료 담으러 가기</button></div>';
     return h+'</div></div>';
   }
   h+='<div class="steps">';

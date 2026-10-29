@@ -624,3 +624,7 @@ button.ic:hover{border-color:var(--navy)}
 /* 심플 모드: 단계를 화면 가운데에 */
 .clinic.is-simple>.wrap{min-height:calc(100vh - var(--hh,76px) - 40px);display:flex;flex-direction:column;justify-content:center}
 .clinic.is-simple .clinic-simple{position:absolute;top:calc(var(--hh,76px) + 8px);right:24px}
+/* 빈 바구니 강조 + 단계 상자 위아래 여백 */
+.cl-empty b{color:#D9622B}
+.steps{padding:44px 20px 40px}
+.steps.empty{padding:48px 20px}
