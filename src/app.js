@@ -294,7 +294,7 @@ function vResults(){
       h+='</div></div>';
     }
     var rest=hot.length?list.filter(function(t){return !t.month;}):list;
-    if(rest.length)h+='<div class="grid">'+rest.map(vCard).join('')+'</div>';
+    if(rest.length)h+=(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
   }
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
   return h;
@@ -309,6 +309,27 @@ function vCard(t){
   else{h+='<span class="btn btn-no" title="내부용 자료라 제안서에 담을 수 없어요">'+I.lock+'내부용</span>';}
   h+='</div>';
   return h+'</article>';
+}
+/* 브로셔 갤러리: 이미지로 올린 브로셔는 포스터 미리보기 */
+var THUMB={},thumbBusy=false;
+function isImg(t){return !!(t.file&&/\.(png|jpe?g|webp|gif)$/i.test(t.file));}
+function vGallery(list){
+  var need=list.filter(function(t){return isImg(t)&&!THUMB[t.file];});
+  if(need.length&&LIVE)setTimeout(function(){loadThumbs(need);},0);
+  return '<div class="gal">'+list.map(function(t){
+    var inB=S.basket.indexOf(t.id)>=0,fav=!!S.favs[t.id],pv;
+    if(isImg(t))pv=THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="'+esc(t.name)+' 미리보기" loading="lazy"><button type="button" class="zoom" data-act="zoom" data-v="'+t.id+'">크게 보기</button>':'<span class="pv-ph">불러오는 중…</span>';
+    else pv='<span class="pv-ph"><b>'+FMT[fmt(t)]+'</b>미리보기 없음<br>열어서 보기</span>';
+    return '<div class="gi"><div class="pv'+(isImg(t)?'':' none')+'">'+pv+(t.month?'<span class="tag a-issue st">이달의 주요 이슈</span>':'')+
+      '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
+      '<div class="nm">'+esc(cleanName(t.name))+'</div><div class="row"><button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
+      (t.doctor?'<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'<span class="btn btn-no">'+I.lock+'내부용</span>')+'</div></div>';
+  }).join('')+'</div>';
+}
+async function loadThumbs(list){
+  if(thumbBusy)return;thumbBusy=true;
+  try{for(var i=0;i<list.length;i++){if(!THUMB[list[i].file])THUMB[list[i].file]=await api.fileUrl(list[i].file);}}catch(e){}
+  thumbBusy=false;var r=document.getElementById('results');if(r)r.innerHTML=vResults();
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
 function vBasketBar(){
@@ -650,6 +671,7 @@ function render(){
     else h+=vTools();
   }
   if(S.uid||!S.boot)h+=vModal();
+  if(S.zoom)h+='<div class="zoom-ov" data-act="zoomClose" role="dialog" aria-label="크게 보기"><img src="'+esc(S.zoom)+'" alt=""><span class="zx">닫기 ✕</span></div>';
   if(S.toast)h+='<div class="toast" role="status">'+esc(S.toast)+'</div>';
   if(S.modal){var keep={};[].forEach.call(document.querySelectorAll('.modal input,.modal textarea,.modal select'),function(el){if(el.id&&el.type!=='file'&&el.type!=='checkbox')keep[el.id]=el.value;});}
   app.innerHTML=h;
@@ -727,6 +749,8 @@ document.addEventListener('click',function(e){
     case 'fav':
       var on=!S.favs[v];if(on)S.favs[v]=true;else delete S.favs[v];track(on?'fav':'unfav',v);
       api.setFav(v,on).catch(function(err){if(on)delete S.favs[v];else S.favs[v]=true;fail(err);});break;
+    case 'zoom':var zt=byId(v);if(zt&&THUMB[zt.file]){S.zoom=THUMB[zt.file];track('open',v);}break;
+    case 'zoomClose':S.zoom='';break;
     case 'open':
       var t=byId(v);if(!t)break;
       var win=LIVE&&(t.url||t.file)?window.open('about:blank','_blank'):null;
