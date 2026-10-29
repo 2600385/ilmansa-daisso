@@ -278,8 +278,8 @@ function vResults(){
     if(parts.length===2&&parts[0]==='전체'&&parts[1]==='전체')parts=['전체'];label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
   }
   h+='<div class="list-h"><span class="muted" style="font-size:14px">'+label+'</span>'+
-     '<span class="vsw" role="group" aria-label="보기 방식"><button type="button" data-act="view" data-v="card" class="'+(S.view!=='list'?'on':'')+'" aria-pressed="'+(S.view!=='list')+'" title="카드형">'+IC_GRID+'</button><button type="button" data-act="view" data-v="list" class="'+(S.view==='list'?'on':'')+'" aria-pressed="'+(S.view==='list')+'" title="한 줄형">'+IC_LIST+'</button></span>'+
-     '<button type="button" class="simple-sw fav'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'"><span class="st" aria-hidden="true">★</span>즐겨찾기만<span class="knob" aria-hidden="true"></span></button></div>';
+     '<button type="button" class="simple-sw fav'+(S.favOnly?' on':'')+'" data-act="favOnly" aria-pressed="'+S.favOnly+'"><span class="st" aria-hidden="true">★</span>즐겨찾기만<span class="knob" aria-hidden="true"></span></button>'+
+     '<span class="vsw" role="group" aria-label="보기 방식"><button type="button" data-act="view" data-v="card" class="'+(S.view!=='list'?'on':'')+'" aria-pressed="'+(S.view!=='list')+'" title="카드형">'+IC_GRID+'</button><button type="button" data-act="view" data-v="list" class="'+(S.view==='list'?'on':'')+'" aria-pressed="'+(S.view==='list')+'" title="한 줄형">'+IC_LIST+'</button></span>'+'</div>';
   if(idle){
     h+='<div class="prompt"><b>가는 곳이나 필요한 걸 골라주세요</b><span class="muted">하나만 골라도 되고, 둘 다 고르면 딱 맞는 것만 꺼내드려요.</span></div>';
   }else if(!S.favOnly&&S.need==='script'){
