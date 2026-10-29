@@ -548,3 +548,4 @@ button.ic:hover{border-color:var(--navy)}
 .sdet-r .t{height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden}
 .sdet-r .t i{display:block;height:100%;border-radius:4px}
 .sdet-r .v{font-size:13px;font-weight:700;text-align:right}
+.chiprow.per{margin-bottom:8px}.chiprow.per .lb,.scope .lb{min-width:72px;font-size:14px;font-weight:700;color:var(--muted)}

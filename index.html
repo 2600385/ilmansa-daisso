@@ -558,6 +558,7 @@ button.ic:hover{border-color:var(--navy)}
 .sdet-r .t{height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden}
 .sdet-r .t i{display:block;height:100%;border-radius:4px}
 .sdet-r .v{font-size:13px;font-weight:700;text-align:right}
+.chiprow.per{margin-bottom:8px}.chiprow.per .lb,.scope .lb{min-width:72px;font-size:14px;font-weight:700;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -652,7 +653,7 @@ var live={
     if(id)return toContact(must(await live.sb.from('contacts').update(row).eq('id',id).select().single()));
     return toContact(must(await live.sb.from('contacts').insert(row).select().single()));},
   deleteContact:async function(id){must(await live.sb.from('contacts').delete().eq('id',id));},
-  stats:async function(){return must(await live.sb.rpc('admin_stats',{p_from:null}));},
+  stats:async function(from){return must(await live.sb.rpc('admin_stats',{p_from:from||null}));},
   requests:async function(){return must(await live.sb.from('requests').select('id,body,place,status,office,division,created_at').order('created_at',{ascending:false}));},
   setReqStatus:async function(id,s){must(await live.sb.from('requests').update({status:s}).eq('id',id));},
   members:async function(){return must(await live.sb.from('profiles').select('emp_no,name,division,office,role').order('office').order('name'));},
@@ -859,7 +860,7 @@ function vResults(){
           (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'')+'</span>';});
       h+='</div></div>';
     }
-    var rest=hot.length?list.filter(function(t){return !t.month;}):list;
+    var rest=list; /* 주요 이슈는 위 줄에서 강조 + 아래 카드에도 한 번 더 */
     if(rest.length)h+=(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
   }
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
@@ -1024,6 +1025,8 @@ function vStats(){
   var h=(LIVE?'':'<div class="inbanner">미리보기 모드: 지금 이 화면에서 누른 기록이 바로 숫자로 쌓입니다.</div>');
   var o2d={};mem.forEach(function(m){if(m.office&&m.division)o2d[m.office]=m.division;});
   var curD=scope.indexOf('d:')===0?scope.slice(2):scope.indexOf('o:')===0?o2d[scope.slice(2)]:'';
+  var PER=[['all','전체 기간'],['today','오늘'],['week','이번 주'],['month','이번 달']];
+  h+='<div class="chiprow per"><span class="lb">기간</span>'+PER.map(function(p){var on=(S.period||'all')===p[0];return '<button type="button" class="chip'+(on?' on':'')+'" data-act="period" data-v="'+p[0]+'" aria-pressed="'+on+'">'+p[1]+'</button>';}).join('')+'</div>';
   h+='<div class="scope"><div class="chiprow"><span class="lb">사업부</span>'+chip('all','전체')+
     Object.keys(divs).sort(function(a,b){var o=['서울3','서울4','지방3','지방4','폴라리스'];var x=o.indexOf(a),y=o.indexOf(b);return (x<0?99:x)-(y<0?99:y)||a.localeCompare(b);}).map(function(d){return chip('d:'+d,d);}).join('')+
     '<span class="sp"></span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
@@ -1036,8 +1039,8 @@ function vStats(){
   var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
   if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+(KLBL[topKind]||topKind)+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
   h+='<div class="k3"><div class="kc"><div class="lab">사용한 사람</div><div class="big">'+people+'<small>/ '+total+'명'+(total?' · '+pct+'%':'')+'</small></div><div class="prog"><i style="width:'+Math.min(pct,100)+'%"></i></div>'+(total?'':'<div class="muted" style="font-size:13px">계정에 명단을 넣으면 비율이 나옵니다</div>')+'<div class="muted" style="font-size:12px">* 개인별 기록은 보지 않습니다</div></div>'+
-    '<button type="button" class="kc kbtn'+(S.statFocus==='f'?' on':'')+'" data-act="statFocus" data-v="f"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">자주 쓰겠다고 표시한 횟수 · <u>자료별 보기</u></div></button>'+
-    '<button type="button" class="kc kbtn'+(S.statFocus==='b'?' on':'')+'" data-act="statFocus" data-v="b"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수 · <u>자료별 보기</u></div></button></div>';
+    '<button type="button" class="kc kbtn'+(S.statFocus==='f'?' on':'')+'" data-act="statFocus" data-v="f"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">지금 즐겨찾기 돼 있는 수 · <u>자료별 보기</u></div></button>'+
+    '<button type="button" class="kc kbtn'+(S.statFocus==='b'?' on':'')+'" data-act="statFocus" data-v="b"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">담은 횟수(누적) · <u>자료별 보기</u></div></button></div>';
   if(S.statFocus){var fk=S.statFocus,tot=fk==='f'?sum('fav_now'):sum('basket');
     var fl=S.tools.map(function(t){return {t:t,v:fk==='f'?sum('fav_now',t.id):sum('basket',t.id)};}).filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
     h+='<section class="sdet"><div class="sdet-h"><b>'+(fk==='f'?'★ 즐겨찾기':'제안서에 담기')+' · 자료별</b><span class="muted">'+fl.length+'개 자료 · 합계 '+tot+'회</span><button type="button" class="btn btn-ghost" data-act="statFocus" data-v="">닫기</button></div>';
@@ -1063,6 +1066,7 @@ function vStats(){
     '</div></section>';
   return h;
 }
+function periodFrom(){var p=S.period||'all',d=new Date();d.setHours(0,0,0,0);if(p==='all')return null;if(p==='week'){d.setDate(d.getDate()-((d.getDay()+6)%7));}if(p==='month')d.setDate(1);return d.toISOString();}
 function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
 function vToolAdmin(){
   var k=S.admKind||'all';
@@ -1270,7 +1274,7 @@ async function afterLogin(uid){
 function saveBasket(){try{sessionStorage.setItem('daisso_basket',JSON.stringify(S.basket));}catch(e){}}
 async function loadAdmin(){
   try{
-    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(),api.requests(),api.members()]);S.stats=r[0];S.reqs=r[1];S.members=r[2];}
+    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(periodFrom()),api.requests(),api.members()]);S.stats=r[0];S.reqs=r[1];S.members=r[2];}
     else{var r2=await Promise.all([api.requests(),api.members()]);S.reqs=r2[0];S.members=r2[1];}
   }catch(e){fail(e);}
   render();
@@ -1359,6 +1363,7 @@ document.addEventListener('click',function(e){
     case 'closeModal':S.modal=null;S.edit=null;break;
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
+    case 'period':S.period=v;S.stats=null;loadAdmin();break;
     case 'statFocus':S.statFocus=S.statFocus===v?'':v;break;
     case 'admKind':S.admKind=v;break;
     case 'goReqs':S.adminArea='manage';S.adminTab='reqs';loadAdmin();break;
