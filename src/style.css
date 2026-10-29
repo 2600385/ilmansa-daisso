@@ -614,3 +614,13 @@ button.ic:hover{border-color:var(--navy)}
 .step:hover .go,.step:focus-visible .go{opacity:1}
 .cl-hint{text-align:center;margin:16px 0 40px;font-size:14px;color:var(--muted)}
 @media (max-width:640px){.steps{justify-content:flex-start}.step{min-width:130px}}
+/* 제안서: 비어 있을 때 번호만 있는 빈 단계 + 안내 */
+.steps.empty .step{cursor:default}
+.steps.empty .step .c,.steps.empty .step:first-child .c{background:#FFFFFF;border:2px dashed #C9D3E3;color:#B4BFD0;box-shadow:none;transform:none}
+.cl-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin:20px 0 40px}
+.cl-empty b{font-size:18px;color:var(--navy)}
+.cl-empty span{font-size:14px;color:var(--muted)}
+.cl-empty .btn{margin-top:8px;min-height:44px;padding:0 22px}
+/* 심플 모드: 단계를 화면 가운데에 */
+.clinic.is-simple>.wrap{min-height:calc(100vh - var(--hh,76px) - 40px);display:flex;flex-direction:column;justify-content:center}
+.clinic.is-simple .clinic-simple{position:absolute;top:calc(var(--hh,76px) + 8px);right:24px}

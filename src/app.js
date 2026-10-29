@@ -398,17 +398,20 @@ function vScript(m){
 /* 거래처 모드 */
 function hospTitle(){var n=S.hospital.trim();return (n?n+' ':'')+'원장님께 드리는 제안';}
 function clinicList(){
-  var ids=S.basket.length?S.basket:activeTools().filter(function(t){return t.doctor;}).map(function(t){return t.id;});
-  return ids.map(byId).filter(function(t){return t&&t.doctor&&t.active;});
+  return S.basket.map(byId).filter(function(t){return t&&t.doctor&&t.active;});
 }
 function vClinic(){
   var list=clinicList();
-  var h='<div class="clinic"><div class="wrap">';
+  var h='<div class="clinic'+(S.simple?' is-simple':'')+'"><div class="wrap">';
   if(!S.simple)h+='<div class="clinic-hero">'+
     '<div class="title-row"><h1 id="hosp-title">'+esc(hospTitle())+'</h1><button type="button" class="btn btn-line" data-act="printOpen">'+I.print+'인쇄</button></div>'+
     '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"></div>'+
     '</div>';
-  if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
+  if(!list.length){
+    h+='<div class="steps empty">'+[1,2,3].map(function(n){return '<div class="step"><span class="c">'+n+'</span></div>';}).join('')+'</div>'+
+      '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>\'혼자 자료 찾는 중\' 화면에서 \'제안서에 담기\'를 누르면 담은 순서대로 여기에 나옵니다.</span><button type="button" class="btn btn-primary" data-act="mode" data-v="prep">자료 담으러 가기</button></div>';
+    return h+'</div></div>';
+  }
   h+='<div class="steps">';
   list.forEach(function(t,i){
     h+='<button type="button" class="step" data-act="present" data-v="'+i+'" title="'+esc(t.pub||t.desc)+'"><span class="c">'+(i+1)+'</span><span class="lb">'+esc(cleanName(t.name))+'</span><span class="go">열기 '+I.arrow+'</span></button>';
