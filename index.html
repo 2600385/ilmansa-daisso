@@ -544,6 +544,20 @@ button.ic:hover{border-color:var(--navy)}
 .tag.kk-site{background:#E0F2F5;color:#22707F}
 .tag.kk-notice{background:#E3F2E8;color:#2F7448}
 @media (max-width:640px){.fgroup .flab{width:auto;border-right:0}}
+/* 통계: KPI 눌러 자료별 보기 */
+.kbtn{text-align:left;font:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.kbtn:hover{border-color:#B9C7DD}
+.kbtn.on{border-color:var(--navy);box-shadow:0 0 0 2px rgba(46,74,120,.12)}
+.sdet{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
+.sdet-h{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sdet-h .muted{font-size:13px;flex:1}
+.sdet-r{display:grid;grid-template-columns:28px minmax(0,1.4fr) 1fr 110px;align-items:center;gap:12px;padding:6px 0}
+.sdet-r .no{font-weight:700;color:var(--muted);text-align:center}
+.sdet-r .nm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdet-r .nm small{margin-left:8px;font-weight:500;color:var(--muted);font-size:12px}
+.sdet-r .t{height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden}
+.sdet-r .t i{display:block;height:100%;border-radius:4px}
+.sdet-r .v{font-size:13px;font-weight:700;text-align:right}
 </style>
 </head>
 <body>
@@ -1012,7 +1026,7 @@ function vStats(){
   var curD=scope.indexOf('d:')===0?scope.slice(2):scope.indexOf('o:')===0?o2d[scope.slice(2)]:'';
   h+='<div class="scope"><div class="chiprow"><span class="lb">사업부</span>'+chip('all','전체')+
     Object.keys(divs).sort(function(a,b){var o=['서울3','서울4','지방3','지방4','폴라리스'];var x=o.indexOf(a),y=o.indexOf(b);return (x<0?99:x)-(y<0?99:y)||a.localeCompare(b);}).map(function(d){return chip('d:'+d,d);}).join('')+
-    '<span class="sp"></span><span class="muted" style="font-size:13px">개인별 기록은 보지 않습니다</span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
+    '<span class="sp"></span><button type="button" class="btn btn-ghost" data-act="reloadStats">새로고침</button></div>';
   if(curD){h+='<div class="chiprow sub-scope"><span class="lb">'+esc(curD)+' 사무소</span>'+chip('d:'+curD,'전체')+
     Object.keys(o2d).filter(function(o){return o2d[o]===curD;}).sort().map(function(o){return chip('o:'+o,o);}).join('')+'</div>';}
   h+='</div>';
@@ -1021,9 +1035,16 @@ function vStats(){
   var byKind={};tr.forEach(function(r){var fk=r.t.kind;byKind[fk]=(byKind[fk]||0)+r.b*2+r.f;});
   var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
   if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+(KLBL[topKind]||topKind)+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
-  h+='<div class="k3"><div class="kc"><div class="lab">사용한 사람</div><div class="big">'+people+'<small>/ '+total+'명'+(total?' · '+pct+'%':'')+'</small></div><div class="prog"><i style="width:'+Math.min(pct,100)+'%"></i></div>'+(total?'':'<div class="muted" style="font-size:13px">계정에 명단을 넣으면 비율이 나옵니다</div>')+'</div>'+
-    '<div class="kc"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">자주 쓰겠다고 표시한 횟수</div></div>'+
-    '<div class="kc"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수</div></div></div>';
+  h+='<div class="k3"><div class="kc"><div class="lab">사용한 사람</div><div class="big">'+people+'<small>/ '+total+'명'+(total?' · '+pct+'%':'')+'</small></div><div class="prog"><i style="width:'+Math.min(pct,100)+'%"></i></div>'+(total?'':'<div class="muted" style="font-size:13px">계정에 명단을 넣으면 비율이 나옵니다</div>')+'<div class="muted" style="font-size:12px">* 개인별 기록은 보지 않습니다</div></div>'+
+    '<button type="button" class="kc kbtn'+(S.statFocus==='f'?' on':'')+'" data-act="statFocus" data-v="f"><div class="lab gold">★ 즐겨찾기</div><div class="big">'+sum('fav_now')+'</div><div class="muted" style="font-size:13px">자주 쓰겠다고 표시한 횟수 · <u>자료별 보기</u></div></button>'+
+    '<button type="button" class="kc kbtn'+(S.statFocus==='b'?' on':'')+'" data-act="statFocus" data-v="b"><div class="lab red">'+I.bag+' 제안서에 담기</div><div class="big">'+sum('basket')+'</div><div class="muted" style="font-size:13px">원장님께 보여주려고 고른 횟수 · <u>자료별 보기</u></div></button></div>';
+  if(S.statFocus){var fk=S.statFocus,tot=fk==='f'?sum('fav_now'):sum('basket');
+    var fl=S.tools.map(function(t){return {t:t,v:fk==='f'?sum('fav_now',t.id):sum('basket',t.id)};}).filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
+    h+='<section class="sdet"><div class="sdet-h"><b>'+(fk==='f'?'★ 즐겨찾기':'제안서에 담기')+' · 자료별</b><span class="muted">'+fl.length+'개 자료 · 합계 '+tot+'회</span><button type="button" class="btn btn-ghost" data-act="statFocus" data-v="">닫기</button></div>';
+    if(!fl.length)h+='<div class="muted" style="padding:14px 4px">아직 기록이 없어요.</div>';
+    fl.forEach(function(r,i){var pc=tot?Math.round(r.v/tot*100):0;
+      h+='<div class="sdet-r"><span class="no">'+(i+1)+'</span><span class="nm">'+esc(cleanName(r.t.name))+'<small>'+esc(KLBL[r.t.kind]||'')+'</small></span><span class="t"><i style="width:'+pc+'%;background:'+(fk==='f'?'#D9B25F':'#C2410C')+'"></i></span><span class="v">'+r.v+'회 · '+pc+'%</span></div>';});
+    h+='</section>';}
   var mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
   h+='<section class="blk"><h2>자료별 순위 <span class="muted" style="font-size:14px;font-weight:500">· 제안서에 담긴 순</span></h2><div class="rank">';
   tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+(KLBL[r.t.kind]||'')+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
@@ -1338,6 +1359,7 @@ document.addEventListener('click',function(e){
     case 'closeModal':S.modal=null;S.edit=null;break;
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
+    case 'statFocus':S.statFocus=S.statFocus===v?'':v;break;
     case 'admKind':S.admKind=v;break;
     case 'goReqs':S.adminArea='manage';S.adminTab='reqs';loadAdmin();break;
     case 'toggleActive':var ta=byId(v);if(ta){var nd=Object.assign({},ta,{active:!ta.active});api.saveTool(ta.id,nd,null).then(function(sv){S.tools=S.tools.map(function(x){return x.id===sv.id?sv:x;});say(sv.active?'MR 화면에 다시 보여요.':'MR 화면에서 숨겼어요.');render();}).catch(fail);}return;

@@ -534,3 +534,17 @@ button.ic:hover{border-color:var(--navy)}
 .tag.kk-site{background:#E0F2F5;color:#22707F}
 .tag.kk-notice{background:#E3F2E8;color:#2F7448}
 @media (max-width:640px){.fgroup .flab{width:auto;border-right:0}}
+/* 통계: KPI 눌러 자료별 보기 */
+.kbtn{text-align:left;font:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.kbtn:hover{border-color:#B9C7DD}
+.kbtn.on{border-color:var(--navy);box-shadow:0 0 0 2px rgba(46,74,120,.12)}
+.sdet{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
+.sdet-h{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sdet-h .muted{font-size:13px;flex:1}
+.sdet-r{display:grid;grid-template-columns:28px minmax(0,1.4fr) 1fr 110px;align-items:center;gap:12px;padding:6px 0}
+.sdet-r .no{font-weight:700;color:var(--muted);text-align:center}
+.sdet-r .nm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdet-r .nm small{margin-left:8px;font-weight:500;color:var(--muted);font-size:12px}
+.sdet-r .t{height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden}
+.sdet-r .t i{display:block;height:100%;border-radius:4px}
+.sdet-r .v{font-size:13px;font-weight:700;text-align:right}
