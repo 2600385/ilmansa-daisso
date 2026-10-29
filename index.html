@@ -930,7 +930,7 @@ function vResults(){
       var hit=!q||(t.name+' '+t.desc+' '+t.by).toLowerCase().indexOf(q)>=0;
       if(S.favOnly)return !!S.favs[t.id]&&hit;
       return inPlace(t,S.place)&&inNeed(t,S.need)&&hit;
-    }).sort(function(a,b){return (b.month?1:0)-(a.month?1:0)||a.sort-b.sort;});
+    }).sort(function(a,b){return (q?(b.month?1:0)-(a.month?1:0):0)||a.sort-b.sort;}); /* 평소엔 관리자가 정한 순서, 검색 땐 주요 이슈 먼저 */
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KLBL[S.need]||'문의처');if(!parts.length)parts.push('검색 결과');}
