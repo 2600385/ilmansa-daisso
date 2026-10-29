@@ -275,7 +275,7 @@ function vResults(){
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KLBL[S.need]||'문의처');if(!parts.length)parts.push('검색 결과');}
-    label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
+    if(parts.length===2&&parts[0]==='전체'&&parts[1]==='전체')parts=['전체'];label=esc(parts.join(' · '))+(q?' · "'+esc(S.q.trim())+'" 검색':'')+' · '+list.length+'개';
   }
   h+='<div class="list-h"><span class="muted" style="font-size:14px">'+label+'</span>'+
      '<span class="vsw" role="group" aria-label="보기 방식"><button type="button" data-act="view" data-v="card" class="'+(S.view!=='list'?'on':'')+'" aria-pressed="'+(S.view!=='list')+'" title="카드형">'+IC_GRID+'</button><button type="button" data-act="view" data-v="list" class="'+(S.view==='list'?'on':'')+'" aria-pressed="'+(S.view==='list')+'" title="한 줄형">'+IC_LIST+'</button></span>'+
