@@ -994,7 +994,7 @@ async function pdfThumb(url,file){
   var pdf=await pdfjsLib.getDocument(url).promise,n=Math.min(pdf.numPages,2),cs=[];
   for(var i=1;i<=n;i++){var pg=await pdf.getPage(i),v=pg.getViewport({scale:1}),sc=1100/v.width,vp=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
     var cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:cx,viewport:vp}).promise;cs.push(c);}
-  if(cs.length>1){var W=cs[0].width+cs[1].width+24,H=Math.max(cs[0].height,cs[1].height),z=document.createElement('canvas');z.width=W;z.height=H;var zx=z.getContext('2d');zx.fillStyle='#fff';zx.fillRect(0,0,W,H);zx.drawImage(cs[0],0,0);zx.drawImage(cs[1],cs[0].width+24,0);ZOOMS[file]=z.toDataURL('image/jpeg',.88);}
+  if(cs.length>1&&(cs[0].width>cs[0].height)===(cs[1].width>cs[1].height)){var W=cs[0].width+cs[1].width+24,H=Math.max(cs[0].height,cs[1].height),z=document.createElement('canvas');z.width=W;z.height=H;var zx=z.getContext('2d');zx.fillStyle='#fff';zx.fillRect(0,0,W,H);zx.drawImage(cs[0],0,0);zx.drawImage(cs[1],cs[0].width+24,0);ZOOMS[file]=z.toDataURL('image/jpeg',.88);}
   return cs[0].toDataURL('image/jpeg',.85);
 }
 function vGallery(list){
