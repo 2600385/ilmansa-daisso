@@ -301,7 +301,7 @@ function vResults(){
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
-  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
+  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
     '<h3>'+esc(t.name)+'</h3>'+(t.kind==='brochure'&&isImg(t)?cThumb(t):'<p>'+esc(t.desc)+'</p>')+'<div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';

@@ -535,6 +535,15 @@ button.ic:hover{border-color:var(--navy)}
 .cthumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 .cthumb .zoom{position:absolute;right:8px;bottom:8px;background:rgba(255,255,255,.94);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--navy)}
 .cthumb .pv-ph{display:flex;height:100%;align-items:center;justify-content:center;font-size:12px;color:#6B7A90}
+/* 필터 두 줄: 라벨 폭 고정 + 세로선 → 버튼 시작 위치 위아래 일치 */
+.fgroup .flab{flex:none;width:118px;box-sizing:border-box;padding-right:14px;margin-right:4px;border-right:1px solid #D5DCE8;align-self:stretch;display:flex;align-items:center}
+/* 카드 종류 표시 */
+.tag.kk-tool{background:#E6EDFA;color:#3554A0}
+.tag.kk-brochure{background:#FCEBDC;color:#A4561B}
+.tag.kk-rp{background:#F7E4EC;color:#9C3B62}
+.tag.kk-site{background:#E0F2F5;color:#22707F}
+.tag.kk-notice{background:#E3F2E8;color:#2F7448}
+@media (max-width:640px){.fgroup .flab{width:auto;border-right:0}}
 </style>
 </head>
 <body>
@@ -844,7 +853,7 @@ function vResults(){
 }
 function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
-  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
+  var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
     '<h3>'+esc(t.name)+'</h3>'+(t.kind==='brochure'&&isImg(t)?cThumb(t):'<p>'+esc(t.desc)+'</p>')+'<div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
