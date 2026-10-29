@@ -273,3 +273,17 @@ with pw as (select substr(md5(random()::text || clock_timestamp()::text), 1, 10)
 select '2600385' as "관리자 사번", p as "처음 비밀번호",
        public._upsert_member('2600385', '[이름]', '[사업부]', '경인1사무소', 'admin', p) is not null as "만들어짐"
 from pw;
+-- 일별 사용 추이 (관리자 통계 그래프용)
+create or replace function public.admin_daily(p_from timestamptz default null)
+returns table (day date, type text, division text, office text, cnt bigint)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then raise exception '관리자만 볼 수 있습니다'; end if;
+  return query
+    select (e.created_at at time zone 'Asia/Seoul')::date, e.type, coalesce(e.division,''), coalesce(e.office,''), count(*)
+      from public.events e
+     where (p_from is null or e.created_at >= p_from) and e.type in ('open','present','basket','fav')
+     group by 1, 2, 3, 4;
+end $$;
+revoke all on function public.admin_daily(timestamptz) from public, anon;
+grant execute on function public.admin_daily(timestamptz) to authenticated;

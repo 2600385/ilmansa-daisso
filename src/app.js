@@ -86,6 +86,7 @@ var live={
     if(id)return toContact(must(await live.sb.from('contacts').update(row).eq('id',id).select().single()));
     return toContact(must(await live.sb.from('contacts').insert(row).select().single()));},
   deleteContact:async function(id){must(await live.sb.from('contacts').delete().eq('id',id));},
+  daily:async function(from){var r=await live.sb.rpc('admin_daily',{p_from:from||null});if(r.error)return null;return r.data;},
   stats:async function(from){return must(await live.sb.rpc('admin_stats',{p_from:from||null}));},
   requests:async function(){return must(await live.sb.from('requests').select('id,body,place,status,office,division,created_at').order('created_at',{ascending:false}));},
   setReqStatus:async function(id,s){must(await live.sb.from('requests').update({status:s}).eq('id',id));},
@@ -466,6 +467,7 @@ function vStats(){
   if(curD){h+='<div class="chiprow sub-scope"><span class="lb">'+esc(curD)+' 사무소</span>'+chip('d:'+curD,'전체')+
     Object.keys(o2d).filter(function(o){return o2d[o]===curD;}).sort().map(function(o){return chip('o:'+o,o);}).join('')+'</div>';}
   h+='</div>';
+  h+=vTrend(inScope);
   var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id)};});
   tr.sort(function(a,b){return (b.b-a.b)||(b.f-a.f);});
   var byKind={};tr.forEach(function(r){var fk=r.t.kind;byKind[fk]=(byKind[fk]||0)+r.b*2+r.f;});
@@ -498,6 +500,37 @@ function vStats(){
     '<button type="button" class="ic" data-act="goReqs"><h3>요청 대기 <span>'+waiting+'</span></h3>'+(waiting?'접수 상태 요청이 '+waiting+'건 있어요':'기다리는 요청이 없어요')+'<small>자료 관리 → 자료 요청 확인하기</small></button>'+
     '</div></section>';
   return h;
+}
+/* 사용 추이 그래프: 꺼내 쓰기 · 담기 · 즐겨찾기 (일별, 62일 넘으면 월별) */
+var TR=[{k:'o',l:'꺼내 쓰기',c:'#3B6FD4',t:['open','present']},{k:'b',l:'제안서 담기',c:'#D9622B',t:['basket']},{k:'f',l:'즐겨찾기',c:'#2FA37A',t:['fav']}];
+function vTrend(inScope){
+  if(!LIVE)return '';
+  if(S.daily==null)return '<section class="trend"><div class="tr-h"><b>사용 추이</b></div><div class="muted" style="font-size:13px;padding:10px 0">그래프를 보려면 Supabase에서 추이용 SQL(supabase/daily.sql)을 한 번 실행해 주세요.</div></section>';
+  var rows=S.daily.filter(inScope),end=new Date();end.setHours(0,0,0,0);
+  var f=periodFrom(),start=f?new Date(f):null;
+  if(!start){start=rows.reduce(function(m,r){var d=new Date(r.day+'T00:00:00');return !m||d<m?d:m;},null)||new Date(end);}
+  if((S.period||'all')==='today'){start=new Date(end);start.setDate(start.getDate()-6);}
+  var days=Math.round((end-start)/864e5)+1,byM=days>62,keys=[],idx={};
+  function key(d){return byM?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'):d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  for(var d=new Date(start);d<=end;d.setDate(d.getDate()+1)){var k=key(d);if(idx[k]==null){idx[k]=keys.length;keys.push(k);}}
+  var val=TR.map(function(){return keys.map(function(){return 0;});});
+  rows.forEach(function(r){var i=idx[byM?r.day.slice(0,7):r.day];if(i==null)return;TR.forEach(function(s,si){if(s.t.indexOf(r.type)>=0)val[si][i]+=Number(r.cnt);});});
+  var mx=Math.max(1,Math.max.apply(null,val.map(function(v){return Math.max.apply(null,v);})));
+  var W=1000,H=200,L=36,Rr=96,T=12,B=26,n=keys.length,xs=function(i){return L+(n<2?(W-L-Rr)/2:i*(W-L-Rr)/(n-1));},ys=function(v){return T+(H-T-B)*(1-v/mx);};
+  var g='<svg viewBox="0 0 '+W+' '+H+'" class="tr-svg" role="img" aria-label="사용 추이 그래프">';
+  [0,.5,1].forEach(function(p){var y=ys(mx*p);g+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+y+'" y2="'+y+'" class="gl"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" class="ax">'+Math.round(mx*p)+'</text>';});
+  var step=Math.max(1,Math.ceil(n/8));keys.forEach(function(k,i){if(i%step===0||i===n-1)g+='<text x="'+xs(i)+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+(byM?k.slice(2).replace('-','.'):k.slice(5).replace('-','/'))+'</text>';});
+  TR.forEach(function(s,si){var pts=val[si].map(function(v,i){return xs(i)+','+ys(v);}).join(' ');
+    g+='<polyline points="'+pts+'" fill="none" stroke="'+s.c+'" stroke-width="2" stroke-linejoin="round"/>';
+    val[si].forEach(function(v,i){if(v)g+='<circle cx="'+xs(i)+'" cy="'+ys(v)+'" r="4" fill="'+s.c+'" stroke="#fff" stroke-width="2"/>';});
+});
+  var lab=TR.map(function(s,si){return {l:s.l,y:ys(val[si][n-1])+4};}).sort(function(a,b){return a.y-b.y;});
+  for(var j=1;j<lab.length;j++)if(lab[j].y-lab[j-1].y<15)lab[j].y=lab[j-1].y+15;
+  lab.forEach(function(o){g+='<text x="'+(W-Rr+10)+'" y="'+o.y+'" class="dl">'+o.l+'</text>';});
+  keys.forEach(function(k,i){var x=xs(i),w=Math.max(8,(W-L-Rr)/Math.max(1,n));g+='<rect x="'+(x-w/2)+'" y="'+T+'" width="'+w+'" height="'+(H-T-B)+'" fill="transparent"><title>'+k+'\n'+TR.map(function(s,si){return s.l+' '+val[si][i]+'회';}).join('\n')+'</title></rect>';});
+  g+='</svg>';
+  var tot=TR.map(function(s,si){return val[si].reduce(function(a,b){return a+b;},0);});
+  return '<section class="trend"><div class="tr-h"><b>사용 추이</b><span class="muted">'+(byM?'월별':'일별')+' · 점에 마우스를 올리면 숫자가 보여요</span><span class="tr-lg">'+TR.map(function(s,si){return '<span><i style="background:'+s.c+'"></i>'+s.l+' '+tot[si]+'</span>';}).join('')+'</span></div>'+g+'</section>';
 }
 function periodFrom(){var p=S.period||'all',d=new Date();d.setHours(0,0,0,0);if(p==='all')return null;if(p==='week'){d.setDate(d.getDate()-((d.getDay()+6)%7));}if(p==='month')d.setDate(1);return d.toISOString();}
 function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
@@ -707,7 +740,7 @@ async function afterLogin(uid){
 function saveBasket(){try{sessionStorage.setItem('daisso_basket',JSON.stringify(S.basket));}catch(e){}}
 async function loadAdmin(){
   try{
-    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(periodFrom()),api.requests(),api.members()]);S.stats=r[0];S.reqs=r[1];S.members=r[2];}
+    if((S.adminArea||'stats')==='stats'){var r=await Promise.all([api.stats(periodFrom()),api.requests(),api.members(),api.daily?api.daily(periodFrom()).catch(function(){return null;}):null]);S.stats=r[0];S.reqs=r[1];S.members=r[2];S.daily=r[3];}
     else{var r2=await Promise.all([api.requests(),api.members()]);S.reqs=r2[0];S.members=r2[1];}
   }catch(e){fail(e);}
   render();

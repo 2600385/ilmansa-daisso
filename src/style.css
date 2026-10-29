@@ -549,3 +549,13 @@ button.ic:hover{border-color:var(--navy)}
 .sdet-r .t i{display:block;height:100%;border-radius:4px}
 .sdet-r .v{font-size:13px;font-weight:700;text-align:right}
 .chiprow.per{margin-bottom:8px}.chiprow.per .lb,.scope .lb{min-width:72px;font-size:14px;font-weight:700;color:var(--muted)}
+/* 사용 추이 그래프 */
+.trend{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.tr-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.tr-h .muted{font-size:13px;flex:1}
+.tr-lg{display:flex;gap:14px;font-size:13px;font-weight:700;color:var(--ink)}
+.tr-lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tr-svg{width:100%;height:auto;display:block}
+.tr-svg .gl{stroke:#E8ECF2;stroke-width:1}
+.tr-svg .ax{font-size:12px;fill:#8A97AB}
+.tr-svg .dl{font-size:13px;font-weight:700;fill:#4A5568}
