@@ -396,7 +396,7 @@ function vScript(m){
 }
 
 /* 거래처 모드 */
-function hospTitle(){return (S.hospital.trim()||'OOO의원')+' 원장님께 드리는 제안';}
+function hospTitle(){var n=S.hospital.trim();return (n?n+' ':'')+'원장님께 드리는 제안';}
 function clinicList(){
   var ids=S.basket.length?S.basket:activeTools().filter(function(t){return t.doctor;}).map(function(t){return t.id;});
   return ids.map(byId).filter(function(t){return t&&t.doctor&&t.active;});
