@@ -628,3 +628,9 @@ button.ic:hover{border-color:var(--navy)}
 .cl-empty b{color:#D9622B}
 .steps{padding:44px 20px 40px}
 .steps.empty{padding:48px 20px}
+/* 제안서 제목 안에서 바로 병원명 입력 */
+.hosp-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:.25em}
+.hosp-in{font:inherit;color:var(--ink);border:0;border-bottom:2px dashed transparent;background:none;padding:0;margin:0;min-width:0;max-width:100%;outline:none;border-radius:0;transition:border-color .15s}
+.hosp-in::placeholder{color:#C9D1DD}
+.hosp-in:not(.has){border-bottom-color:#DCE3EC}
+.hosp-in:hover,.hosp-in:focus{border-bottom-color:#B9C7DD}
