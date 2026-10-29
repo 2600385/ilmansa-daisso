@@ -411,10 +411,10 @@ function vClinic(){
   if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
   h+='<div class="steps">';
   list.forEach(function(t,i){
-    h+='<button type="button" class="step" data-act="present" data-v="'+i+'"><span class="no">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(cleanName(t.name))+'</h2><p>'+esc(t.pub||t.desc)+'</p><span class="go">열기 '+I.arrow+'</span></button>';
+    h+='<button type="button" class="step" data-act="present" data-v="'+i+'" title="'+esc(t.pub||t.desc)+'"><span class="c">'+(i+1)+'</span><span class="lb">'+esc(cleanName(t.name))+'</span><span class="go">열기 '+I.arrow+'</span></button>';
   });
   h+='</div>';
-  if(list.length)h+='<p class="cl-hint">진료실에 들어가기 전, 01번 자료를 눌러 제안 화면을 열어두세요. 다음 자료는 "다음"으로 넘기면 됩니다.</p>';
+  if(list.length)h+='<p class="cl-hint">진료실에 들어가기 전, 1번 자료를 눌러 제안 화면을 열어두세요. 다음 자료는 "다음"으로 넘겨 진행하세요.</p>';
   h+='</div></div>';
   if(S.present>=0&&list[S.present]){
     var t=list[S.present],i=S.present;

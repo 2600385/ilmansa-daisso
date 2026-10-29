@@ -600,3 +600,17 @@ button.ic:hover{border-color:var(--navy)}
 /* 즐겨찾기만 → 별 열 위쪽, 보기 전환은 맨 오른쪽 */
 .list-h .simple-sw.fav{margin-left:auto}
 .list-h .vsw{margin:0 0 0 14px}
+/* 제안서: 1 ─ 2 ─ 3 가로 스텝퍼 (흰 상자 안 가운데 정렬, 많으면 옆으로 밀기) */
+.steps{display:flex;justify-content:safe center;overflow-x:auto;gap:0;margin-top:28px;padding:30px 20px 24px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 26px rgba(46,74,120,.06)}
+.clinic>.wrap>.steps:first-child{padding-top:30px}
+.step{flex:0 1 200px;min-width:150px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:0 8px;border:0;border-radius:0;background:none;box-shadow:none;position:relative;cursor:pointer}
+.step:hover{border-color:transparent}
+.step:not(:last-child):after{content:"";position:absolute;top:26px;left:calc(50% + 34px);right:calc(-50% + 34px);border-top:2px dashed #C9D3E3}
+.step .c{width:52px;height:52px;border-radius:50%;background:#FFFFFF;border:2px solid var(--navy);color:var(--navy);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .15s,background .15s,color .15s}
+.step:first-child .c{background:var(--navy);color:#FFFFFF;box-shadow:0 0 0 5px #E3EAF5}
+.step:hover .c{background:var(--navy);color:#FFFFFF;transform:translateY(-3px)}
+.step .lb{font-size:16px;font-weight:700;line-height:1.4;color:var(--ink);word-break:keep-all}
+.step .go{font-size:13px;font-weight:700;color:var(--navy);display:inline-flex;align-items:center;gap:4px;opacity:0;transition:opacity .15s;margin-top:-4px}
+.step:hover .go,.step:focus-visible .go{opacity:1}
+.cl-hint{text-align:center;margin:16px 0 40px;font-size:14px;color:var(--muted)}
+@media (max-width:640px){.steps{justify-content:flex-start}.step{min-width:130px}}
