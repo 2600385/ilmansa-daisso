@@ -396,7 +396,7 @@ function vScript(m){
 }
 
 /* 거래처 모드 */
-function hospW(v){var n=0;String(v||'').split('').forEach(function(c){n+=/[\u3131-\uD79D]/.test(c)?1:.6;});return Math.max(3.4,n+.6)+'em';}
+function hospW(v){var n=0;String(v||'').split('').forEach(function(c){n+=/[\u3131-\uD79D]/.test(c)?1:.6;});return Math.max(3.2,n*.93+.15)+'em';}
 function hospTitle(){var n=S.hospital.trim();return (n?n+' ':'')+'원장님께 드리는 제안';}
 function clinicList(){
   return S.basket.map(byId).filter(function(t){return t&&t.doctor&&t.active;});
