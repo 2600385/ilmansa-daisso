@@ -530,6 +530,11 @@ button.ic:hover{border-color:var(--navy)}
 .gi .star svg{width:16px;height:16px}
 /* 이달의 주요 이슈: 이름에 연한 분홍 형광펜 */
 .is-nm{background:linear-gradient(transparent 52%,rgba(255,170,195,.32) 52%);padding:0 3px;border-radius:2px}
+/* 전체 목록의 브로셔 카드: 설명 글 대신 포스터 윗부분 */
+.cthumb{position:relative;display:block;width:100%;height:120px;padding:0;border:1px solid #E3E7EE;border-radius:10px;overflow:hidden;background:#F7F9FC;cursor:zoom-in;margin:2px 0 4px}
+.cthumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.cthumb .zoom{position:absolute;right:8px;bottom:8px;background:rgba(255,255,255,.94);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--navy)}
+.cthumb .pv-ph{display:flex;height:100%;align-items:center;justify-content:center;font-size:12px;color:#6B7A90}
 </style>
 </head>
 <body>
@@ -703,7 +708,7 @@ function track(type,target){try{api.track(type,target);}catch(e){}}
 /* ---------- 도우미 ---------- */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function byId(id){for(var i=0;i<S.tools.length;i++){if(S.tools[i].id===id)return S.tools[i];}return null;}
-function areaLabel(id){if(id==='month')return '이달의 주요 이슈';for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
+function areaLabel(id){if(id==='month')return '이달의 주요 이슈';if(id==='all')return '전체';for(var i=0;i<PLACES.length;i++){if(PLACES[i].id===id)return PLACES[i].label;}return '';}
 function inPlace(t,p){if(p==='month')return !!t.month;return p==='none'||p==='all'||t.tags.indexOf(p)>=0||(t.kind==='edu'&&p==='ref');}
 function inNeed(t,n){return n==='none'||n==='all'||t.kind===n;}
 function say(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){S.toast='';render();},2800);}
@@ -784,7 +789,7 @@ function vTools(){
      '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 자료를 한곳에 모았습니다.<br>필요할 때 바로 꺼내 쓰세요.</span></p>'+
      '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴 이름이나 키워드 (예: 시뮬레이션, 검체위수탁, 기관신고)"></div></section>';
   h+='<section class="blk"><div class="filters"><div class="fgroup place" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
-  PLACES.forEach(function(p){var on=p.id===S.place&&!S.favOnly;
+  [{id:'all',label:'전체',c:'#8C99B3'}].concat(PLACES).forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
     h+='<button type="button" class="tab'+(on?' on':'')+'" data-act="place" data-v="'+p.id+'" aria-pressed="'+on+'"><span class="dot" style="background:'+p.c+'" aria-hidden="true"></span>'+p.label+'<span class="n">'+n+'</span></button>';});
   h+='</div><div class="fgroup" role="group" aria-label="뭐가 필요하세요?"><span class="flab">뭐가 필요하세요?</span>';
@@ -841,7 +846,7 @@ function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
   var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag k-'+fmt(t)+'">'+FMT[fmt(t)]+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
-    '<h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p><div class="acts">'+
+    '<h3>'+esc(t.name)+'</h3>'+(t.kind==='brochure'&&isImg(t)?cThumb(t):'<p>'+esc(t.desc)+'</p>')+'<div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
   if(t.doctor){h+='<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>';}
   else{h+='<span class="btn btn-no" title="내부용 자료라 제안서에 담을 수 없어요">'+I.lock+'내부용</span>';}
@@ -863,6 +868,10 @@ function vGallery(list){
       '<div class="nm">'+esc(cleanName(t.name))+'</div><div class="row"><button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
       (t.doctor?'<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'<span class="btn btn-no">'+I.lock+'내부용</span>')+'</div></div>';
   }).join('')+'</div>';
+}
+function cThumb(t){
+  if(!THUMB[t.file]&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
+  return '<button type="button" class="cthumb" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="" loading="lazy"><span class="zoom">크게 보기</span>':'<span class="pv-ph">불러오는 중…</span>')+'</button>';
 }
 async function loadThumbs(list){
   if(thumbBusy)return;thumbBusy=true;
