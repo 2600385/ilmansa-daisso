@@ -563,3 +563,14 @@ button.ic:hover{border-color:var(--navy)}
 .grid .card h3{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .grid .card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .grid .card .cthumb{height:96px}
+/* 카드: 마우스 올리면 확실히 떠오르게 + 잘린 글은 펼쳐 보기 */
+.card{position:relative}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 36px rgba(31,42,68,.16),0 2px 0 #5B9BF0 inset;border-color:#BFD3F2}
+.card .txt{display:flex;flex-direction:column;gap:10px;flex-grow:1;position:relative}
+.grid .card .txt h3{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.grid .card .txt p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .full{display:none;position:absolute;left:-8px;right:-8px;top:-8px;z-index:6;background:#FFFFFF;border:1px solid #BFD3F2;border-radius:12px;padding:12px 14px;box-shadow:0 12px 28px rgba(31,42,68,.18);font-size:14px;line-height:1.55;color:var(--muted)}
+.card .full b{display:block;font-size:16px;color:var(--ink);margin-bottom:6px;line-height:1.35}
+.card .txt:hover .full{display:block}
+@media (hover:none){.card .full{display:none!important}}
+@media (prefers-reduced-motion:reduce){.card:hover{transform:none}}

@@ -304,7 +304,8 @@ function vCard(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0;
   var h='<article class="card"><div class="card-h"><div class="tags"><span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'</div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button></div>'+
-    '<h3 title="'+esc(t.name)+'">'+esc(t.name)+'</h3>'+(t.kind==='brochure'&&isImg(t)?cThumb(t):'<p title="'+esc(t.desc)+'">'+esc(t.desc)+'</p>')+'<div class="acts">'+
+    (t.kind==='brochure'&&isImg(t)?'<h3>'+esc(t.name)+'</h3>'+cThumb(t):
+      '<div class="txt"><h3>'+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p>'+(t.name.length>18||t.desc.length>52?'<div class="full" aria-hidden="true"><b>'+esc(t.name)+'</b>'+esc(t.desc)+'</div>':'')+'</div>')+'<div class="acts">'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>';
   if(t.doctor){h+='<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'제안서에 담기')+'</button>';}
   else{h+='<span class="btn btn-no" title="내부용 자료라 제안서에 담을 수 없어요">'+I.lock+'내부용</span>';}
