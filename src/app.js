@@ -406,7 +406,7 @@ function vClinic(){
   var h='<div class="clinic"><div class="wrap">';
   if(!S.simple)h+='<div class="clinic-hero">'+
     '<div class="title-row"><h1 id="hosp-title">'+esc(hospTitle())+'</h1><button type="button" class="btn btn-line" data-act="printOpen">'+I.print+'인쇄</button></div>'+
-    '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"><span class="muted" style="font-size:13px">이 화면에만 보이고 저장되지 않아요</span></div>'+
+    '<div class="hosp"><label for="hosp" class="muted" style="font-size:14px">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="병원명을 입력하세요" autocomplete="off"></div>'+
     '</div>';
   if(!S.basket.length&&!S.simple){h+='<p class="muted" style="margin:20px 0 0;font-size:14px">담은 툴이 없어서 원장님 화면용 자료를 모두 보여드려요. 준비 화면에서 "제안서에 담기"를 누르면 그 순서대로 나옵니다.</p>';}
   h+='<div class="steps">';
