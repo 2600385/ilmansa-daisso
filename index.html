@@ -1050,7 +1050,7 @@ function vToolAdmin(){
   [{id:'all',label:'전체'}].concat(KINDS).forEach(function(n){
     var c=n.id==='all'?S.tools.length:S.tools.filter(function(t){return t.kind===n.id;}).length;
     h+='<button type="button" class="chip'+(k===n.id?' on':'')+'" data-act="admKind" data-v="'+n.id+'" aria-pressed="'+(k===n.id)+'">'+n.label+' '+c+'</button>';});
-  h+='</div><button type="button" class="btn btn-primary" data-act="newTool" style="min-height:46px;padding:0 22px">+ 자료 추가</button></div>';
+  h+='</div><div style="display:flex;gap:8px"><button type="button" class="btn btn-line" data-act="newContact" style="min-height:46px;padding:0 18px">+ 문의처(전화번호) 추가</button><button type="button" class="btn btn-primary" data-act="newTool" style="min-height:46px;padding:0 22px">+ 자료 추가</button></div></div>';
   if(!list.length)return h+'<div class="prompt muted">이 종류로 등록된 자료가 없어요. "+ 자료 추가"로 올려보세요.</div>';
   h+='<div class="mrows" role="list">';
   list.forEach(function(t){
