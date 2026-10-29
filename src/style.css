@@ -634,3 +634,10 @@ button.ic:hover{border-color:var(--navy)}
 .hosp-in::placeholder{color:#C9D1DD}
 .hosp-in:not(.has){border-bottom-color:#DCE3EC}
 .hosp-in:hover,.hosp-in:focus{border-bottom-color:#B9C7DD}
+/* 병원명 입력: 눈에 덜 띄게 흐린 한 줄 */
+.hosp.soft{gap:10px;opacity:.75;transition:opacity .15s}
+.hosp.soft:hover,.hosp.soft:focus-within{opacity:1}
+.hosp.soft label{font-size:13px;color:#A0ABBB}
+.hosp.soft input{min-height:32px;width:220px;padding:0 2px;border:0;border-bottom:1px dashed #D5DCE8;border-radius:0;background:none;font-size:14px;color:var(--muted)}
+.hosp.soft input::placeholder{color:#C3CBD7}
+.hosp.soft input:focus{outline:none;border-bottom-color:#9FB0C8}

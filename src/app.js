@@ -405,7 +405,8 @@ function vClinic(){
   var list=clinicList();
   var h='<div class="clinic'+(S.simple?' is-simple':'')+'"><div class="wrap">';
   if(!S.simple)h+='<div class="clinic-hero">'+
-    '<div class="title-row"><h1 class="hosp-h"><input id="hosp" class="hosp-in'+(S.hospital.trim()?' has':'')+'" value="'+esc(S.hospital)+'" placeholder="병원명" aria-label="병원명" autocomplete="off" style="width:'+hospW(S.hospital)+'"><span>원장님께 드리는 제안</span></h1><button type="button" class="btn btn-line" data-act="printOpen">'+I.print+'인쇄</button></div>'+
+    '<div class="title-row"><h1 id="hosp-title">'+esc(hospTitle())+'</h1><button type="button" class="btn btn-line" data-act="printOpen">'+I.print+'인쇄</button></div>'+
+    '<div class="hosp soft"><label for="hosp">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="입력하면 제목에 들어가요" autocomplete="off"></div>'+
     '</div>';
   if(!list.length){
     h+='<div class="steps empty">'+[1,2,3].map(function(n){return '<div class="step"><span class="c">'+n+'</span></div>';}).join('')+'</div>'+
@@ -917,7 +918,7 @@ document.addEventListener('input',function(e){
   var t=e.target;
   /* 입력창은 그대로 두고 결과만 바꿔서 한글 조합이 끊기지 않게 함 */
   if(t.id==='q'){S.q=t.value;var r=document.getElementById('results');if(r)r.innerHTML=vResults();}
-  else if(t.id==='hosp'){S.hospital=t.value;t.style.width=hospW(t.value);t.classList.toggle('has',!!t.value.trim());}
+  else if(t.id==='hosp'){S.hospital=t.value;var ht=document.getElementById('hosp-title');if(ht)ht.textContent=hospTitle();}
 });
 document.addEventListener('change',function(e){
   var t=e.target;
