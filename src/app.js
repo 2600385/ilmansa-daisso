@@ -798,10 +798,12 @@ async function showPresent(i){
 /* =====================================================================
    이벤트
    ===================================================================== */
+/* 팝업 안에서 드래그하다 바깥에서 손을 떼도 닫히지 않게: 누르기 시작한 곳도 바깥이어야 닫힘 */
+var downEl=null;document.addEventListener('pointerdown',function(e){downEl=e.target;},true);
 document.addEventListener('click',function(e){
   var el=e.target.closest('[data-act]');if(!el)return;
   var act=el.getAttribute('data-act'),v=el.getAttribute('data-v');
-  if(act==='closeModal'&&e.target!==el)return;
+  if(act==='closeModal'&&(e.target!==el||(el.classList.contains('modal-bg')&&downEl!==el)))return;
   switch(act){
     case 'mode':S.mode=v;S.present=-1;S.basketOpen=false;window.scrollTo(0,0);break;
     case 'page':S.page=v;window.scrollTo(0,0);if(v==='admin')loadAdmin();break;
