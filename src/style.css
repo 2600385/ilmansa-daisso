@@ -641,3 +641,9 @@ button.ic:hover{border-color:var(--navy)}
 .hosp.soft input{min-height:32px;width:220px;padding:0 2px;border:0;border-bottom:1px dashed #D5DCE8;border-radius:0;background:none;font-size:14px;color:var(--muted)}
 .hosp.soft input::placeholder{color:#C3CBD7}
 .hosp.soft input:focus{outline:none;border-bottom-color:#9FB0C8}
+/* 문의처 */
+.chiprow.cgrp{margin:4px 0 10px}
+.ctbl td{vertical-align:middle}
+.ctel a{color:var(--navy);font-weight:700;text-decoration:none;white-space:nowrap;user-select:all}
+@media (hover:none){.ctel a{text-decoration:underline}}
+.cfound{margin-top:22px}.cfound h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:0 0 8px;color:var(--navy)}

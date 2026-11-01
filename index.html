@@ -651,6 +651,12 @@ button.ic:hover{border-color:var(--navy)}
 .hosp.soft input{min-height:32px;width:220px;padding:0 2px;border:0;border-bottom:1px dashed #D5DCE8;border-radius:0;background:none;font-size:14px;color:var(--muted)}
 .hosp.soft input::placeholder{color:#C3CBD7}
 .hosp.soft input:focus{outline:none;border-bottom-color:#9FB0C8}
+/* 문의처 */
+.chiprow.cgrp{margin:4px 0 10px}
+.ctbl td{vertical-align:middle}
+.ctel a{color:var(--navy);font-weight:700;text-decoration:none;white-space:nowrap;user-select:all}
+@media (hover:none){.ctel a{text-decoration:underline}}
+.cfound{margin-top:22px}.cfound h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:0 0 8px;color:var(--navy)}
 </style>
 </head>
 <body>
@@ -958,6 +964,7 @@ function vResults(){
     if(rest.length)h+=S.view==='list'?'<div class="lrows" role="list">'+rest.map(vRow).join('')+'</div>':(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
   }
   else{h+='<div class="prompt"><span>'+(S.favOnly?'아직 즐겨찾기한 툴이 없어요. 카드의 별을 눌러 담아보세요.':'찾는 툴이 아직 없네요. 아래에서 요청해 주세요.')+'</span></div>';}
+  if(q&&!S.favOnly&&S.need!=='contact'){var cm=S.contacts.filter(function(c){return cMatch(c,q);});if(cm.length)h+='<section class="cfound"><h3>'+I.phone+'문의처 '+cm.length+'건</h3><div class="tbl-box"><table class="ctbl" style="min-width:560px"><tbody>'+cRows(cm)+'</tbody></table></div></section>';}
   return h;
 }
 var IC_GRID='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>';
@@ -1043,13 +1050,22 @@ function vBasketBar(){
     '<button type="button" class="go-link" data-act="mode" data-v="clinic">제안하러 가기 '+I.arrow+'</button></div></div></div></div>';
   return h;
 }
+/* 문의처: 기관 꼬리표·필터·검색, 휴대폰에선 눌러서 전화 */
+var CGRP=[{id:'hira',l:'심평원',c:'kk-site'},{id:'nhis',l:'공단·복지부',c:'kk-notice'},{id:'chart',l:'차트사',c:'kk-brochure'},{id:'wc',l:'웰체크',c:'kk-tool'},{id:'etc',l:'기타',c:'kk-rp'}];
+function cgroup(c){var x=c.topic+' '+c.dept;return /차트/.test(x)?'chart':/웰체크/.test(x)?'wc':/공단|복지부/.test(x)?'nhis':/심평원/.test(x)?'hira':'etc';}
+function cMatch(c,q){return !q||(c.topic+' '+c.dept+' '+c.tel+' '+CGRP.filter(function(g){return g.id===cgroup(c);})[0].l).toLowerCase().indexOf(q)>=0;}
+function cRows(list){return list.map(function(c){var g=CGRP.filter(function(x){return x.id===cgroup(c);})[0],tel=String(c.tel||'');
+  return '<tr><td><span class="tag '+g.c+'">'+g.l+'</span></td><td style="font-weight:700">'+esc(c.topic)+'</td><td>'+esc(c.dept)+'</td><td class="ctel"><a href="tel:'+esc(tel.replace(/[^0-9+]/g,''))+'">'+esc(tel)+'</a></td></tr>';}).join('');}
 function vContacts(){
-  var list=S.contacts.filter(function(c){return inPlace(c,S.place);});
-  var h='<div class="inbanner">'+I.lock+'내부용 · 담당자 개인 번호 대신 부서와 대표번호만 넣습니다.</div>';
-  if(!list.length)return h+'<div class="prompt muted">등록된 문의처가 없어요.</div>';
-  h+='<div class="tbl-box"><table style="min-width:520px"><thead><tr><th>이럴 때</th><th>부서</th><th>연락처</th></tr></thead><tbody>';
-  list.forEach(function(c){h+='<tr><td style="font-weight:700">'+esc(c.topic)+'</td><td>'+esc(c.dept)+'</td><td style="user-select:all">'+esc(c.tel)+'</td></tr>';});
-  return h+'</tbody></table></div>';
+  var q=S.q.trim().toLowerCase(),cg=S.cgrp||'all';
+  var base=S.contacts.filter(function(c){return inPlace(c,S.place)&&cMatch(c,q);});
+  var list=base.filter(function(c){return cg==='all'||cgroup(c)===cg;});
+  var used=CGRP.filter(function(g){return S.contacts.some(function(c){return cgroup(c)===g.id;});});
+  var h='<div class="inbanner">'+I.lock+'내부용 · 담당자 개인 번호 대신 부서와 대표번호만 넣습니다. 위 검색창에 기관·부서·용도를 쳐도 찾아져요.</div>';
+  h+='<div class="chiprow cgrp">'+[{id:'all',l:'전체'}].concat(used).map(function(g){var n=g.id==='all'?base.length:base.filter(function(c){return cgroup(c)===g.id;}).length,on=cg===g.id;
+    return '<button type="button" class="chip'+(on?' on':'')+'" data-act="cgrp" data-v="'+g.id+'" aria-pressed="'+on+'">'+g.l+' '+n+'</button>';}).join('')+'</div>';
+  if(!list.length)return h+'<div class="prompt muted">'+(q?'"'+esc(S.q.trim())+'"에 맞는 문의처가 없어요.':'등록된 문의처가 없어요.')+'</div>';
+  return h+'<div class="tbl-box"><table class="ctbl" style="min-width:560px"><thead><tr><th style="width:110px">기관</th><th>이럴 때</th><th>부서</th><th style="width:150px">연락처</th></tr></thead><tbody>'+cRows(list)+'</tbody></table></div>';
 }
 function vScripts(){
   var stages=STAGES.filter(function(s){return S.place==='new'?s.id!=='s3':S.place==='keep'?s.id==='s3':true;});
@@ -1528,6 +1544,7 @@ document.addEventListener('click',function(e){
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
+    case 'cgrp':S.cgrp=v;break;
     case 'view':S.view=v;try{localStorage.setItem('daisso_view',v);}catch(e){}break;
     case 'statFocus':S.statFocus=S.statFocus===v?'':v;break;
     case 'admKind':S.admKind=v;break;
