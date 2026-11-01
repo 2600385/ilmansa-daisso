@@ -365,8 +365,8 @@ function cThumb(t){
 async function loadThumbs(list){
   if(thumbBusy)return;thumbBusy=true;
   for(var i=0;i<list.length;i++){var f=list[i].file;if(THUMB[f])continue;
-    var cov=null;if(/\.pdf$/i.test(f)){try{var cu=await api.fileUrl(f+'.cover.jpg');if((await fetch(cu,{method:'HEAD'})).ok)cov=cu;}catch(e){}} /* 따로 올린 표지 이미지가 있으면 그걸 미리보기로 */
-    try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f,cov):u;}catch(e){THUMB[f]=''; }}
+    var cov=null;if(/\.pdf$/i.test(f)){try{var cu=await api.fileUrl(f+'.cover.jpg');var cr=await fetch(cu);if(cr.ok)cov=URL.createObjectURL(await cr.blob());}catch(e){}} /* 따로 올린 표지 이미지가 있으면 그걸 미리보기로 */
+    try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f,cov):URL.createObjectURL(await (await fetch(u)).blob()); /* 서명 주소는 1시간 뒤 만료 → 내려받아 두고 씀 */}catch(e){THUMB[f]=''; }}
   thumbBusy=false;var r=document.getElementById('results');if(r)r.innerHTML=vResults();
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
