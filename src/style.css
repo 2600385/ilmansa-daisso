@@ -647,3 +647,8 @@ button.ic:hover{border-color:var(--navy)}
 .ctel a{color:var(--navy);font-weight:700;text-decoration:none;white-space:nowrap;user-select:all}
 @media (hover:none){.ctel a{text-decoration:underline}}
 .cfound{margin-top:22px}.cfound h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:0 0 8px;color:var(--navy)}
+/* 출처 꼬리표: 아이콘 + 회색 글씨 */
+.src{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#6B7A90;white-space:nowrap;flex:none}
+.src svg{width:14px;height:14px}
+.gi .nm .src{margin-right:4px;vertical-align:-2px}
+.mr-meta .src{font-size:13px}
