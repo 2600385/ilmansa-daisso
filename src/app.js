@@ -313,8 +313,10 @@ function vRow(t){
   if(t.kind==='brochure'&&isImg(t)){if(THUMB[t.file]===undefined&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
     th='<button type="button" class="lr-th" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="">':'')+'</button>';}
   /* 한 줄형 B안: 썸네일 자리는 항상 비워두고, 1줄=이름(+이슈 점), 2줄=종류·출처·설명 */
-  var meta='<span class="lr-k kc-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(srcOf(t)?' · '+srcOf(t).l:'')+(t.desc?' · '+esc(t.desc):'');
-  return '<div class="lr b2" role="listitem"><span class="lr-slot">'+th+'</span>'+
+  /* 맨 앞 칸: 브로셔는 미리보기, 나머지는 색 종류 꼬리표 → 둘째 줄엔 출처·설명만 */
+  var meta=[srcOf(t)?srcOf(t).l:'',t.desc?esc(t.desc):''].filter(Boolean).join(' · ');
+  var lead=th||'<span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>';
+  return '<div class="lr b2" role="listitem"><span class="lr-slot">'+lead+'</span>'+
     '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><div class="lr-nm">'+esc(t.name)+(t.month?'<em class="lr-iss">● 이달의 이슈</em>':'')+'</div><div class="lr-ds">'+meta+'</div></div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button>'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+

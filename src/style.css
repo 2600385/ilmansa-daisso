@@ -675,3 +675,5 @@ button.ic:hover{border-color:var(--navy)}
 .lr-k{font-weight:700}
 .kc-tool{color:#3554A0}.kc-brochure{color:#A4561B}.kc-rp{color:#9C3B62}.kc-site{color:#22707F}.kc-notice{color:#2F7448}
 @media (max-width:760px){.lr.b2{flex-wrap:nowrap}.lr.b2 .lr-main{order:0;flex-basis:auto}.lr.b2 .lr-ds{display:block}}
+.lr.b2 .lr-slot{width:84px}
+.lr.b2 .lr-slot .tag{display:block;width:84px;text-align:center;min-width:0}
