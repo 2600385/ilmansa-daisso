@@ -665,3 +665,13 @@ button.ic:hover{border-color:var(--navy)}
 .btn-orange{background:#EE7F1F;border:1px solid #EE7F1F;color:#FFFFFF}.btn-orange:hover{background:#DD6F12}
 .steps.preview{overflow:visible;flex-wrap:wrap}
 .inst-card{margin-top:12px}.inst-card b{font-size:14.5px}
+/* 한 줄형 B안 */
+.lr.b2{gap:14px;padding:10px 16px}
+.lr.b2 .lr-slot{flex:none;width:40px;display:flex;justify-content:center}
+.lr.b2 .lr-main{display:block;flex:1;min-width:0}
+.lr.b2 .lr-nm{display:block;max-width:none;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr.b2 .lr-iss{font-style:normal;font-size:12px;font-weight:700;color:#C2410C;margin-left:8px}
+.lr.b2 .lr-ds{display:block;margin-top:2px;font-size:13px;color:#6B7A90;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-k{font-weight:700}
+.kc-tool{color:#3554A0}.kc-brochure{color:#A4561B}.kc-rp{color:#9C3B62}.kc-site{color:#22707F}.kc-notice{color:#2F7448}
+@media (max-width:760px){.lr.b2{flex-wrap:nowrap}.lr.b2 .lr-main{order:0;flex-basis:auto}.lr.b2 .lr-ds{display:block}}

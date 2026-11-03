@@ -312,8 +312,10 @@ function vRow(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0,th='';
   if(t.kind==='brochure'&&isImg(t)){if(THUMB[t.file]===undefined&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
     th='<button type="button" class="lr-th" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="">':'')+'</button>';}
-  return '<div class="lr" role="listitem">'+th+'<span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+
-    '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><span class="lr-nm">'+esc(t.name)+'</span>'+srcTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'<span class="lr-ds">'+esc(t.desc)+'</span></div>'+
+  /* 한 줄형 B안: 썸네일 자리는 항상 비워두고, 1줄=이름(+이슈 점), 2줄=종류·출처·설명 */
+  var meta='<span class="lr-k kc-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(srcOf(t)?' · '+srcOf(t).l:'')+(t.desc?' · '+esc(t.desc):'');
+  return '<div class="lr b2" role="listitem"><span class="lr-slot">'+th+'</span>'+
+    '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><div class="lr-nm">'+esc(t.name)+(t.month?'<em class="lr-iss">● 이달의 이슈</em>':'')+'</div><div class="lr-ds">'+meta+'</div></div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button>'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
     (t.doctor?'<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'<span class="btn btn-no">'+I.lock+'내부용</span>')+'</div>';

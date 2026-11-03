@@ -675,6 +675,16 @@ button.ic:hover{border-color:var(--navy)}
 .btn-orange{background:#EE7F1F;border:1px solid #EE7F1F;color:#FFFFFF}.btn-orange:hover{background:#DD6F12}
 .steps.preview{overflow:visible;flex-wrap:wrap}
 .inst-card{margin-top:12px}.inst-card b{font-size:14.5px}
+/* 한 줄형 B안 */
+.lr.b2{gap:14px;padding:10px 16px}
+.lr.b2 .lr-slot{flex:none;width:40px;display:flex;justify-content:center}
+.lr.b2 .lr-main{display:block;flex:1;min-width:0}
+.lr.b2 .lr-nm{display:block;max-width:none;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr.b2 .lr-iss{font-style:normal;font-size:12px;font-weight:700;color:#C2410C;margin-left:8px}
+.lr.b2 .lr-ds{display:block;margin-top:2px;font-size:13px;color:#6B7A90;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-k{font-weight:700}
+.kc-tool{color:#3554A0}.kc-brochure{color:#A4561B}.kc-rp{color:#9C3B62}.kc-site{color:#22707F}.kc-notice{color:#2F7448}
+@media (max-width:760px){.lr.b2{flex-wrap:nowrap}.lr.b2 .lr-main{order:0;flex-basis:auto}.lr.b2 .lr-ds{display:block}}
 </style>
 </head>
 <body>
@@ -995,8 +1005,10 @@ function vRow(t){
   var fav=!!S.favs[t.id],inB=S.basket.indexOf(t.id)>=0,th='';
   if(t.kind==='brochure'&&isImg(t)){if(THUMB[t.file]===undefined&&LIVE)setTimeout(function(){loadThumbs([t]);},0);
     th='<button type="button" class="lr-th" data-act="zoom" data-v="'+t.id+'" aria-label="'+esc(t.name)+' 크게 보기">'+(THUMB[t.file]?'<img src="'+esc(THUMB[t.file])+'" alt="">':'')+'</button>';}
-  return '<div class="lr" role="listitem">'+th+'<span class="tag kk-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+
-    '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><span class="lr-nm">'+esc(t.name)+'</span>'+srcTag(t)+(t.month?'<span class="tag a-issue">이달의 주요 이슈</span>':'')+'<span class="lr-ds">'+esc(t.desc)+'</span></div>'+
+  /* 한 줄형 B안: 썸네일 자리는 항상 비워두고, 1줄=이름(+이슈 점), 2줄=종류·출처·설명 */
+  var meta='<span class="lr-k kc-'+t.kind+'">'+(KLBL[t.kind]||'자료')+'</span>'+(srcOf(t)?' · '+srcOf(t).l:'')+(t.desc?' · '+esc(t.desc):'');
+  return '<div class="lr b2" role="listitem"><span class="lr-slot">'+th+'</span>'+
+    '<div class="lr-main" title="'+esc(t.name+(t.desc?' — '+t.desc:''))+'"><div class="lr-nm">'+esc(t.name)+(t.month?'<em class="lr-iss">● 이달의 이슈</em>':'')+'</div><div class="lr-ds">'+meta+'</div></div>'+
     '<button type="button" class="star'+(fav?' on':'')+'" data-act="fav" data-v="'+t.id+'" aria-pressed="'+fav+'" aria-label="'+esc(t.name)+' 즐겨찾기">'+I.star+'</button>'+
     '<button type="button" class="btn btn-primary" data-act="open" data-v="'+t.id+'">꺼내 쓰기</button>'+
     (t.doctor?'<button type="button" class="btn '+(inB?'btn-gold on':'btn-line')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'<span class="btn btn-no">'+I.lock+'내부용</span>')+'</div>';
