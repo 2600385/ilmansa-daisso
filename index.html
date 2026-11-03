@@ -662,6 +662,18 @@ button.ic:hover{border-color:var(--navy)}
 .src svg{width:14px;height:14px}
 .gi .nm .src{margin-right:4px;vertical-align:-2px}
 .mr-meta .src{font-size:13px}
+/* 앱 추가 안내 칸 (휴대폰) */
+.inst-card{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:14px 18px;border:1px dashed #C9D3E3;border-radius:16px;background:var(--surface);text-align:left;font:inherit;cursor:pointer}
+.inst-card .ic{font-size:24px}.inst-card b{display:block;font-size:15px;color:var(--navy)}.inst-card small{font-size:13px;color:var(--muted)}
+.inst-card .x{margin-left:auto;font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
+.inst-m h3{margin:14px 0 4px;font-size:15px}.inst-m ol{margin:0;padding-left:20px;font-size:14px;line-height:1.75}.inst-m .tip{margin:14px 0;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+/* 빈 바구니: 이달의 이슈 흐린 미리보기 + 선택 */
+.steps.preview{position:relative}
+.steps.preview .step{opacity:.28;filter:grayscale(1)}
+.pv-tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#fff;color:#8A97AB;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.cl-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.btn-orange{background:#EE7F1F;border:1px solid #EE7F1F;color:#FFFFFF}.btn-orange:hover{background:#DD6F12}
+.steps.preview{overflow:visible;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -932,6 +944,7 @@ function vTools(){
   h+='</section>';
   h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
      '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
+  if(showInstall())h+='<button type="button" class="inst-card" data-act="installHelp"><span class="ic" aria-hidden="true">📱</span><span><b>홈 화면에 앱처럼 추가하기</b><small>아이콘 한 번으로 바로 열어요</small></span><span class="x">방법 보기 ›</span></button>';
   h+='</div>';
   return h+vBasketBar();
 }
@@ -1111,8 +1124,15 @@ function vClinic(){
     '<div class="hosp soft"><label for="hosp">병원명</label><input id="hosp" value="'+esc(S.hospital)+'" placeholder="입력하면 제목에 들어가요" autocomplete="off"></div>'+
     '</div>';
   if(!list.length){
+    var mon=activeTools().filter(function(t){return t.month&&t.doctor;}).sort(function(a,b){return a.sort-b.sort;});
+    if(mon.length){
+      h+='<div class="steps empty preview"><span class="pv-tag">미리보기 · 이달의 주요 이슈</span>'+mon.map(function(t,i){return '<div class="step"><span class="c">'+(i+1)+'</span><span class="lb">'+esc(cleanName(t.name))+'</span></div>';}).join('')+'</div>'+
+        '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>이달의 주요 이슈 '+mon.length+'개로 바로 진행하거나, 거래처에 맞는 자료를 직접 담아보세요.</span>'+
+        '<div class="cl-btns"><button type="button" class="btn btn-line" data-act="useMonth">이달의 이슈로 진행하기</button><button type="button" class="btn btn-orange" data-act="mode" data-v="prep">자료 담으러 가기</button></div></div>';
+    }else{
     h+='<div class="steps empty">'+[1,2,3].map(function(n){return '<div class="step"><span class="c">'+n+'</span></div>';}).join('')+'</div>'+
-      '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>\'제안서에 담기\'를 누르면 담은 순서대로 여기에 나옵니다.</span><button type="button" class="btn btn-primary" data-act="mode" data-v="prep">자료 담으러 가기</button></div>';
+      '<div class="cl-empty"><b>제안 바구니가 비어 있어요</b><span>\'제안서에 담기\'를 누르면 담은 순서대로 여기에 나옵니다.</span><button type="button" class="btn btn-orange" data-act="mode" data-v="prep">자료 담으러 가기</button></div>';
+    }
     return h+'</div></div>';
   }
   h+='<div class="steps">';
@@ -1318,8 +1338,17 @@ function modalWrap(id,title,body,wide){
   return '<div class="modal-bg" data-act="closeModal"><form class="modal" id="'+id+'" role="dialog" aria-modal="true" aria-labelledby="'+id+'T"'+(wide?' style="max-width:680px"':'')+'><h2 id="'+id+'T">'+title+'</h2>'+body+
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn btn-line" data-act="closeModal">취소</button><button type="submit" class="btn btn-primary"'+(S.busy?' disabled':'')+'>'+(S.busy?'저장 중…':'저장')+'</button></div></form></div>';
 }
+/* 앱 추가 안내: 휴대폰에서만, 이미 앱(홈 화면)으로 실행 중이면 숨김 */
+function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
 function vModal(){
   var m=S.modal;if(!m)return '';
+  if(m==='install'){
+    return '<div class="modal-bg" data-act="closeModal"><div class="modal inst-m" role="dialog" aria-modal="true" aria-labelledby="inT"><h2 id="inT">📱 홈 화면에 앱처럼 추가하기</h2>'+
+      '<h3>🍎 아이폰 (Safari)</h3><ol><li>아래 <b>공유 버튼</b>(네모에서 위로 화살표)을 눌러요</li><li>아래로 내려 <b>"홈 화면에 추가"</b>를 눌러요</li><li><b>추가</b>를 누르면 완료</li></ol>'+
+      '<h3>🤖 안드로이드 (Chrome)</h3><ol><li>오른쪽 위 <b>점 3개(⋮)</b> 메뉴를 눌러요</li><li><b>"앱 설치"</b> 또는 <b>"홈 화면에 추가"</b>를 눌러요</li><li><b>설치</b>를 누르면 완료</li></ol>'+
+      '<p class="tip">💡 이미 추가했는데 아이콘이나 이름이 예전 그대로라면, 기존 아이콘을 지우고 다시 추가해 보세요.</p>'+
+      '<div style="display:flex;justify-content:flex-end"><button type="button" class="btn btn-primary" data-act="closeModal">확인</button></div></div></div>';
+  }
   if(m==='req'){
     return modalWrap('reqForm','툴 요청하기','<p class="muted" style="margin:0;font-size:14px">요청은 사무소 단위로만 모아 봅니다. 이름은 관리자에게 보이지 않아요.</p>'+
       '<div class="fg"><label class="lb" for="reqText">어떤 툴이나 자료가 필요한가요?</label><textarea id="reqText" class="field" maxlength="1000" placeholder="예: 투석 환자가 많은 의원에 보여줄 수익 계산"></textarea></div>'+
@@ -1554,6 +1583,8 @@ document.addEventListener('click',function(e){
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
+    case 'installHelp':S.modal='install';break;
+    case 'useMonth':S.basket=activeTools().filter(function(t){return t.month&&t.doctor;}).sort(function(a,b){return a.sort-b.sort;}).map(function(t){track('basket',t.id);return t.id;});saveBasket();break;
     case 'admSrc':S.admSrc=v;break;
     case 'cgrp':S.cgrp=v;break;
     case 'view':S.view=v;try{localStorage.setItem('daisso_view',v);}catch(e){}break;
