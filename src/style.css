@@ -654,7 +654,7 @@ button.ic:hover{border-color:var(--navy)}
 .mr-meta .src{font-size:13px}
 /* 앱 추가 안내 칸 (휴대폰) */
 .inst-card{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:14px 18px;border:1px dashed #C9D3E3;border-radius:16px;background:var(--surface);text-align:left;font:inherit;cursor:pointer}
-.inst-card .ic{font-size:24px}.inst-card b{display:block;font-size:15px;color:var(--navy)}.inst-card small{font-size:13px;color:var(--muted)}
+.inst-card .inst-ic{font-size:24px;flex:none}.inst-card b{display:block;font-size:15px;color:var(--navy)}.inst-card small{font-size:13px;color:var(--muted)}
 .inst-card .x{margin-left:auto;font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
 .inst-m h3{margin:14px 0 4px;font-size:15px}.inst-m ol{margin:0;padding-left:20px;font-size:14px;line-height:1.75}.inst-m .tip{margin:14px 0;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
 /* 빈 바구니: 이달의 이슈 흐린 미리보기 + 선택 */
@@ -664,3 +664,4 @@ button.ic:hover{border-color:var(--navy)}
 .cl-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
 .btn-orange{background:#EE7F1F;border:1px solid #EE7F1F;color:#FFFFFF}.btn-orange:hover{background:#DD6F12}
 .steps.preview{overflow:visible;flex-wrap:wrap}
+.inst-card{margin-top:12px}.inst-card b{font-size:14.5px}

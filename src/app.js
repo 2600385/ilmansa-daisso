@@ -262,7 +262,7 @@ function vTools(){
   h+='</section>';
   h+='<section class="req"><div><div style="font-weight:700">찾는 툴이 없나요?</div><div class="muted" style="font-size:14px">필요한 툴이나 자료를 알려주시면 다음 달 공략 툴로 만들어 올려드립니다.</div></div>'+
      '<button type="button" class="btn btn-primary" data-act="openReq">툴 요청하기</button></section>';
-  if(showInstall())h+='<button type="button" class="inst-card" data-act="installHelp"><span class="ic" aria-hidden="true">📱</span><span><b>홈 화면에 앱처럼 추가하기</b><small>아이콘 한 번으로 바로 열어요</small></span><span class="x">방법 보기 ›</span></button>';
+  if(showInstall())h+='<button type="button" class="inst-card" data-act="installHelp"><span class="inst-ic" aria-hidden="true">📱</span><span><b>홈 화면에 앱처럼 추가하기</b><small>아이콘 한 번으로 바로 열어요</small></span><span class="x">방법 보기 ›</span></button>';
   h+='</div>';
   return h+vBasketBar();
 }
