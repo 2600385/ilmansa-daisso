@@ -699,3 +699,11 @@ button.ic:hover{border-color:var(--navy)}
 .adm-search{display:flex;align-items:center;gap:8px;max-width:360px;margin:0 0 12px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted)}
 .adm-search svg{width:16px;height:16px;flex:none}
 .adm-search input{flex:1;min-width:0;border:0;outline:none;background:none;min-height:38px;font-size:14px;color:var(--ink)}
+/* 개인 제작 메모 알림 (연노랑) */
+.own-tip{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);background:#FFF8DB;border:1px solid #F1DB8A;color:#5C4300;border-radius:14px;padding:12px 14px 14px 16px;font-size:14px;box-shadow:0 12px 30px rgba(15,23,42,.16);animation:tipIn .25s ease-out}
+.own-tip b{font-weight:700}.own-tip .sep{opacity:.5}
+.own-tip button{flex:none;border:0;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;background:#5C4300;color:#FFFFFF;cursor:pointer}
+.own-tip .tbar{position:absolute;left:14px;right:14px;bottom:5px;height:2px;border-radius:2px;background:#E9CF6F;transform-origin:left;animation:tipBar 5s linear forwards}
+@keyframes tipIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes tipBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){.own-tip,.own-tip .tbar{animation:none}}

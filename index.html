@@ -709,6 +709,14 @@ button.ic:hover{border-color:var(--navy)}
 .adm-search{display:flex;align-items:center;gap:8px;max-width:360px;margin:0 0 12px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted)}
 .adm-search svg{width:16px;height:16px;flex:none}
 .adm-search input{flex:1;min-width:0;border:0;outline:none;background:none;min-height:38px;font-size:14px;color:var(--ink)}
+/* 개인 제작 메모 알림 (연노랑) */
+.own-tip{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);background:#FFF8DB;border:1px solid #F1DB8A;color:#5C4300;border-radius:14px;padding:12px 14px 14px 16px;font-size:14px;box-shadow:0 12px 30px rgba(15,23,42,.16);animation:tipIn .25s ease-out}
+.own-tip b{font-weight:700}.own-tip .sep{opacity:.5}
+.own-tip button{flex:none;border:0;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;background:#5C4300;color:#FFFFFF;cursor:pointer}
+.own-tip .tbar{position:absolute;left:14px;right:14px;bottom:5px;height:2px;border-radius:2px;background:#E9CF6F;transform-origin:left;animation:tipBar 5s linear forwards}
+@keyframes tipIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes tipBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){.own-tip,.own-tip .tbar{animation:none}}
 </style>
 </head>
 <body>
@@ -1429,6 +1437,13 @@ function tick(ts){
   if(mq.pos>=max){mq.pos=max;mq.dir=-1;mq.wait=1800;}else if(mq.pos<=0){mq.pos=0;mq.dir=1;mq.wait=1800;}
   it.scrollLeft=mq.pos;
 }
+/* 개인 제작 자료를 담을 때 하루 한 번: 수치 확인 메모 */
+var ownTimer=0;
+function ownTip(t){
+  if(!t||t.src!=='own')return;var d=new Date().toISOString().slice(0,10);
+  try{if(localStorage.getItem('daisso_own_tip')===d)return;localStorage.setItem('daisso_own_tip',d);}catch(e){}
+  S.ownTip=true;clearTimeout(ownTimer);ownTimer=setTimeout(function(){S.ownTip=false;render();},5000);
+}
 function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
 function vModal(){
   var m=S.modal;if(!m)return '';
@@ -1561,6 +1576,7 @@ function render(){
   }
   if(S.uid||!S.boot)h+=vModal();
   if(S.zoom)h+='<div class="zoom-ov" data-act="zoomClose" role="dialog" aria-label="크게 보기"><img src="'+esc(S.zoom)+'" alt=""><span class="zx">닫기 ✕</span></div>';
+  if(S.ownTip)h+='<div class="own-tip" role="status"><span aria-hidden="true">✏️</span><span><b>개인 제작 자료예요</b> <span class="sep">·</span> 수치가 최신 기준인지 확인하고 보여주세요</span><button type="button" data-act="ownTipClose">확인</button><span class="tbar"></span></div>';
   if(S.toast)h+='<div class="toast" role="status">'+esc(S.toast)+'</div>';
   if(S.modal){var keep={};[].forEach.call(document.querySelectorAll('.modal input,.modal textarea,.modal select'),function(el){if(el.id&&el.type!=='file'&&el.type!=='checkbox')keep[el.id]=el.value;});}
   app.innerHTML=h;
@@ -1648,7 +1664,7 @@ document.addEventListener('click',function(e){
       var win=LIVE&&(t.url||t.file)?window.open('about:blank','_blank'):null;
       openTool(t,false).then(function(url){if(url&&win){win.opener=null;win.location.href=url;}else if(win){win.close();}}).catch(function(err){if(win)win.close();fail(err);});
       break;
-    case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
+    case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);ownTip(byId(v));}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
     case 'basketOpen':S.basketOpen=!S.basketOpen;break;
     case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('제안서를 비웠어요.');break;
     case 'bkUp':case 'bkDown':var k=+v,j=act==='bkUp'?k-1:k+1;if(j>=0&&j<S.basket.length){var tmp=S.basket[k];S.basket[k]=S.basket[j];S.basket[j]=tmp;saveBasket();}break;
@@ -1676,6 +1692,7 @@ document.addEventListener('click',function(e){
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
     case 'isMore':var ii=document.querySelector('.issue-strip .is-items');if(ii)ii.scrollBy({left:ii.clientWidth*.7,behavior:'smooth'});return;
+    case 'ownTipClose':S.ownTip=false;clearTimeout(ownTimer);break;
     case 'installHelp':S.modal='install';break;
     case 'useMonth':S.basket=activeTools().filter(function(t){return t.month&&t.doctor;}).sort(function(a,b){return a.sort-b.sort;}).map(function(t){track('basket',t.id);return t.id;});saveBasket();break;
     case 'admSrc':S.admSrc=v;break;

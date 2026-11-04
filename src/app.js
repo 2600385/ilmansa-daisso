@@ -712,6 +712,13 @@ function tick(ts){
   if(mq.pos>=max){mq.pos=max;mq.dir=-1;mq.wait=1800;}else if(mq.pos<=0){mq.pos=0;mq.dir=1;mq.wait=1800;}
   it.scrollLeft=mq.pos;
 }
+/* 개인 제작 자료를 담을 때 하루 한 번: 수치 확인 메모 */
+var ownTimer=0;
+function ownTip(t){
+  if(!t||t.src!=='own')return;var d=new Date().toISOString().slice(0,10);
+  try{if(localStorage.getItem('daisso_own_tip')===d)return;localStorage.setItem('daisso_own_tip',d);}catch(e){}
+  S.ownTip=true;clearTimeout(ownTimer);ownTimer=setTimeout(function(){S.ownTip=false;render();},5000);
+}
 function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
 function vModal(){
   var m=S.modal;if(!m)return '';
@@ -844,6 +851,7 @@ function render(){
   }
   if(S.uid||!S.boot)h+=vModal();
   if(S.zoom)h+='<div class="zoom-ov" data-act="zoomClose" role="dialog" aria-label="크게 보기"><img src="'+esc(S.zoom)+'" alt=""><span class="zx">닫기 ✕</span></div>';
+  if(S.ownTip)h+='<div class="own-tip" role="status"><span aria-hidden="true">✏️</span><span><b>개인 제작 자료예요</b> <span class="sep">·</span> 수치가 최신 기준인지 확인하고 보여주세요</span><button type="button" data-act="ownTipClose">확인</button><span class="tbar"></span></div>';
   if(S.toast)h+='<div class="toast" role="status">'+esc(S.toast)+'</div>';
   if(S.modal){var keep={};[].forEach.call(document.querySelectorAll('.modal input,.modal textarea,.modal select'),function(el){if(el.id&&el.type!=='file'&&el.type!=='checkbox')keep[el.id]=el.value;});}
   app.innerHTML=h;
@@ -931,7 +939,7 @@ document.addEventListener('click',function(e){
       var win=LIVE&&(t.url||t.file)?window.open('about:blank','_blank'):null;
       openTool(t,false).then(function(url){if(url&&win){win.opener=null;win.location.href=url;}else if(win){win.close();}}).catch(function(err){if(win)win.close();fail(err);});
       break;
-    case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
+    case 'basket':var i=S.basket.indexOf(v);if(i>=0){S.basket.splice(i,1);}else{S.basket.push(v);track('basket',v);ownTip(byId(v));}if(!S.basket.length)S.basketOpen=false;saveBasket();break;
     case 'basketOpen':S.basketOpen=!S.basketOpen;break;
     case 'basketClear':S.basket=[];S.basketOpen=false;saveBasket();say('제안서를 비웠어요.');break;
     case 'bkUp':case 'bkDown':var k=+v,j=act==='bkUp'?k-1:k+1;if(j>=0&&j<S.basket.length){var tmp=S.basket[k];S.basket[k]=S.basket[j];S.basket[j]=tmp;saveBasket();}break;
@@ -959,6 +967,7 @@ document.addEventListener('click',function(e){
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
     case 'isMore':var ii=document.querySelector('.issue-strip .is-items');if(ii)ii.scrollBy({left:ii.clientWidth*.7,behavior:'smooth'});return;
+    case 'ownTipClose':S.ownTip=false;clearTimeout(ownTimer);break;
     case 'installHelp':S.modal='install';break;
     case 'useMonth':S.basket=activeTools().filter(function(t){return t.month&&t.doctor;}).sort(function(a,b){return a.sort-b.sort;}).map(function(t){track('basket',t.id);return t.id;});saveBasket();break;
     case 'admSrc':S.admSrc=v;break;
