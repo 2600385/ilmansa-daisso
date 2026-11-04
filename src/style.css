@@ -677,3 +677,12 @@ button.ic:hover{border-color:var(--navy)}
 @media (max-width:760px){.lr.b2{flex-wrap:nowrap}.lr.b2 .lr-main{order:0;flex-basis:auto}.lr.b2 .lr-ds{display:block}}
 .lr.b2 .lr-slot{width:84px}
 .lr.b2 .lr-slot .tag{display:block;width:84px;text-align:center;min-width:0}
+/* 이달의 주요 이슈: 넘칠 때 오른쪽 흐림 + › 버튼 */
+.issue-strip .is-items{scroll-behavior:smooth;scrollbar-width:none}
+.issue-strip .is-items::-webkit-scrollbar{display:none}
+.issue-strip.ovf .is-items{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 70px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 70px),transparent)}
+.issue-strip.ovf.scrolled .is-items{-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 70px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 70px),transparent)}
+.is-more{display:none;flex:none;width:30px;height:30px;border-radius:50%;border:1px solid #E3E7EE;background:#fff;color:var(--navy);font-size:18px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(31,42,68,.12);align-items:center;justify-content:center;margin-left:-6px}
+.issue-strip.ovf .is-more{display:flex;animation:isPulse 1.6s ease-in-out 2}
+@keyframes isPulse{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.issue-strip.ovf .is-more{animation:none}}

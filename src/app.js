@@ -297,7 +297,7 @@ function vResults(){
       hot.forEach(function(t){var inB=S.basket.indexOf(t.id)>=0;
         h+='<span class="is-item"><span class="is-nm">'+esc(cleanName(t.name))+'</span><button type="button" class="is-btn go" data-act="open" data-v="'+t.id+'">열기</button>'+
           (t.doctor?'<button type="button" class="is-btn'+(inB?' on':'')+'" data-act="basket" data-v="'+t.id+'" aria-pressed="'+inB+'">'+I.bag+(inB?'담았어요':'담기')+'</button>':'')+'</span>';});
-      h+='</div></div>';
+      h+='</div><button type="button" class="is-more" data-act="isMore" aria-label="이달의 주요 이슈 더 보기">›</button></div>';
     }
     var rest=list; /* 주요 이슈는 위 줄에서 강조 + 아래 카드에도 한 번 더 */
     if(rest.length)h+=S.view==='list'?'<div class="lrows" role="list">'+rest.map(vRow).join('')+'</div>':(S.need==='brochure'&&!S.favOnly)?vGallery(rest):'<div class="grid">'+rest.map(vCard).join('')+'</div>';
@@ -376,7 +376,7 @@ async function loadThumbs(list){
   for(var i=0;i<list.length;i++){var f=list[i].file;if(THUMB[f])continue;
     var cov=null;if(/\.pdf$/i.test(f)){try{var cu=await api.fileUrl(f+'.cover.jpg');var cr=await fetch(cu);if(cr.ok)cov=URL.createObjectURL(await cr.blob());}catch(e){}} /* 따로 올린 표지 이미지가 있으면 그걸 미리보기로 */
     try{var u=await api.fileUrl(f);THUMB[f]=/\.pdf$/i.test(f)?await pdfThumb(u,f,cov):URL.createObjectURL(await (await fetch(u)).blob()); /* 서명 주소는 1시간 뒤 만료 → 내려받아 두고 씀 */}catch(e){THUMB[f]=''; }}
-  thumbBusy=false;var r=document.getElementById('results');if(r)r.innerHTML=vResults();
+  thumbBusy=false;var r=document.getElementById('results');if(r){r.innerHTML=vResults();stripFx();}
 }
 /* 제안서: 담았을 때만 아래 막대로 나타남. ① 이름 ② 이름 … */
 function vBasketBar(){
@@ -661,6 +661,15 @@ function modalWrap(id,title,body,wide){
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn btn-line" data-act="closeModal">취소</button><button type="submit" class="btn btn-primary"'+(S.busy?' disabled':'')+'>'+(S.busy?'저장 중…':'저장')+'</button></div></form></div>';
 }
 /* 앱 추가 안내: 휴대폰에서만, 이미 앱(홈 화면)으로 실행 중이면 숨김 */
+/* 이달의 주요 이슈 줄이 넘치면: 오른쪽 흐림 + › 버튼 + 처음 한 번 살짝 밀렸다 돌아오기 */
+var stripNudged=false;
+function stripFx(){
+  var st=document.querySelector('.issue-strip'),it=st&&st.querySelector('.is-items');if(!it)return;
+  function upd(){var more=it.scrollWidth-it.clientWidth-it.scrollLeft>4;st.classList.toggle('ovf',more);st.classList.toggle('scrolled',it.scrollLeft>4);}
+  upd();it.onscroll=upd;
+  if(!stripNudged&&it.scrollWidth>it.clientWidth+4&&!matchMedia('(prefers-reduced-motion: reduce)').matches){stripNudged=true;
+    setTimeout(function(){it.scrollTo({left:90,behavior:'smooth'});setTimeout(function(){it.scrollTo({left:0,behavior:'smooth'});},700);},600);}
+}
 function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
 function vModal(){
   var m=S.modal;if(!m)return '';
@@ -797,6 +806,7 @@ function render(){
   app.innerHTML=h;
   var hd=app.querySelector('header.top');document.documentElement.style.setProperty('--hh',(hd?hd.offsetHeight:0)+'px');
   if(S.modal&&keep){Object.keys(keep).forEach(function(id){var el=document.getElementById(id);if(el)el.value=keep[id];});}
+  stripFx();
   if(fid){var el=document.getElementById(fid);if(el){el.focus();if(sel){try{el.setSelectionRange(sel[0],sel[1]);}catch(e){}}}}
 }
 
@@ -905,6 +915,7 @@ document.addEventListener('click',function(e){
     case 'adminTab':S.adminTab=v;loadAdmin();break;
     case 'scope':S.scope=v;break;
     case 'period':S.period=v;S.stats=null;loadAdmin();break;
+    case 'isMore':var ii=document.querySelector('.issue-strip .is-items');if(ii)ii.scrollBy({left:ii.clientWidth*.7,behavior:'smooth'});return;
     case 'installHelp':S.modal='install';break;
     case 'useMonth':S.basket=activeTools().filter(function(t){return t.month&&t.doctor;}).sort(function(a,b){return a.sort-b.sort;}).map(function(t){track('basket',t.id);return t.id;});saveBasket();break;
     case 'admSrc':S.admSrc=v;break;
@@ -978,7 +989,7 @@ async function doDelete(key){
 document.addEventListener('input',function(e){
   var t=e.target;
   /* 입력창은 그대로 두고 결과만 바꿔서 한글 조합이 끊기지 않게 함 */
-  if(t.id==='q'){S.q=t.value;var r=document.getElementById('results');if(r)r.innerHTML=vResults();}
+  if(t.id==='q'){S.q=t.value;var r=document.getElementById('results');if(r){r.innerHTML=vResults();stripFx();}}
   else if(t.id==='hosp'){S.hospital=t.value;var ht=document.getElementById('hosp-title');if(ht)ht.textContent=hospTitle();}
 });
 document.addEventListener('change',function(e){
