@@ -1372,11 +1372,15 @@ function modalWrap(id,title,body,wide){
 }
 /* 앱 추가 안내: 휴대폰에서만, 이미 앱(홈 화면)으로 실행 중이면 숨김 */
 /* 이달의 주요 이슈 줄이 넘치면: 천천히 흐르는 전광판(마우스·손가락을 올리면 멈춤) */
+var mqStart=0;
 function stripFx(){
   var st=document.querySelector('.issue-strip'),it=st&&st.querySelector('.is-items');if(!it||it.querySelector('.is-track'))return;
   if(it.scrollWidth<=it.clientWidth+4||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   var one=it.innerHTML;it.innerHTML='<div class="is-track"><div class="is-set">'+one+'</div><div class="is-set" aria-hidden="true">'+one+'</div></div>';
-  var w=it.querySelector('.is-set').scrollWidth;it.querySelector('.is-track').style.animationDuration=Math.max(18,w/38)+'s';
+  /* 화면이 다시 그려져도 처음으로 튕기지 않게, 흐르던 위치에서 이어서 재생 */
+  var w=it.querySelector('.is-set').scrollWidth,dur=Math.max(18,w/38),tr=it.querySelector('.is-track');
+  if(!mqStart)mqStart=Date.now();
+  tr.style.animationDuration=dur+'s';tr.style.animationDelay=(-(((Date.now()-mqStart)/1000)%dur))+'s';
   st.classList.add('marquee');
 }
 function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
