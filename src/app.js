@@ -661,17 +661,35 @@ function modalWrap(id,title,body,wide){
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn btn-line" data-act="closeModal">취소</button><button type="submit" class="btn btn-primary"'+(S.busy?' disabled':'')+'>'+(S.busy?'저장 중…':'저장')+'</button></div></form></div>';
 }
 /* 앱 추가 안내: 휴대폰에서만, 이미 앱(홈 화면)으로 실행 중이면 숨김 */
-/* 이달의 주요 이슈 줄이 넘치면: 천천히 흐르는 전광판(마우스·손가락을 올리면 멈춤) */
-var mqStart=0;
+/* 이달의 주요 이슈 줄이 넘치면: 천천히 오른쪽 끝까지 갔다가 잠깐 쉬고 왼쪽으로 되돌아오는 왕복 흐름.
+   마우스를 올리거나 손가락을 대면 멈추고, 그 상태에서 직접 옆으로 밀거나(트랙패드·드래그) 휠로 움직일 수 있음 */
+var mq={pos:0,dir:1,wait:0,hold:false,last:0,raf:0};
 function stripFx(){
-  var st=document.querySelector('.issue-strip'),it=st&&st.querySelector('.is-items');if(!it||it.querySelector('.is-track'))return;
-  if(it.scrollWidth<=it.clientWidth+4||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  var one=it.innerHTML;it.innerHTML='<div class="is-track"><div class="is-set">'+one+'</div><div class="is-set" aria-hidden="true">'+one+'</div></div>';
-  /* 화면이 다시 그려져도 처음으로 튕기지 않게, 흐르던 위치에서 이어서 재생 */
-  var w=it.querySelector('.is-set').scrollWidth,dur=Math.max(18,w/38),tr=it.querySelector('.is-track');
-  if(!mqStart)mqStart=Date.now();
-  tr.style.animationDuration=dur+'s';tr.style.animationDelay=(-(((Date.now()-mqStart)/1000)%dur))+'s';
-  st.classList.add('marquee');
+  var st=document.querySelector('.issue-strip'),it=st&&st.querySelector('.is-items');if(!it)return;
+  var max=it.scrollWidth-it.clientWidth;st.classList.toggle('ovf',max>4);
+  if(max<=4)return;
+  it.scrollLeft=Math.min(mq.pos,max);
+  if(it._mq)return;it._mq=1;
+  it.addEventListener('pointerenter',function(){mq.hold=true;});
+  it.addEventListener('pointerleave',function(){mq.hold=false;mq.pos=it.scrollLeft;mq.wait=600;});
+  it.addEventListener('touchstart',function(){mq.hold=true;},{passive:true});
+  it.addEventListener('touchend',function(){setTimeout(function(){mq.hold=false;mq.pos=it.scrollLeft;},2500);},{passive:true});
+  it.addEventListener('scroll',function(){if(mq.hold)mq.pos=it.scrollLeft;},{passive:true});
+  /* 마우스로 잡고 끌기 */
+  var dx=null,sl=0;it.addEventListener('mousedown',function(e){if(e.target.closest('button'))return;dx=e.clientX;sl=it.scrollLeft;it.classList.add('drag');});
+  window.addEventListener('mousemove',function(e){if(dx!==null){it.scrollLeft=sl-(e.clientX-dx);}});
+  window.addEventListener('mouseup',function(){if(dx!==null){dx=null;it.classList.remove('drag');mq.pos=it.scrollLeft;}});
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(!mq.raf)mq.raf=requestAnimationFrame(tick);
+}
+function tick(ts){
+  mq.raf=requestAnimationFrame(tick);
+  var it=document.querySelector('.issue-strip .is-items');var dt=mq.last?Math.min(64,ts-mq.last):16;mq.last=ts;
+  if(!it||mq.hold)return;var max=it.scrollWidth-it.clientWidth;if(max<=4)return;
+  if(mq.wait>0){mq.wait-=dt;return;}
+  mq.pos+=mq.dir*dt*0.035;
+  if(mq.pos>=max){mq.pos=max;mq.dir=-1;mq.wait=1800;}else if(mq.pos<=0){mq.pos=0;mq.dir=1;mq.wait=1800;}
+  it.scrollLeft=mq.pos;
 }
 function showInstall(){try{var sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;return !sa&&matchMedia('(pointer:coarse)').matches;}catch(e){return false;}}
 function vModal(){
