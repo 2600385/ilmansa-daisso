@@ -705,6 +705,10 @@ button.ic:hover{border-color:var(--navy)}
 /* 왕복 흐름 (전광판 대체) */
 .issue-strip.ovf .is-items{overflow-x:auto;scroll-behavior:auto;cursor:grab;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 40px),transparent)}
 .issue-strip .is-items.drag{cursor:grabbing;user-select:none}
+/* 관리자 자료 검색 */
+.adm-search{display:flex;align-items:center;gap:8px;max-width:360px;margin:0 0 12px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted)}
+.adm-search svg{width:16px;height:16px;flex:none}
+.adm-search input{flex:1;min-width:0;border:0;outline:none;background:none;min-height:38px;font-size:14px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -1327,14 +1331,20 @@ function kpi(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class=
 function vToolAdmin(){
   var k=S.admKind||'all';
   var sf=S.admSrc||'all';
-  var list=S.tools.filter(function(t){return (k==='all'||t.kind===k)&&(sf==='all'||(sf==='none'?!t.src:t.src===sf));});
-  var h='<div class="chiprow" style="margin-bottom:8px"><span class="lb" style="min-width:40px;font-size:13px;color:var(--muted)">출처</span>'+[{id:'all',l:'전체'}].concat(SRCS).concat([{id:'none',l:'미지정'}]).map(function(x){var n=x.id==='all'?S.tools.length:S.tools.filter(function(t){return x.id==='none'?!t.src:t.src===x.id;}).length,on=sf===x.id;return '<button type="button" class="chip'+(on?' on':'')+'" data-act="admSrc" data-v="'+x.id+'" aria-pressed="'+on+'">'+x.l+' '+n+'</button>';}).join('')+'</div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="chiprow">';
+  var h='<div class="adm-search">'+I.search+'<input id="aq" type="search" value="'+esc(S.aq||'')+'" placeholder="자료 이름·설명으로 찾기" autocomplete="off" aria-label="자료 검색"></div>';
+  h+='<div class="chiprow" style="margin-bottom:8px"><span class="lb" style="min-width:40px;font-size:13px;color:var(--muted)">출처</span>'+[{id:'all',l:'전체'}].concat(SRCS).concat([{id:'none',l:'미지정'}]).map(function(x){var n=x.id==='all'?S.tools.length:S.tools.filter(function(t){return x.id==='none'?!t.src:t.src===x.id;}).length,on=sf===x.id;return '<button type="button" class="chip'+(on?' on':'')+'" data-act="admSrc" data-v="'+x.id+'" aria-pressed="'+on+'">'+x.l+' '+n+'</button>';}).join('')+'</div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div class="chiprow">';
   [{id:'all',label:'전체'}].concat(KINDS).forEach(function(n){
     var c=n.id==='all'?S.tools.length:S.tools.filter(function(t){return t.kind===n.id;}).length;
     h+='<button type="button" class="chip'+(k===n.id?' on':'')+'" data-act="admKind" data-v="'+n.id+'" aria-pressed="'+(k===n.id)+'">'+n.label+' '+c+'</button>';});
   h+='</div><div style="display:flex;gap:8px"><button type="button" class="btn btn-line" data-act="newContact" style="min-height:46px;padding:0 18px">+ 문의처(전화번호) 추가</button><button type="button" class="btn btn-primary" data-act="newTool" style="min-height:46px;padding:0 22px">+ 자료 추가</button></div></div>';
-  if(!list.length)return h+'<div class="prompt muted">이 종류로 등록된 자료가 없어요. "+ 자료 추가"로 올려보세요.</div>';
-  h+='<div class="mrows" role="list">';
+  return h+'<div id="adm-list">'+vAdmList()+'</div>';
+}
+function vAdmList(){
+  var k=S.admKind||'all',sf=S.admSrc||'all',aq=(S.aq||'').trim();
+  var list=S.tools.filter(function(t){return (k==='all'||t.kind===k)&&(sf==='all'||(sf==='none'?!t.src:t.src===sf))&&(!aq||srchScore(t,aq)>0);});
+  if(aq)list.sort(function(a,b){return srchScore(b,aq)-srchScore(a,aq);});
+  if(!list.length)return '<div class="prompt muted">'+(aq?'"'+esc(aq)+'"에 맞는 자료가 없어요.':'이 종류로 등록된 자료가 없어요. "+ 자료 추가"로 올려보세요.')+'</div>';
+  var h='<div class="mrows" role="list">';
   list.forEach(function(t){
     var op=t.file?(/\.pdf$/i.test(t.file)?'PDF':'파일'):t.url?'주소':'';
     h+='<div class="mrow'+(t.active?'':' off')+'" role="listitem"><span class="tag k-'+fmt(t)+'">'+(KLBL[t.kind]||'기타')+'</span>'+
@@ -1739,6 +1749,7 @@ async function doDelete(key){
 document.addEventListener('input',function(e){
   var t=e.target;
   /* 입력창은 그대로 두고 결과만 바꿔서 한글 조합이 끊기지 않게 함 */
+  if(t.id==='aq'){S.aq=t.value;var al=document.getElementById('adm-list');if(al)al.innerHTML=vAdmList();}
   if(t.id==='q'){S.q=t.value;var r=document.getElementById('results');if(r){r.innerHTML=vResults();stripFx();}}
   else if(t.id==='hosp'){S.hospital=t.value;var ht=document.getElementById('hosp-title');if(ht)ht.textContent=hospTitle();}
 });

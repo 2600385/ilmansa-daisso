@@ -695,3 +695,7 @@ button.ic:hover{border-color:var(--navy)}
 /* 왕복 흐름 (전광판 대체) */
 .issue-strip.ovf .is-items{overflow-x:auto;scroll-behavior:auto;cursor:grab;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 40px),transparent)}
 .issue-strip .is-items.drag{cursor:grabbing;user-select:none}
+/* 관리자 자료 검색 */
+.adm-search{display:flex;align-items:center;gap:8px;max-width:360px;margin:0 0 12px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted)}
+.adm-search svg{width:16px;height:16px;flex:none}
+.adm-search input{flex:1;min-width:0;border:0;outline:none;background:none;min-height:38px;font-size:14px;color:var(--ink)}
