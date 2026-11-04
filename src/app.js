@@ -15,6 +15,21 @@ var EMAIL_DOMAIN = '@daisso.internal';
 var PLACES=[{id:'new',label:'신규처 제안',c:'#C77D9B'},{id:'keep',label:'거래처 관리',c:'#4C9F86'},{id:'ref',label:'업무참고',c:'#8D72C9'}];
 var KINDS=[{id:'tool',label:'툴',c:'#5C7FC4'},{id:'brochure',label:'브로셔',c:'#E0A15E'},{id:'rp',label:'표준RP',c:'#C77D9B'},{id:'site',label:'참고 사이트',c:'#4FA3B8'},{id:'notice',label:'교육·공문',c:'#6BA37E'}];
 var SRCS=[{id:'official',l:'사내 공식',i:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16"/><path d="M9 21v-4h6v4M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg>'},{id:'agency',l:'기관 발행',i:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M4 10h16M12 3l9 5H3z"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8"/></svg>'},{id:'own',l:'자체 제작',i:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>'}];
+/* 검색: ① 띄어쓰기·기호 무시 ② 두 글자씩 쪼개 대부분 겹치면 ③ 이름에 글자가 순서대로 다 있으면(줄임말) — 점수 높은 순 */
+function nrm(x){return String(x||'').toLowerCase().replace(/[\s·_\-\*\(\)\[\]\.,&+x]/g,'');}
+var SCACHE={};
+function srchScore(t,q){
+  var key=t.id+'|'+q;if(SCACHE[key]!=null)return SCACHE[key];
+  var nq=nrm(q),nn=nrm(t.name),all=nrm(t.name+' '+t.desc+' '+t.by+' '+((srcOf(t)||{}).l||'')+' '+(KLBL[t.kind]||'')),sc=0;
+  if(!nq)sc=1;
+  else if(nn.indexOf(nq)>=0)sc=120;
+  else if(all.indexOf(nq)>=0)sc=100;
+  else{
+    if(nq.length>=3){var bg=[],hit=0;for(var i=0;i<nq.length-1;i++)bg.push(nq.substr(i,2));bg.forEach(function(b){if(all.indexOf(b)>=0)hit++;});var r=hit/bg.length;if(r>=0.6)sc=40+Math.round(r*40);}
+    if(!sc&&nq.length>=3){var j=0;for(var k=0;k<nn.length&&j<nq.length;k++)if(nn[k]===nq[j])j++;if(j===nq.length)sc=35;}
+  }
+  return SCACHE[key]=sc;
+}
 function srcOf(t){return SRCS.filter(function(x){return x.id===t.src;})[0];}
 function srcTag(t,iconOnly){var x=srcOf(t);return x?'<span class="src" title="'+x.l+'">'+x.i+(iconOnly?'':x.l)+'</span>':'';}
 var KLBL={};KINDS.forEach(function(k){KLBL[k.id]=k.label;});
@@ -272,10 +287,10 @@ function vResults(){
   var list=null,label='';
   if(!idle&&!(!S.favOnly&&(S.need==='script'||S.need==='contact'))){
     list=activeTools().filter(function(t){
-      var hit=!q||(t.name+' '+t.desc+' '+t.by+' '+((srcOf(t)||{}).l||'')).toLowerCase().indexOf(q)>=0;
+      var hit=!q||srchScore(t,q)>0;
       if(S.favOnly)return !!S.favs[t.id]&&hit;
       return inPlace(t,S.place)&&inNeed(t,S.need)&&hit;
-    }).sort(function(a,b){return (q?(b.month?1:0)-(a.month?1:0):0)||a.sort-b.sort;}); /* 평소엔 관리자가 정한 순서, 검색 땐 주요 이슈 먼저 */
+    }).sort(function(a,b){return (q?srchScore(b,q)-srchScore(a,q)||(b.month?1:0)-(a.month?1:0):0)||a.sort-b.sort;}); /* 평소엔 관리자가 정한 순서, 검색 땐 주요 이슈 먼저 */
     var parts=[];
     if(S.favOnly)parts.push('즐겨찾기한 툴');
     else{if(S.place!=='none')parts.push(areaLabel(S.place));if(S.need!=='none')parts.push(S.need==='all'?'전체':KLBL[S.need]||'문의처');if(!parts.length)parts.push('검색 결과');}
@@ -396,7 +411,7 @@ function vBasketBar(){
 /* 문의처: 기관 꼬리표·필터·검색, 휴대폰에선 눌러서 전화 */
 var CGRP=[{id:'hira',l:'심평원',c:'kk-site'},{id:'nhis',l:'공단·복지부',c:'kk-notice'},{id:'chart',l:'차트사',c:'kk-brochure'},{id:'wc',l:'웰체크',c:'kk-tool'},{id:'etc',l:'기타',c:'kk-rp'}];
 function cgroup(c){var x=c.topic+' '+c.dept;return /차트/.test(x)?'chart':/웰체크/.test(x)?'wc':/공단|복지부/.test(x)?'nhis':/심평원/.test(x)?'hira':'etc';}
-function cMatch(c,q){return !q||(c.topic+' '+c.dept+' '+c.tel+' '+CGRP.filter(function(g){return g.id===cgroup(c);})[0].l).toLowerCase().indexOf(q)>=0;}
+function cMatch(c,q){return !q||nrm(c.topic+' '+c.dept+' '+c.tel+' '+CGRP.filter(function(g){return g.id===cgroup(c);})[0].l).indexOf(nrm(q))>=0;}
 function cRows(list){return list.map(function(c){var g=CGRP.filter(function(x){return x.id===cgroup(c);})[0],tel=String(c.tel||'');
   return '<tr><td><span class="tag '+g.c+'">'+g.l+'</span></td><td style="font-weight:700">'+esc(c.topic)+'</td><td>'+esc(c.dept)+'</td><td class="ctel"><a href="tel:'+esc(tel.replace(/[^0-9+]/g,''))+'">'+esc(tel)+'</a></td></tr>';}).join('');}
 function vContacts(){
@@ -809,6 +824,7 @@ function vModal(){
    ===================================================================== */
 var app=document.getElementById('app');
 function render(){
+  SCACHE={};
   var a=document.activeElement,fid=a&&a.id,sel=null;
   try{sel=fid&&a.selectionStart!=null?[a.selectionStart,a.selectionEnd]:null;}catch(e){}
   var h;
