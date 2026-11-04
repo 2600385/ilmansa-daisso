@@ -477,7 +477,7 @@ function vClinic(){
     list.forEach(function(x,j){h+='<button type="button" class="rail-i'+(j===i?' on':'')+'" data-act="jump" data-v="'+j+'" aria-current="'+(j===i?'step':'false')+'"><span class="rn">'+(j+1)+'</span><span class="rl">'+esc(cleanName(x.name))+'</span></button>';});
     h+='</nav><div class="page-turn '+(S.flip==='prev'?'from-r':'from-l')+(S.flipAnim?' anim':'')+'">';
     if(S.presentUrl&&S.presentBlocked){h+='<div class="present-body"><div class="present-ph blocked"><b style="font-size:22px;color:var(--navy)">'+esc(cleanName(t.name))+'</b>'+
-      '<span class="muted">이 사이트는 다른 화면 안에서 열리지 않게 되어 있어요. 새 창으로 열어 보여주세요.</span>'+
+      '<span class="muted">이 사이트는 다른 화면 안에서 열리지 않게 되어 있어요.<br>새 창으로 열어 보여주세요.</span>'+
       '<a class="btn btn-primary" style="min-height:52px;padding:0 28px;font-size:17px" href="'+esc(S.presentUrl)+'" target="_blank" rel="noopener">새 창으로 열기 '+I.arrow+'</a></div></div>';}
     else if(S.presentUrl){h+='<iframe class="present-frame" src="'+esc(S.presentUrl)+'" title="'+esc(t.name)+'"></iframe>';}
     else{h+='<div class="present-body"><div class="present-ph"><b style="font-size:20px;color:var(--navy)">'+esc(t.name)+'</b>'+
