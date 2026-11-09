@@ -993,7 +993,7 @@ function vTools(){
   var h='<div class="page wrap">';
   h+='<section class="hero"><h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
      '<p><strong style="color:var(--ink)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</strong><span class="sub"><br>신규처 어프로치부터 기존처 관리까지, 매달 업데이트되는 일만사·웰체크 자료를 한곳에 모았습니다.<br>필요할 때 바로 꺼내 쓰세요.</span></p>'+
-     '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴이나 키워드 (예: 기관신고, 차트, 홍보물, 검체위수탁)"></div></section>';
+     '<div class="search"><label for="q" class="sr">툴 검색</label>'+I.search+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="툴이나 키워드 (예: 기관신고, 차트 연동, 검체위수탁, 기본교육 답지)"></div></section>';
   h+='<section class="blk"><div class="filters"><div class="fgroup place" role="group" aria-label="어디 가세요?"><span class="flab">어디 가세요?</span>';
   [{id:'all',label:'전체',c:'#8C99B3'}].concat(PLACES).forEach(function(p){var on=p.id===S.place&&!S.favOnly;
     var n=activeTools().filter(function(t){return inPlace(t,p.id);}).length;
