@@ -545,8 +545,8 @@ function vStats(){
     Object.keys(o2d).filter(function(o){return o2d[o]===curD;}).sort().map(function(o){return chip('o:'+o,o);}).join('')+'</div>';}
   h+='</div>';
   h+=vTrend(inScope);
-  var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id)};});
-  tr.sort(function(a,b){return (b.b-a.b)||(b.f-a.f);});
+  var tr=S.tools.map(function(t){return {t:t,f:sum('fav_now',t.id),b:sum('basket',t.id),o:sum('open',t.id)+sum('present',t.id)};});
+  tr.sort(function(a,b){return (b.b-a.b)||(b.o-a.o)||(b.f-a.f);});
   var byKind={};tr.forEach(function(r){var fk=r.t.kind;byKind[fk]=(byKind[fk]||0)+r.b*2+r.f;});
   var topKind=Object.keys(byKind).sort(function(a,b){return byKind[b]-byKind[a];})[0];
   if(topKind&&byKind[topKind]>0)h+='<div class="dir"><b>방향</b><span>"'+(KLBL[topKind]||topKind)+'" 자료가 가장 많이 즐겨찾기되고 제안서에 담겼어요. 다음 자료도 이 형태로 만들면 좋습니다.</span></div>';
@@ -563,10 +563,11 @@ function vStats(){
     fl.forEach(function(r,i){var pc=tot?Math.round(r.v/tot*100):0;
       h+='<div class="sdet-r"><span class="no">'+(i+1)+'</span><span class="nm">'+esc(cleanName(r.t.name))+'<small>'+esc(KLBL[r.t.kind]||'')+'</small></span><span class="t"><i style="width:'+pc+'%;background:'+(fk==='f'?'#D9B25F':fk==='o'?'#3B6FD4':'#C2410C')+'"></i></span><span class="v">'+(fk==='o'?'혼자 '+r.a+' · 원장님께 '+r.p:r.v+'회 · '+pc+'%')+'</span></div>';});
     h+='</section>';}
-  var mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
+  var mo=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.o;}).concat([0]))),mb=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.b;}).concat([0]))),mf=Math.max(1,Math.max.apply(null,tr.map(function(r){return r.f;}).concat([0])));
   h+='<section class="blk"><h2>자료별 순위 <span class="muted" style="font-size:14px;font-weight:500">· 제안서에 담긴 순</span></h2><div class="rank">';
   tr.forEach(function(r,i){h+='<div class="ri'+(i<3&&(r.b||r.f)?' top':'')+'"><span class="no">'+(i+1)+'</span><div style="min-width:0"><div class="nm">'+esc(r.t.name)+(r.t.active?'':' <span class="muted" style="font-weight:500">(숨김)</span>')+'</div><div class="kd">'+(KLBL[r.t.kind]||'')+' · '+esc(r.t.tags.map(areaLabel).join('·')||'전체')+'</div></div><div class="bars">'+
-    '<div class="bar2"><span class="red">'+I.bag+'</span><span class="t"><i style="width:'+(r.b/mb*100)+'%;background:#C2410C"></i></span><span class="v">'+r.b+'</span></div>'+
+    '<div class="bar2" title="꺼내 쓰기 (혼자+원장님께)"><span style="color:#3B6FD4">'+I.arrow+'</span><span class="t"><i style="width:'+(r.o/mo*100)+'%;background:#3B6FD4"></i></span><span class="v">'+r.o+'</span></div>'+
+    '<div class="bar2" title="제안서에 담기"><span class="red">'+I.bag+'</span><span class="t"><i style="width:'+(r.b/mb*100)+'%;background:#C2410C"></i></span><span class="v">'+r.b+'</span></div>'+
     '<div class="bar2"><span class="gold">★</span><span class="t"><i style="width:'+(r.f/mf*100)+'%;background:#D9B25F"></i></span><span class="v">'+r.f+'</span></div></div></div>';});
   h+='</div></section>';
   var spread=tr.filter(function(r){return r.b>=1;}),tidy=tr.filter(function(r){return r.t.active&&!r.f&&!r.b&&rows.length;});
