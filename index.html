@@ -722,6 +722,7 @@ button.ic:hover{border-color:var(--navy)}
 .sdet-r{grid-template-columns:28px minmax(0,1.4fr) 1fr 150px}
 @media (max-width:900px){.k3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .bar2 svg{width:14px;height:14px}
+#empId::placeholder{font-size:13.5px;letter-spacing:-.2px}
 </style>
 </head>
 <body>
@@ -953,7 +954,7 @@ function vLogin(){
     '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px">'+
       '<h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
       '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p></div>'+
-    '<div class="fg"><label class="lb" for="empId">사번 또는 사무소명</label><input id="empId" class="field" autocomplete="username" placeholder="사번 또는 사무소명을 입력하세요"><div class="muted" style="font-size:12.5px;margin-top:6px">예: 사번 or 경인1</div></div>'+
+    '<div class="fg"><label class="lb" for="empId">사번 또는 사무소명</label><input id="empId" class="field" autocomplete="username" placeholder="사번 또는 사무소명을 입력하세요 ( 예) 사번 or 경인1 )"></div>'+
     '<label class="chk"><input id="keep" type="checkbox" checked> 이 기기에서 로그인 유지</label>'+
     (LIVE?'':'<label class="chk"><input id="asAdmin" type="checkbox"> 관리자 화면까지 미리보기 <span class="preview-flag">미리보기 전용</span></label>')+
     (S.loginErr?'<div role="alert" style="color:var(--warn);font-size:14px;font-weight:700;text-align:center">'+esc(S.loginErr)+'</div>':'')+

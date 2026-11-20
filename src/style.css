@@ -712,3 +712,4 @@ button.ic:hover{border-color:var(--navy)}
 .sdet-r{grid-template-columns:28px minmax(0,1.4fr) 1fr 150px}
 @media (max-width:900px){.k3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .bar2 svg{width:14px;height:14px}
+#empId::placeholder{font-size:13.5px;letter-spacing:-.2px}
