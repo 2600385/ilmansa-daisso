@@ -765,7 +765,10 @@ function srcTag(t,iconOnly){var x=srcOf(t);return x?'<span class="src" title="'+
 var KLBL={};KINDS.forEach(function(k){KLBL[k.id]=k.label;});
 var NEEDS=[{id:'all',label:'전체',c:'#8C99B3'}].concat(KINDS).concat([{id:'contact',label:'문의처',c:'#8D72C9',phone:true}]);
 /* MR은 사번만으로 로그인: 내부 비밀번호를 사번에서 만들어 씀. 관리자는 따로 비밀번호를 둠 */
-function normEmp(v){v=String(v||'').trim();var d=v.replace(/\D/g,'');return (d.length>7&&d===v.replace(/[\s-]/g,''))?d.slice(-7):v;}
+/* 사무소 로그인: 사무소명(예: 경인1)을 내부 계정 코드로 바꿔 로그인. 사무소 계정은 즐겨찾기 저장 안 함 */
+var OFFICE_IDS={"남부1":"ofc01","남부2":"ofc02","남부3":"ofc03","동부1":"ofc04","동부2":"ofc05","북부1":"ofc06","북부2":"ofc07","북부3":"ofc08","서부1":"ofc09","서부2":"ofc10","중부":"ofc11","강원":"ofc12","경기1":"ofc13","경기2":"ofc14","경기3":"ofc15","경인1":"ofc16","경인2":"ofc17","경인3":"ofc18","경인4":"ofc19","경남1":"ofc20","경남2":"ofc21","대구1":"ofc22","대구2":"ofc23","대구3":"ofc24","부산1":"ofc25","부산2":"ofc26","부산3":"ofc27","울산":"ofc28","광주1":"ofc29","광주2":"ofc30","대전1":"ofc31","대전2":"ofc32","전주1":"ofc33","전주2":"ofc34","청주1":"ofc35","청주2":"ofc36","폴라리스1":"ofc37","폴라리스2":"ofc38"};
+function isOfficeAcct(){return !!(S.me&&/^ofc\d+$/.test(S.me.emp_no||''));}
+function normEmp(v){v=String(v||'').trim();var ov=v.replace(/\s|사무소/g,'');if(OFFICE_IDS[ov])return OFFICE_IDS[ov];var d=v.replace(/\D/g,'');return (d.length>7&&d===v.replace(/[\s-]/g,''))?d.slice(-7):v;}
 function mrPw(emp){return 'daisso-'+String(emp||'').trim().toLowerCase();}
 var KIND={tool:'웹툴',site:'URL',brochure:'브로셔',notice:'공문',edu:'교육자료'};
 /* 자료 형태는 따로 고르지 않고 정해짐: 파일이면 PDF·이미지, 주소면 웹툴(tool)·URL(그 밖) */
@@ -950,7 +953,7 @@ function vLogin(){
     '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px">'+
       '<h1 class="logo" aria-label="일만사 다있소">'+logo()+'</h1><div class="rainbow" aria-hidden="true"></div>'+
       '<p style="margin:0;font-size:15px;color:var(--muted)"><span class="hl">툴</span> 찾느라 <span class="hl">툴툴</span>대던 날은 이제 끝!</p></div>'+
-    '<div class="fg"><label class="lb" for="empId">사번</label><input id="empId" class="field" inputmode="numeric" autocomplete="username" placeholder="사번을 입력하세요"></div>'+
+    '<div class="fg"><label class="lb" for="empId">사번 또는 사무소명</label><input id="empId" class="field" autocomplete="username" placeholder="사번 또는 사무소명을 입력하세요 (예: 사번 or 경인1)"></div>'+
     '<label class="chk"><input id="keep" type="checkbox" checked> 이 기기에서 로그인 유지</label>'+
     (LIVE?'':'<label class="chk"><input id="asAdmin" type="checkbox"> 관리자 화면까지 미리보기 <span class="preview-flag">미리보기 전용</span></label>')+
     (S.loginErr?'<div role="alert" style="color:var(--warn);font-size:14px;font-weight:700;text-align:center">'+esc(S.loginErr)+'</div>':'')+
@@ -1258,7 +1261,7 @@ function vStats(){
   var R=rows.filter(inScope);
   function sum(type,target){return R.filter(function(r){return r.type===type&&(target===undefined||r.target===target);}).reduce(function(a,r){return a+Number(r.cnt);},0);}
   var people=R.filter(function(r){return r.type==='any';}).reduce(function(a,r){return a+Number(r.people);},0);
-  var total=mem.filter(inScope).length;
+  var total=mem.filter(function(m){return inScope(m)&&!/^ofc\d+$/.test(m.emp_no||'');}).length; /* 사무소 계정은 인원 수에서 제외 */
   if(total&&people>total)people=total; /* 소속이 바뀐 사람은 집계 묶음이 둘로 나뉘어 두 번 셀 수 있어 등록 인원으로 맞춤 */
   var pct=total?Math.round(people/total*100):0;
   var reqs=(S.reqs||[]).filter(inScope);
@@ -1663,7 +1666,7 @@ document.addEventListener('click',function(e){
     case 'place':S.place=v;S.favOnly=false;break;
     case 'need':S.need=v;S.favOnly=false;break;
     case 'favOnly':S.favOnly=!S.favOnly;break;
-    case 'fav':
+    case 'fav':if(isOfficeAcct()){say('★ 즐겨찾기는 사번으로 로그인했을 때만 저장돼요.');break;}
       var on=!S.favs[v];if(on)S.favs[v]=true;else delete S.favs[v];track(on?'fav':'unfav',v);
       api.setFav(v,on).catch(function(err){if(on)delete S.favs[v];else S.favs[v]=true;fail(err);});break;
     case 'zoom':var zt=byId(v);if(zt&&THUMB[zt.file]){S.zoom=ZOOMS[zt.file]||THUMB[zt.file];track('open',v);}break;
@@ -1796,12 +1799,12 @@ document.addEventListener('submit',async function(e){
   try{
     if(f.id==='loginForm'){
       var emp=normEmp(val('empId'));
-      if(LIVE&&!emp){S.loginErr='사번을 넣어주세요.';render();return;}
+      if(LIVE&&!emp){S.loginErr='사번이나 사무소명을 넣어주세요.';render();return;}
       var pw=mrPw(emp);
       var keepOn=checked('keep'),asAdmin=checked('asAdmin');
       S.busy=true;S.loginErr='';render();
       try{var uid=await api.signIn(emp,pw,keepOn,asAdmin);await afterLogin(uid);track('login',null);}
-      catch(err){S.loginErr=err&&err.code==='bad'?'등록되지 않은 사번이에요. 담당 CM에게 문의해 주세요.':'지금 서버가 잠시 멈춰 있어요. 담당 CM에게 알려주세요.';S.uid=null;}
+      catch(err){S.loginErr=err&&err.code==='bad'?'등록되지 않은 사번이나 사무소명이에요. 담당 CM에게 문의해 주세요.':'지금 서버가 잠시 멈춰 있어요. 담당 CM에게 알려주세요.';S.uid=null;}
       S.busy=false;render();return;
     }
     if(f.id==='reqForm'){
